@@ -6,4 +6,5 @@ export default defineConfig([
   globalIgnores(['dist*/', '.astro/', 'node_modules/', 'materiali/', 'appunti/']),
   tseslint.configs.recommended,
   astro.configs.recommended,
+  astro.configs['jsx-a11y-recommended'],
 ]);

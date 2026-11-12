@@ -28,6 +28,7 @@
     "@types/node": "26.6.6",
     "eslint": "10.13.0",
     "eslint-plugin-astro": "3.2.1",
+    "eslint-plugin-jsx-a11y-x": "0.2.0",
     "linkedom": "0.18.14",
     "prettier": "3.9.10",
     "prettier-plugin-astro": "1.1.2",
