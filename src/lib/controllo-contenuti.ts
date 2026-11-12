@@ -125,7 +125,7 @@ const ESTENSIONE = { md: '.md', yaml: '.yaml' } as const;
 const NOME_FILE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
 /** Reads every collection from `src/content/<collection>/it/`. */
-function leggiContenuti(radice: string, problemi: Problema[]): Contenuti {
+export function leggiContenuti(radice: string, problemi: Problema[]): Contenuti {
   const contenuti = vuoto();
 
   for (const collezione of COLLEZIONI) {

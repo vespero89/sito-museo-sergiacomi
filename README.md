@@ -20,14 +20,16 @@ to turn the pre-commit hook on.
 
 ## Commands
 
-| Command                 | What it does                                                                                        |
-| ----------------------- | --------------------------------------------------------------------------------------------------- |
-| `npm run dev`           | Development server.                                                                                 |
-| `npm run build`         | Build into `dist/`.                                                                                 |
-| `npm test`              | Vitest: unit tests and tests on the built `dist/` (run `npm run build` first).                      |
-| `npm run content:check` | Content schemas, references between collections and `src/data/sito.yaml`.                           |
-| `npm run check`         | Everything the pre-commit hook runs: type check, ESLint, Prettier, content check, build and Vitest. |
-| `npm run format`        | Format all files with Prettier.                                                                     |
+| Command                    | What it does                                                                                        |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| `npm run dev`              | Development server.                                                                                 |
+| `npm run build`            | Build into `dist/`.                                                                                 |
+| `npm run build:production` | Production build. Stops with a list while anything is not confirmed (see "Unconfirmed content").    |
+| `npm test`                 | Vitest: unit tests and tests on the built `dist/` (run `npm run build` first).                      |
+| `npm run content:check`    | Content schemas, references between collections and `src/data/sito.yaml`.                           |
+| `npm run content:report`   | What is not confirmed yet, by collection and type.                                                  |
+| `npm run check`            | Everything the pre-commit hook runs: type check, ESLint, Prettier, content check, build and Vitest. |
+| `npm run format`           | Format all files with Prettier.                                                                     |
 
 The `check` command grows as the project does: later tasks add their own steps to it.
 
@@ -37,6 +39,16 @@ Content lives in `src/content/<collection>/it/` (Markdown with frontmatter, or Y
 `src/data/sito.yaml`. The schemas are in `src/lib/schemi.ts` and `src/lib/sito.ts`; the services registry
 is `src/data/servizi.ts`. Astro only logs a broken reference between collections and goes on, so
 `npm run content:check` checks every reference itself and lists all the bad ones.
+
+## Unconfirmed content
+
+Every entry has a `stato` (`confermato`, `da-confermare`, `segnaposto`) and a `daConfermare` list of
+single doubts; inside a text a doubt is marked `[[DA CONFERMARE: reason]]`. Places have `verificato`,
+images have `altVerificato`, and `src/data/sito.yaml` has its own `daConfermare` list. The preview shows
+all of it with the `DaConfermare` label (a listed `sito.yaml` field shows only the label, never the
+value). `npm run build:production` stops, with the list, while any of these is open. `ALLOW_OPEN_ITEMS=1`
+lets a production build go on, but only as a private preview: noindex, no sitemap, no `llms.txt`.
+`npm run content:report` is the working list for the content team.
 
 ## Git workflow
 

@@ -1,9 +1,11 @@
 import { defineConfig } from 'astro/config';
+import { bloccoProduzione } from './src/lib/blocco-produzione.ts';
 
 // Static output. Security headers and redirects live in config/hosting.mjs (later task),
 // not in Astro (`security.csp` stays off).
 export default defineConfig({
   output: 'static',
+  integrations: [bloccoProduzione()],
   trailingSlash: 'always',
   build: {
     format: 'directory',
