@@ -10,14 +10,16 @@ interface Props {
   opera: OperaCompleta;
   /** Show the town under the title (nearby works); the list is already grouped by town. */
   conComune?: boolean;
+  /** Name the photo for the page transition (only in the list: the name must be unique on a page). */
+  transizione?: boolean;
 }
-const { opera, conComune = false } = Astro.props;
+const { opera, conComune = false, transizione = false } = Astro.props;
 const { titolo, anno, materiali, categoria, daConfermare } = opera.voce.data;
 const notaAnno = daConfermare.find((d) => d.campo === 'anno')?.nota;
 ---
 
 <article class="carta">
-  <div class="foto">
+  <div class="foto" data-opera={transizione ? opera.slug : undefined}>
     <FotoOpera
       foto={opera.foto}
       categoria={categoria}

@@ -65,6 +65,7 @@ const datiJsonLd = {
   altOg={fotoUtile?.data.alt}
   jsonld={[operaJsonLd(datiJsonLd, Astro.site!), briciolaJsonLd(briciole, indirizzo, Astro.site!)]}
 >
+  <link slot="head" rel="stylesheet" href="/assets/vt-opere.css" />
   <article class="opera">
     <div class="intestazione">
       <h1>{titolo}</h1>
@@ -74,7 +75,7 @@ const datiJsonLd = {
 
     <div class="corpo">
       <div class="principale">
-        <figure class="figura">
+        <figure class="figura" data-opera={opera.slug}>
           <FotoOpera
             foto={opera.foto}
             categoria={categoria}

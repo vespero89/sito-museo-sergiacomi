@@ -63,6 +63,7 @@ const modalita = decidiModalita(process.env);
       immagineOg={immagineOg}
       altOg={altOg}
     />
+    <slot name="head" />
     {jsonld && <script type="application/ld+json" set:html={serializza(jsonld)} />}
   </head>
   <body>

@@ -41,6 +41,7 @@ const quante = (n: number) => (n === 1 ? t('opere.una') : t('opere.piu').replace
   briciole={briciole}
   jsonld={[briciolaJsonLd(briciole, '/opere/', Astro.site!)]}
 >
+  <link slot="head" rel="stylesheet" href="/assets/vt-opere.css" />
   <div class="intestazione">
     <h1>{titolo}</h1>
     <p class="intro">{t('opere.intro')}</p>
@@ -53,7 +54,7 @@ const quante = (n: number) => (n === 1 ? t('opere.una') : t('opere.piu').replace
       <ul class="schede">
         {lista.map((opera) => (
           <li>
-            <CartaOpera opera={opera} />
+            <CartaOpera opera={opera} transizione />
           </li>
         ))}
       </ul>

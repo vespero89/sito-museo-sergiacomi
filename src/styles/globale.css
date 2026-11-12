@@ -109,3 +109,12 @@ main:focus {
     scroll-behavior: auto;
   }
 }
+
+/* Page transitions between pages (spec 5.9): native CSS, no script. Only without a reduced-motion
+   preference; browsers that do not know the rule ignore it. The names of the photos of the works
+   are in /assets/vt-opere.css. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+}

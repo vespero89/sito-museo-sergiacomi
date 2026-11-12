@@ -10,6 +10,9 @@ export default defineConfig({
   testDir: 'tests/e2e',
   testMatch: '**/*.spec.ts',
   fullyParallel: true,
+  // One browser at a time: with several windows open at once, Chromium sometimes skips the page
+  // transition, and the transitions test would fail at random.
+  workers: 1,
   reporter: [['list']],
   use: { baseURL: ORIGINE },
   projects: [{ name: 'chromium', use: { browserName: 'chromium' } }],

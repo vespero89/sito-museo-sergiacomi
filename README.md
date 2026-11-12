@@ -72,6 +72,13 @@ characters, it is also the meta description; it never uses a field listed in `da
 entry replaces it). A work without a photo shows a panel "Foto in arrivo". `npm run content:report` also lists
 the work pages with fewer than 40 written words (they stay published).
 
+Page transitions: native CSS (`@view-transition` in `src/styles/globale.css`), only without
+`prefers-reduced-motion: reduce`; no script. The photo of a work grows from the card in `/opere/` to the top of its
+page: both carry `data-opera="<slug>"`, and the name `opera-<slug>` is written into `/assets/vt-opere.css`
+(`src/pages/assets/vt-opere.css.ts`, linked only from those pages) because the CSP forbids `style=""`. The name must
+be unique on a page, so the nearby works do not carry it. The e2e tests run with one worker: with several windows
+Chromium sometimes skips the transition.
+
 ## Unconfirmed content
 
 Every entry has a `stato` (`confermato`, `da-confermare`, `segnaposto`) and a `daConfermare` list of
