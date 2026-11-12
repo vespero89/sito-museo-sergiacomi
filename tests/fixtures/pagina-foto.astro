@@ -1,0 +1,17 @@
+---
+// Test-only page: it shows the Foto component on three real masters (a tall one, a small one,
+// a wide one). The build test in tests/build/foto.test.ts injects it as a route; it is not part of the site.
+import Foto from '../../src/components/Foto.astro';
+---
+
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <title>Prova foto</title>
+  </head>
+  <body>
+    <Foto id="tomba-palmucci-intera" sizes="100vw" priorita />
+    <Foto id="le-merlettaie-monumento-1" sizes="(min-width: 60em) 50vw, 100vw" />
+    <Foto id="sala-1-vista-1" sizes="100vw" />
+  </body>
+</html>

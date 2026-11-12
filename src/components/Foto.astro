@@ -1,0 +1,42 @@
+---
+// A photo of the `immagini` collection, optimised at build time (spec 7): AVIF and WebP with a
+// JPEG fallback, `srcset` and `sizes`, real `width` and `height` (no layout jump), lazy and
+// async. The `alt` comes from the collection and cannot be left out. `priorita` marks the one
+// image that is the largest in view: eager and high priority, one per page at most.
+// A photo is never enlarged: the widths stop at the real width of the file.
+import { Picture } from 'astro:assets';
+import { getEntry } from 'astro:content';
+import { larghezzePerSrcset } from '../lib/foto.ts';
+import { sorgenteFoto } from '../lib/foto-sorgenti.ts';
+
+interface Props {
+  /** Id of the photo in the `immagini` collection. */
+  id: string;
+  /** What the browser needs to pick a width, as in `<img sizes>`. Say how wide the photo is shown. */
+  sizes: string;
+  /** The largest image in view: eager and `fetchpriority="high"`. */
+  priorita?: boolean;
+  class?: string;
+  /** Lower the widest version (px), for photos shown small. */
+  larghezzaMax?: number;
+}
+
+const { id, sizes, priorita = false, class: classe, larghezzaMax } = Astro.props;
+
+const voce = await getEntry('immagini', id);
+if (!voce) throw new Error(`Foto: there is no photo "${id}" in the immagini collection`);
+
+const sorgente = await sorgenteFoto(voce.data.file);
+const larghezze = larghezzePerSrcset(sorgente.width, larghezzaMax ? { max: larghezzaMax } : {});
+---
+
+<Picture
+  src={sorgente}
+  alt={voce.data.decorativa ? '' : voce.data.alt}
+  widths={larghezze}
+  sizes={sizes}
+  formats={['avif', 'webp']}
+  fallbackFormat="jpeg"
+  priority={priorita}
+  class={classe}
+/>
