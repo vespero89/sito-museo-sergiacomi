@@ -8,6 +8,7 @@ luogo: fermo-monumento-ai-caduti
 immagini:
   - immagine: monumento-ai-caduti-fermo-monumento-1
     ruolo: monumento
+sala: sala-4
 fonti:
   - 'Elenco delle opere nel testo del sito della Fondazione (docx, 2022)'
 stato: da-confermare

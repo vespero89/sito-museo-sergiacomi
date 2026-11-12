@@ -6,6 +6,7 @@ nellElenco: true
 materiali: ['bronzo']
 luogo: offida-chiesa-di-sant-agostino
 edificio: 'Chiesa di S. Agostino'
+sala: sala-2
 fonti:
   - 'Elenco delle opere nel testo del sito della Fondazione (docx, 2022)'
   - "Vecchio sito museosergiacomi.it, pagina L'artista (testo tratto da www.museipiceni.it)"

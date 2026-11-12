@@ -8,6 +8,7 @@ luogo: offida
 immagini:
   - immagine: beato-bernardo-monumento-1
     ruolo: monumento
+sala: sala-2
 fonti:
   - 'Elenco delle opere nel testo del sito della Fondazione (docx, 2022)'
   - "Vecchio sito museosergiacomi.it, pagina L'artista (testo tratto da www.museipiceni.it)"

@@ -290,6 +290,9 @@
   origine: fondazione
   stato: confermato
   altVerificato: false
+  soggetto:
+    tipo: sala
+    id: sala-4
   fileOriginale: 3 - Sito Web/2 - Il Museo/Imagini - Museo - Sito Web/11- Tavolo Sergiacomi.jpeg
 - id: museo-tavolo-particolare-1
   file: museo-tavolo-particolare-1.jpg
@@ -297,6 +300,9 @@
   origine: fondazione
   stato: confermato
   altVerificato: false
+  soggetto:
+    tipo: sala
+    id: sala-4
   fileOriginale: 3 - Sito Web/2 - Il Museo/Imagini - Museo - Sito Web/12 -Particolare tavolo.jpeg
 - id: strumenti-1
   file: strumenti-1.jpg
@@ -325,6 +331,9 @@
   origine: fondazione
   stato: confermato
   altVerificato: false
+  soggetto:
+    tipo: sala
+    id: sala-1
   fileOriginale: 3 - Sito Web/2 - Il Museo/Imagini - Museo - Sito Web/13 - SALA1.jpg
 - id: le-merlettaie-copertina-1
   file: le-merlettaie-copertina-1.jpg

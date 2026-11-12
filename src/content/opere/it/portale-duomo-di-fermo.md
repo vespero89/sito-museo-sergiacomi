@@ -6,6 +6,7 @@ nellElenco: true
 materiali: ['bronzo']
 luogo: fermo-duomo
 edificio: 'Duomo di Fermo'
+sala: sala-4
 fonti:
   - 'Elenco delle opere nel testo del sito della Fondazione (docx, 2022)'
   - "Vecchio sito museosergiacomi.it, pagina L'artista (testo tratto da www.museipiceni.it)"

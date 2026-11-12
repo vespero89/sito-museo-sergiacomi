@@ -8,9 +8,9 @@ daConfermare:
   - campo: social
     nota: Profili social non ancora raccolti.
   - campo: sostegno.iban
-    nota: IBAN della Fondazione da riprendere dal vecchio sito e confermare.
+    nota: IBAN preso dal vecchio sito (2012), da confermare con la Fondazione.
   - campo: sostegno.intestatario
-    nota: Intestatario da confermare insieme all'IBAN.
+    nota: Intestatario ricavato dal piede del vecchio sito, da confermare insieme all'IBAN.
   - campo: sostegno.causale
     nota: Causale da concordare con la Fondazione.
 
@@ -76,6 +76,6 @@ navigazione:
         - { titolo: Accessibilità, href: /accessibilita/ }
 
 sostegno:
-  iban: ''
-  intestatario: ''
+  iban: IT17H0847469620000080101643
+  intestatario: Fondazione Lavoroperlapersona
   causale: ''

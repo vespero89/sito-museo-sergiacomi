@@ -16,6 +16,7 @@ immagini:
     ruolo: fonderia
   - immagine: sogno-del-pescatore-monumento-1
     ruolo: monumento
+sala: sala-3
 fonti:
   - 'Elenco delle opere nel testo del sito della Fondazione (docx, 2022)'
   - "Vecchio sito museosergiacomi.it, pagina L'artista (testo tratto da www.museipiceni.it)"
