@@ -117,6 +117,9 @@ export const TABELLA = [
     originale: `${OPERE}/12 - Cimitero Offida/Tomba Palmucci - Particolare 1 - Offida.png`,
     nuovo: 'tomba-palmucci-particolare-1.jpg',
   },
+  // Archive scans downloaded from the old site (third party: credited in immagini.yaml)
+  { originale: 'vecchio-sito/camilli.jpg', nuovo: 'archivio-articolo-camilli-1.jpg' },
+  { originale: 'vecchio-sito/pergamena.jpg', nuovo: 'archivio-pergamena-offida-1.jpg' },
   // Via crucis: five photos not attributed to any work (Offida 1952 or Teramo 1974, to be confirmed)
   { originale: `${OPERE}/3 - Via crucis/Via Crucis - I.jpg`, nuovo: 'via-crucis-1.jpg' },
   { originale: `${OPERE}/3 - Via crucis/Via Crucis - II.jpg`, nuovo: 'via-crucis-2.jpg' },

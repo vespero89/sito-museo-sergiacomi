@@ -347,3 +347,27 @@
     tipo: opera
     id: le-merlettaie
   fileOriginale: 3 - Sito Web/merlettaie1.jpeg
+- id: archivio-articolo-camilli-1
+  file: archivio-articolo-camilli-1.jpg
+  alt: 'Pagina di rivista in bianco e nero con il titolo Aldo Sergiacomi scultore in Offida, tre foto e due colonne di testo'
+  didascalia: 'Articolo di Serafino Camilli, rivista Flash, pagina 17.'
+  origine: terzi
+  credito: 'Serafino Camilli, rivista Flash'
+  stato: da-confermare
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/vecchio-sito/camilli.jpg
+  daConfermare:
+    - campo: credito
+      nota: 'Scansione presa dal vecchio sito: autore e permesso di pubblicazione da confermare'
+- id: archivio-pergamena-offida-1
+  file: archivio-pergamena-offida-1.jpg
+  alt: 'Pergamena miniata con cornice a fiori, due vedute di Offida e il nome Aldo Sergiacomi in grandi lettere rosse'
+  didascalia: 'Pergamena della Città di Offida, 27 luglio 1992.'
+  origine: terzi
+  credito: 'Città di Offida'
+  stato: da-confermare
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/vecchio-sito/pergamena.jpg
+  daConfermare:
+    - campo: credito
+      nota: 'Scansione presa dal vecchio sito: autore e permesso di pubblicazione da confermare'
