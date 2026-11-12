@@ -1,10 +1,14 @@
 import { defineConfig } from 'astro/config';
 import { bloccoProduzione } from './src/lib/blocco-produzione.ts';
+import { ORIGINE_PREDEFINITA } from './src/lib/seo.ts';
 import { potaOriginaliFoto } from './src/lib/pota-originali.ts';
 
 // Static output. Security headers and redirects live in config/hosting.mjs (later task),
 // not in Astro (`security.csp` stays off).
 export default defineConfig({
+  // Origin for canonical and Open Graph addresses. The domain is not decided yet: set SITE_URL
+  // when it is (the default is a reserved placeholder that never resolves).
+  site: process.env.SITE_URL || ORIGINE_PREDEFINITA,
   output: 'static',
   integrations: [bloccoProduzione(), potaOriginaliFoto()],
   trailingSlash: 'always',
