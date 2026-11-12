@@ -37,5 +37,17 @@
   "sostieni.causale": "Causale",
   "pubblicazioni.titolo": "Pubblicazioni",
   "pubblicazioni.descrizione": "Libri e testi su Aldo Sergiacomi e sulla sua opera, pubblicati o consigliati dalla Fondazione Lavoroperlapersona.",
-  "pubblicazioni.intro": "Qui troverai i libri su Aldo Sergiacomi. Non vendiamo nulla da questo sito: indichiamo dove trovarli."
+  "pubblicazioni.intro": "Qui troverai i libri su Aldo Sergiacomi. Non vendiamo nulla da questo sito: indichiamo dove trovarli.",
+  "galleria.chiudi": "Chiudi",
+  "galleria.precedente": "Foto precedente",
+  "galleria.successiva": "Foto successiva",
+  "galleria.contatore": "{n} di {tot}",
+  "pianta.titolo": "Pianta del museo",
+  "pianta.descrizione": "Schema dei quattro ambienti del museo: le sale, il laboratorio, il chiostro e gli spazi dei laboratori. Ogni riquadro porta alla pagina dell'ambiente.",
+  "pianta.etichetta": "Gli ambienti del museo",
+  "ambienti.strumenti": "Gli strumenti",
+  "ambienti.inMostra": "In mostra",
+  "ambienti.schedaOpera": "Vai alla scheda dell'opera",
+  "ambienti.didattica": "Le attività dei laboratori sono nella pagina Didattica",
+  "ambienti.doveSiSvolgono": "I laboratori si svolgono negli spazi della Fondazione"
 }

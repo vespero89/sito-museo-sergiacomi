@@ -12,12 +12,14 @@ interface Props {
   voce: CollectionEntry<'pagine'>;
   /** JSON-LD nodes of the page, besides the breadcrumb which is added here. */
   jsonld?: NodoJsonLd[];
+  /** The page above this one, when the address is under another page (for example `/il-museo/`). */
+  padre?: { titolo: string; href: string };
 }
-const { voce, jsonld = [] } = Astro.props;
+const { voce, jsonld = [], padre } = Astro.props;
 const { titolo, descrizione, slug, stato, daConfermare } = voce.data;
-const indirizzo = `/${slug}/`;
+const indirizzo = `${padre?.href ?? '/'}${slug}/`;
 const { Content } = await render(voce);
-const briciole = [{ titolo: t('briciole.home'), href: '/' }, { titolo }];
+const briciole = [{ titolo: t('briciole.home'), href: '/' }, ...(padre ? [padre] : []), { titolo }];
 ---
 
 <Base

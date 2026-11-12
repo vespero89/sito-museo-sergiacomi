@@ -1,0 +1,61 @@
+---
+// The tools of the workshop (raspe, scalpelli, mole): one card per entry of `strumenti`, with its
+// photo, name and text. Names and uses are placeholders until the Foundation gives them.
+import { getCollection, render } from 'astro:content';
+import Dubbi from './Dubbi.astro';
+import Foto from './Foto.astro';
+
+const voci = (await getCollection('strumenti')).sort((a, b) => a.id.localeCompare(b.id));
+const strumenti = await Promise.all(
+  voci.map(async (voce) => ({ voce, Contenuto: (await render(voce)).Content })),
+);
+---
+
+<ul class="strumenti">
+  {strumenti.map(({ voce, Contenuto }) => (
+    <li class="strumento">
+      <Foto
+        id={voce.data.immagine.id}
+        sizes="(min-width: 64em) 22rem, (min-width: 40em) 50vw, 100vw"
+      />
+      <div class="dettagli">
+        <h3>{voce.data.nome}</h3>
+        <Dubbi stato={voce.data.stato} dubbi={voce.data.daConfermare} />
+        <Contenuto />
+      </div>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .strumenti {
+    display: grid;
+    gap: var(--spazio-5);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .strumento {
+    overflow: hidden;
+    background: var(--colore-superficie);
+    border: 1px solid var(--colore-bordo);
+    border-radius: var(--raggio-m);
+  }
+  .strumento :global(img) {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+  .dettagli {
+    padding: var(--spazio-4) var(--spazio-5) var(--spazio-5);
+  }
+  h3 {
+    margin-block: 0 var(--spazio-2);
+    font-size: var(--testo-xl);
+  }
+  .dettagli :global(p) {
+    margin-block: 0 var(--spazio-3);
+  }
+</style>

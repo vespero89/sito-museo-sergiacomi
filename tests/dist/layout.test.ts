@@ -16,13 +16,15 @@ describe('layout of every built page', () => {
     expect(document.querySelectorAll('footer')).toHaveLength(1);
   });
 
-  it.each(pagine)('%s: the menu is a native popover with a button, no script', (_path, document) => {
+  it.each(pagine)('%s: the menu is a native popover with a button, no script of its own', (_path, document) => {
     const bottone = document.querySelector('button[popovertarget]');
     const menu = document.getElementById(bottone!.getAttribute('popovertarget')!);
     expect(menu?.tagName).toBe('NAV');
     expect(menu?.hasAttribute('popover')).toBe(true);
-    // A JSON-LD script is data, not code.
-    expect(document.querySelectorAll('script:not([type="application/ld+json"])')).toHaveLength(0);
+    // A JSON-LD script is data, not code. The only code is the gallery's own file, on pages that have one.
+    const codice = document.querySelectorAll('script:not([type="application/ld+json"])');
+    expect(codice).toHaveLength(document.querySelector('[data-galleria]') ? 1 : 0);
+    for (const script of codice) expect(script.getAttribute('src')).toMatch(/^\/_astro\/Galleria/);
   });
 
   it.each(pagine)('%s: the menu items come from sito.yaml', (_path, document) => {

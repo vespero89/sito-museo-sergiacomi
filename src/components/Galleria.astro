@@ -1,0 +1,232 @@
+---
+// Photo gallery (spec 5.5). Without JavaScript: a grid of thumbnails, each a link to the large
+// image file, with its caption. With JavaScript: a click opens a native modal <dialog> (Esc closes
+// it; the browser traps the focus) with the large photo, caption, previous and next buttons
+// (arrow keys too) and a counter. The script gives the focus back to the link that opened the
+// dialog; it does not rely on the browser for that. No autoplay, no slide animation.
+// The photo in the dialog is a copy of the thumbnail's <picture>, so it keeps the srcset and the
+// `alt` of the `immagini` collection and no <img> is written by hand.
+import { getImage } from 'astro:assets';
+import { getEntry } from 'astro:content';
+import { t } from '../i18n/index.ts';
+import { sorgenteFoto } from '../lib/foto-sorgenti.ts';
+import Foto from './Foto.astro';
+
+interface Props {
+  /** Ids of the photos in the `immagini` collection, two or more. */
+  immagini: string[];
+  /** Names the gallery for the screen reader (the dialog label). */
+  titolo: string;
+  /** Makes the element ids unique when a page has more than one gallery. */
+  id: string;
+}
+const { immagini, titolo, id } = Astro.props;
+const LARGHEZZA_GRANDE = 1600;
+
+const foto = await Promise.all(
+  immagini.map(async (idFoto) => {
+    const voce = await getEntry('immagini', idFoto);
+    if (!voce)
+      throw new Error(`Galleria: there is no photo "${idFoto}" in the immagini collection`);
+    const sorgente = await sorgenteFoto(voce.data.file);
+    const grande = await getImage({
+      src: sorgente,
+      width: Math.min(sorgente.width, LARGHEZZA_GRANDE),
+      format: 'jpeg',
+    });
+    return { id: idFoto, href: grande.src, didascalia: voce.data.didascalia, alt: voce.data.alt };
+  }),
+);
+const idTitolo = `${id}-titolo`;
+---
+
+<div class="galleria" data-galleria data-contatore={t('galleria.contatore')}>
+  <ul class="miniature">
+    {foto.map((f) => (
+      <li>
+        <figure>
+          <a class="apri" href={f.href} data-testo={f.didascalia ?? ''}>
+            <Foto id={f.id} sizes="(min-width: 48em) 28rem, 50vw" />
+          </a>
+          {f.didascalia && <figcaption>{f.didascalia}</figcaption>}
+        </figure>
+      </li>
+    ))}
+  </ul>
+
+  <dialog class="dialogo" aria-labelledby={idTitolo}>
+    <div class="barra">
+      <p class="titolo" id={idTitolo}>
+        {titolo}
+      </p>
+      <button type="button" class="chiudi">
+        {t('galleria.chiudi')}
+      </button>
+    </div>
+    <div class="immagine" data-immagine></div>
+    <p class="didascalia" aria-live="polite" data-didascalia></p>
+    <div class="comandi">
+      <button type="button" class="precedente">
+        {t('galleria.precedente')}
+      </button>
+      <button type="button" class="successiva">
+        {t('galleria.successiva')}
+      </button>
+    </div>
+  </dialog>
+</div>
+
+<script>
+  const SIZES_DIALOGO = '(min-width: 64em) 60rem, 94vw';
+
+  function avvia(radice: HTMLElement) {
+    const dialogo = radice.querySelector('dialog');
+    const link = [...radice.querySelectorAll<HTMLAnchorElement>('a.apri')];
+    const contenitore = radice.querySelector<HTMLElement>('[data-immagine]');
+    const didascalia = radice.querySelector<HTMLElement>('[data-didascalia]');
+    if (!dialogo || !contenitore || !didascalia || typeof dialogo.showModal !== 'function') return;
+
+    const modello = radice.dataset['contatore'] ?? '{n} / {tot}';
+    let indice = 0;
+    let apritore: HTMLElement | null = null;
+
+    function mostra(nuovo: number) {
+      indice = (nuovo + link.length) % link.length;
+      const corrente = link[indice]!;
+      const copia = corrente.querySelector('picture')!.cloneNode(true) as HTMLElement;
+      copia.querySelectorAll('source, img').forEach((e) => e.setAttribute('sizes', SIZES_DIALOGO));
+      copia.querySelector('img')!.setAttribute('loading', 'eager');
+      contenitore!.replaceChildren(copia);
+      const contatore = modello
+        .replace('{n}', String(indice + 1))
+        .replace('{tot}', String(link.length));
+      const testo = corrente.dataset['testo'] || copia.querySelector('img')!.alt;
+      didascalia!.textContent = `${contatore}. ${testo}`;
+    }
+
+    link.forEach((a, i) => {
+      a.addEventListener('click', (evento) => {
+        evento.preventDefault();
+        apritore = a;
+        mostra(i);
+        dialogo.showModal();
+      });
+    });
+    radice.querySelector('.chiudi')!.addEventListener('click', () => dialogo.close());
+    radice.querySelector('.precedente')!.addEventListener('click', () => mostra(indice - 1));
+    radice.querySelector('.successiva')!.addEventListener('click', () => mostra(indice + 1));
+    dialogo.addEventListener('keydown', (evento) => {
+      if (evento.key === 'ArrowLeft') mostra(indice - 1);
+      if (evento.key === 'ArrowRight') mostra(indice + 1);
+    });
+    // A click on the backdrop (the dialog itself, outside its content) closes it.
+    dialogo.addEventListener('click', (evento) => {
+      if (evento.target === dialogo) dialogo.close();
+    });
+    // Esc and the buttons both end here: the focus goes back to the thumbnail that opened it.
+    dialogo.addEventListener('close', () => {
+      apritore?.focus();
+      apritore = null;
+      contenitore.replaceChildren();
+    });
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-galleria]').forEach(avvia);
+</script>
+
+<style>
+  .miniature {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+    gap: var(--spazio-4);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  figure {
+    margin: 0;
+  }
+  .apri {
+    display: block;
+    overflow: hidden;
+    border-radius: var(--raggio-m);
+    box-shadow: var(--ombra-m);
+  }
+  .apri :global(img) {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    transition: transform var(--durata-m) var(--curva);
+  }
+  .apri:hover :global(img) {
+    transform: scale(1.04);
+  }
+  figcaption {
+    margin-block-start: var(--spazio-2);
+    font-size: var(--testo-s);
+    color: var(--colore-testo-tenue);
+  }
+
+  .dialogo {
+    width: min(100% - 2 * var(--spazio-3), 64rem);
+    max-width: none;
+    max-height: calc(100dvh - 2 * var(--spazio-3));
+    padding: var(--spazio-4);
+    border: 0;
+    border-radius: var(--raggio-m);
+    background: var(--colore-scuro);
+    color: var(--colore-sul-scuro);
+  }
+  .dialogo::backdrop {
+    background: rgb(20 16 12 / 0.8);
+  }
+  .barra,
+  .comandi {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spazio-3);
+  }
+  .titolo {
+    margin: 0;
+    font-family: var(--font-titoli);
+    font-size: var(--testo-l);
+  }
+  .immagine {
+    margin-block: var(--spazio-3);
+  }
+  .immagine :global(img) {
+    display: block;
+    max-width: 100%;
+    max-height: 62dvh;
+    margin-inline: auto;
+    object-fit: contain;
+  }
+  .didascalia {
+    min-height: 3em;
+    margin: 0 0 var(--spazio-3);
+    color: var(--colore-sul-scuro-tenue);
+  }
+  .dialogo button {
+    min-height: var(--bersaglio-min);
+    padding-inline: var(--spazio-4);
+    border: 2px solid var(--colore-sul-scuro);
+    border-radius: var(--raggio-pieno);
+    background: transparent;
+    color: var(--colore-sul-scuro);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .dialogo button:hover {
+    background: var(--colore-sul-scuro);
+    color: var(--colore-scuro);
+  }
+  .dialogo :focus-visible {
+    outline-color: var(--colore-sul-scuro);
+  }
+  :global(body:has(dialog[open])) {
+    overflow: hidden;
+  }
+</style>

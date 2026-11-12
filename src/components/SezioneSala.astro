@@ -1,0 +1,86 @@
+---
+// One room of the museum as a section of a page (spec 11): name, text, what is on show, photos.
+// Two or more photos make a gallery, one is shown on its own. The section has the room id as its
+// anchor (`#sala-1`), so a work that is in that room can point to it.
+import { render, type CollectionEntry } from 'astro:content';
+import { t } from '../i18n/index.ts';
+import Dubbi from './Dubbi.astro';
+import Foto from './Foto.astro';
+import Galleria from './Galleria.astro';
+
+interface Props {
+  sala: CollectionEntry<'sale'>;
+}
+const { sala } = Astro.props;
+const { nome, esposti, immagini, stato, daConfermare } = sala.data;
+const { Content } = await render(sala);
+const foto = immagini.map((i) => i.id);
+const idTitolo = `${sala.id}-titolo`;
+---
+
+<section class="sala" id={sala.id} aria-labelledby={idTitolo}>
+  <h2 id={idTitolo}>{nome}</h2>
+  <Dubbi stato={stato} dubbi={daConfermare} />
+  <div class="corpo">
+    <div class="testo">
+      <Content />
+      {esposti && (
+        <p class="esposti">
+          <strong>{t('ambienti.inMostra')}:</strong> {esposti}
+        </p>
+      )}
+    </div>
+    {foto.length === 1 && (
+      <figure class="foto">
+        <Foto id={foto[0]!} sizes="(min-width: 64em) 32rem, 100vw" />
+      </figure>
+    )}
+  </div>
+  {foto.length > 1 && <Galleria immagini={foto} titolo={nome} id={`galleria-${sala.id}`} />}
+</section>
+
+<style>
+  .sala {
+    padding-block: var(--spazio-6);
+    border-block-start: 1px solid var(--colore-bordo);
+    scroll-margin-block-start: var(--spazio-4);
+  }
+  h2 {
+    font-size: var(--testo-2xl);
+    margin-block: 0 var(--spazio-3);
+    color: var(--colore-accento-scuro);
+  }
+  .corpo {
+    display: grid;
+    gap: var(--spazio-5);
+    margin-block-end: var(--spazio-5);
+  }
+  @media (min-width: 64em) {
+    .corpo:has(.foto) {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+  .testo {
+    max-width: var(--larghezza-testo);
+    font-size: var(--testo-l);
+  }
+  .testo :global(p) {
+    margin-block: 0 var(--spazio-4);
+  }
+  .esposti {
+    padding: var(--spazio-3) var(--spazio-4);
+    background: var(--colore-superficie-calda);
+    border-radius: var(--raggio-m);
+    font-size: var(--testo-m);
+  }
+  .foto {
+    margin: 0;
+  }
+  .foto :global(img) {
+    display: block;
+    width: 100%;
+    border-radius: var(--raggio-m);
+    box-shadow: var(--ombra-m);
+  }
+</style>

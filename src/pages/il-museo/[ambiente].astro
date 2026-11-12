@@ -1,0 +1,88 @@
+---
+// The four environments of the museum (spec 11, change of 12/11), one page each under /il-museo/.
+// The address of each comes from the `slug` of its `pagine` entry (src/lib/ambienti.ts).
+import { getCollection, getEntry } from 'astro:content';
+import Galleria from '../../components/Galleria.astro';
+import ListaStrumenti from '../../components/ListaStrumenti.astro';
+import SezioneSala from '../../components/SezioneSala.astro';
+import { t } from '../../i18n/index.ts';
+import PaginaTesto from '../../layouts/PaginaTesto.astro';
+import { AMBIENTE_DELLE_SALE, type Ambiente } from '../../lib/ambienti.ts';
+import { leggiAmbienti, leggiAmbiente } from '../../lib/ambienti-dati.ts';
+
+export async function getStaticPaths() {
+  const ambienti = await leggiAmbienti();
+  return ambienti.map(({ ambiente, voce }) => ({
+    params: { ambiente: voce.data.slug },
+    props: { ambiente },
+  }));
+}
+
+const { ambiente } = Astro.props as { ambiente: Ambiente };
+const { voce } = await leggiAmbiente(ambiente);
+const museo = (await getEntry('pagine', 'il-museo'))!;
+const padre = { titolo: museo.data.titolo, href: '/il-museo/' };
+
+const sale = await getCollection('sale');
+const salePerId = (id: string) => sale.find((s) => s.id === id)!;
+
+// The photos of the cloister: the first realisation of the Merlettaie and the story of the work.
+const FOTO_CHIOSTRO = [
+  'le-merlettaie-copertina-1',
+  'le-merlettaie-ritratto-1',
+  'le-merlettaie-bozzetto-1',
+];
+// The work page does not exist until the works task: link to it only when it does.
+const esisteSchedaOpere = Object.keys(import.meta.glob('../opere/*.astro')).length > 0;
+---
+
+<PaginaTesto voce={voce} padre={padre}>
+  {ambiente === 'le-sale' && AMBIENTE_DELLE_SALE.map((id) => <SezioneSala sala={salePerId(id)} />)}
+
+  {ambiente === 'il-laboratorio' && (
+    <>
+      <SezioneSala sala={salePerId('sala-4')} />
+      <section class="strumenti" aria-labelledby="strumenti-titolo">
+        <h2 id="strumenti-titolo">{t('ambienti.strumenti')}</h2>
+        <ListaStrumenti />
+      </section>
+    </>
+  )}
+
+  {ambiente === 'il-chiostro' && (
+    <section class="chiostro">
+      <Galleria immagini={FOTO_CHIOSTRO} titolo={voce.data.titolo} id="galleria-chiostro" />
+      {esisteSchedaOpere && (
+        <p class="collegamento">
+          <a href="/opere/le-merlettaie/">{t('ambienti.schedaOpera')}: Le Merlettaie</a>
+        </p>
+      )}
+    </section>
+  )}
+
+  {ambiente === 'spazi-fondazione' && (
+    <p class="collegamento">
+      <a href="/didattica/">{t('ambienti.didattica')}</a>
+    </p>
+  )}
+</PaginaTesto>
+
+<style>
+  .strumenti {
+    padding-block: var(--spazio-6);
+    border-block-start: 1px solid var(--colore-bordo);
+  }
+  .strumenti h2 {
+    margin-block: 0 var(--spazio-4);
+    font-size: var(--testo-2xl);
+    color: var(--colore-accento-scuro);
+  }
+  .chiostro {
+    margin-block-start: var(--spazio-5);
+  }
+  .collegamento {
+    margin-block: var(--spazio-5) 0;
+    font-size: var(--testo-l);
+    font-weight: 600;
+  }
+</style>

@@ -3,8 +3,10 @@ import { getCollection, getEntry, render } from 'astro:content';
 import Dubbi from '../components/Dubbi.astro';
 import { t } from '../i18n/index.ts';
 import PaginaTesto from '../layouts/PaginaTesto.astro';
+import { leggiAmbiente } from '../lib/ambienti-dati.ts';
 
 const voce = (await getEntry('pagine', 'didattica'))!;
+const spazi = await leggiAmbiente('spazi-fondazione');
 const tutte = await getCollection('didattica');
 const gruppi = await Promise.all(
   [
@@ -23,6 +25,9 @@ const gruppi = await Promise.all(
 ---
 
 <PaginaTesto voce={voce}>
+  <p class="dove">
+    <a href={spazi.indirizzo}>{t('ambienti.doveSiSvolgono')}</a>
+  </p>
   {gruppi
     .filter((g) => g.schede.length > 0)
     .map((gruppo) => (
@@ -47,6 +52,11 @@ const gruppi = await Promise.all(
 </PaginaTesto>
 
 <style>
+  .dove {
+    margin-block: var(--spazio-5) 0;
+    font-size: var(--testo-l);
+    font-weight: 600;
+  }
   .gruppo {
     margin-block-start: var(--spazio-6);
   }

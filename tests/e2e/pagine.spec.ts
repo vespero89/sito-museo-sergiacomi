@@ -10,6 +10,15 @@ const PAGINE = [
   { nome: 'Sostieni', indirizzo: '/sostieni/', stato: 200 },
   { nome: 'Didattica', indirizzo: '/didattica/', stato: 200 },
   { nome: 'Pubblicazioni', indirizzo: '/pubblicazioni/', stato: 200 },
+  { nome: 'Il Museo', indirizzo: '/il-museo/', stato: 200 },
+  { nome: 'Le sale', indirizzo: '/il-museo/le-sale/', stato: 200 },
+  { nome: 'Il laboratorio', indirizzo: '/il-museo/il-laboratorio/', stato: 200 },
+  { nome: 'Il chiostro', indirizzo: '/il-museo/il-chiostro/', stato: 200 },
+  {
+    nome: 'Gli spazi dei laboratori',
+    indirizzo: '/il-museo/gli-spazi-dei-laboratori/',
+    stato: 200,
+  },
 ];
 const SCHERMI = [
   { nome: 'phone 390', vista: TELEFONO },
