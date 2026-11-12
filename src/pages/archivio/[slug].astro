@@ -1,0 +1,172 @@
+---
+// A document of the archive (task 14): the scan or photo, what it is, its source and credit, and
+// the works and rooms it is linked to.
+import { getCollection, getEntry, render } from 'astro:content';
+import Dubbi from '../../components/Dubbi.astro';
+import Foto from '../../components/Foto.astro';
+import { t, type ChiaveUi } from '../../i18n/index.ts';
+import Base from '../../layouts/Base.astro';
+import { indirizzoSala } from '../../lib/ambienti.ts';
+import { briciole as briciolaJsonLd } from '../../lib/jsonld.ts';
+
+export async function getStaticPaths() {
+  return (await getCollection('archivio')).map((voce) => ({
+    params: { slug: voce.id },
+    props: { voce },
+  }));
+}
+
+const { voce } = Astro.props;
+const {
+  titolo,
+  tipo,
+  data,
+  dataTesto,
+  descrizione,
+  file,
+  fonte,
+  origine,
+  credito,
+  stato,
+  daConfermare,
+} = voce.data;
+const { Content } = await render(voce);
+const opere = await Promise.all(voce.data.opere.map((o) => getEntry('opere', o.id)));
+const sale = await Promise.all(voce.data.sale.map((s) => getEntry('sale', s.id)));
+const indirizzo = `/archivio/${voce.id}/`;
+const briciole = [
+  { titolo: t('briciole.home'), href: '/' },
+  { titolo: t('archivio.titolo'), href: '/archivio/' },
+  { titolo },
+];
+---
+
+<Base
+  titolo={titolo}
+  descrizione={descrizione}
+  indirizzo={indirizzo}
+  briciole={briciole}
+  jsonld={[briciolaJsonLd(briciole, indirizzo, Astro.site!)]}
+>
+  <article class="documento">
+    <div class="intestazione">
+      <h1>{titolo}</h1>
+      <Dubbi stato={stato} dubbi={daConfermare} />
+    </div>
+    <div class="corpo">
+      {file && (
+        <figure class="figura">
+          <Foto id={file.id} sizes="(min-width: 56em) 28rem, 100vw" priorita larghezzaMax={800} />
+        </figure>
+      )}
+      <div class="testo">
+        <p class="descrizione">{descrizione}</p>
+        <Content />
+        <dl class="fatti">
+          <div>
+            <dt>{t(('archivio.tipoUno.' + tipo) as ChiaveUi)}</dt>
+            <dd>{dataTesto ?? data}</dd>
+          </div>
+          {fonte && (
+            <div>
+              <dt>{t('archivio.fonte')}</dt>
+              <dd>{fonte}</dd>
+            </div>
+          )}
+          {origine === 'terzi' && credito && (
+            <div>
+              <dt>{t('archivio.credito')}</dt>
+              <dd>{credito}</dd>
+            </div>
+          )}
+        </dl>
+        {opere.length > 0 && (
+          <section aria-labelledby="opere-titolo">
+            <h2 id="opere-titolo">{t('archivio.opere')}</h2>
+            <ul>
+              {opere.map((o) => (
+                <li>
+                  <a href={`/opere/${o!.id}/`}>{o!.data.titolo}</a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+        {sale.length > 0 && (
+          <section aria-labelledby="sale-titolo">
+            <h2 id="sale-titolo">{t('archivio.sale')}</h2>
+            <ul>
+              {sale.map((s) => (
+                <li>
+                  <a href={indirizzoSala(s!.id)}>{s!.data.nome}</a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </div>
+    </div>
+  </article>
+</Base>
+
+<style>
+  .documento {
+    padding-block-end: var(--spazio-6);
+  }
+  .intestazione {
+    padding-block: var(--spazio-5) var(--spazio-4);
+    border-block-end: 1px solid var(--colore-bordo);
+    margin-block-end: var(--spazio-5);
+  }
+  h1 {
+    font-size: var(--testo-3xl);
+    margin-block-end: 0;
+  }
+  .corpo {
+    display: grid;
+    gap: var(--spazio-5);
+  }
+  @media (min-width: 56em) {
+    .corpo {
+      grid-template-columns: minmax(0, 28rem) minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+  .figura {
+    margin: 0;
+  }
+  .figura :global(img) {
+    display: block;
+    width: 100%;
+    border-radius: var(--raggio-m);
+    box-shadow: var(--ombra-m);
+  }
+  .descrizione {
+    margin-block-start: 0;
+    font-size: var(--testo-l);
+  }
+  .fatti {
+    margin: var(--spazio-5) 0;
+    padding: var(--spazio-4) var(--spazio-5);
+    background: var(--colore-superficie-calda);
+    border-radius: var(--raggio-m);
+  }
+  .fatti div + div {
+    margin-block-start: var(--spazio-3);
+  }
+  dt {
+    font-size: var(--testo-s);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--colore-testo-tenue);
+  }
+  dd {
+    margin: 0;
+    font-weight: 600;
+  }
+  h2 {
+    margin-block: var(--spazio-5) var(--spazio-3);
+    font-size: var(--testo-xl);
+    color: var(--colore-accento-scuro);
+  }
+</style>

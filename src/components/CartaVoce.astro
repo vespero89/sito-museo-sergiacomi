@@ -1,0 +1,80 @@
+---
+// A card for a page of the site (itinerary, event, document, path): a photo if there is one, the
+// title as the link that covers the whole card, a line of facts and a short text.
+import Dubbi from './Dubbi.astro';
+import Foto from './Foto.astro';
+
+interface Props {
+  titolo: string;
+  href: string;
+  /** A line under the title: date, type, number of stops. */
+  dati?: string | undefined;
+  testo?: string | undefined;
+  /** Id of a photo in the `immagini` collection. */
+  foto?: string | undefined;
+  stato?: 'confermato' | 'da-confermare' | 'segnaposto' | undefined;
+  dubbi?: { campo: string; nota: string }[] | undefined;
+  /** Heading level of the title: 2 on a list, 3 under a section heading. */
+  livello?: 2 | 3;
+}
+const { titolo, href, dati, testo, foto, stato, dubbi, livello = 3 } = Astro.props;
+const Titolo = `h${livello}` as 'h2' | 'h3';
+---
+
+<article class="carta">
+  {foto && (
+    <div class="foto">
+      <Foto id={foto} sizes="(min-width: 40em) 22rem, 100vw" larghezzaMax={400} />
+    </div>
+  )}
+  <div class="testo">
+    <Titolo>
+      <a href={href}>{titolo}</a>
+    </Titolo>
+    {dati && <p class="dati">{dati}</p>}
+    {testo && <p>{testo}</p>}
+    {stato && <Dubbi stato={stato} dubbi={dubbi} />}
+  </div>
+</article>
+
+<style>
+  .carta {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--colore-superficie);
+    border: 1px solid var(--colore-bordo);
+    border-radius: var(--raggio-m);
+    box-shadow: var(--ombra-m);
+    overflow: hidden;
+  }
+  .foto :global(img) {
+    display: block;
+    width: 100%;
+    height: 14rem;
+    object-fit: cover;
+  }
+  .testo {
+    padding: var(--spazio-4) var(--spazio-5) var(--spazio-5);
+  }
+  .testo :global(h2),
+  .testo :global(h3) {
+    margin-block: 0 var(--spazio-2);
+    font-size: var(--testo-xl);
+  }
+  /* The link covers the card: one target for the pointer and one stop for the keyboard. */
+  .testo :global(h2 a)::after,
+  .testo :global(h3 a)::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .dati {
+    margin-block: 0 var(--spazio-2);
+    color: var(--colore-testo-tenue);
+  }
+  p {
+    margin-block: 0 var(--spazio-2);
+  }
+</style>

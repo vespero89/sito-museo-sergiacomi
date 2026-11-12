@@ -99,6 +99,10 @@ The menu is a native `popover`: no JavaScript. Interface texts are in `src/i18n/
 `SITE_URL` (a placeholder domain until the real one is decided). Pages that the menu points at but that do
 not exist yet are listed in `tests/dist/pagine-future.json`: each task removes its own entries.
 
+## Next event
+
+The "next event" (`/eventi/` and the home page) is worked out at build time with the day in Rome (`src/lib/date.ts`): an event is next until the end of its last day. The site is static, so it shows the answer of its last build, and an event that has passed can stay on screen until the next deploy. There is no scheduled rebuild and no client code for it (accepted limit, 12/11/2026).
+
 ## Hosting
 
 `config/hosting.mjs` is the single source of the security headers, the CSP and the 301 redirects from the

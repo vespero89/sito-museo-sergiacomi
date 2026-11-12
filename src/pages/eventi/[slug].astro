@@ -1,0 +1,160 @@
+---
+// An event or an initiative (task 14). Only a dated event has an Event JSON-LD (spec 6.2).
+import { getCollection, render } from 'astro:content';
+import Dubbi from '../../components/Dubbi.astro';
+import Foto from '../../components/Foto.astro';
+import { t } from '../../i18n/index.ts';
+import Base from '../../layouts/Base.astro';
+import { indirizzoEvento, testoData } from '../../lib/eventi-dati.ts';
+import { briciole as briciolaJsonLd, evento as eventoJsonLd } from '../../lib/jsonld.ts';
+
+export async function getStaticPaths() {
+  return (await getCollection('eventi')).map((voce) => ({
+    params: { slug: voce.id },
+    props: { voce },
+  }));
+}
+
+const { voce } = Astro.props;
+const {
+  titolo,
+  tipo,
+  descrizione,
+  data,
+  dataFine,
+  ora,
+  luogo,
+  immagine,
+  link,
+  stato,
+  daConfermare,
+} = voce.data;
+const { Content } = await render(voce);
+const meta = descrizione ?? t('evento.descrizioneBase');
+const indirizzo = indirizzoEvento(voce.id);
+const briciole = [
+  { titolo: t('briciole.home'), href: '/' },
+  { titolo: t('eventi.titolo'), href: '/eventi/' },
+  { titolo },
+];
+// A date that is in doubt is not data (spec 6.2).
+const dataSicura = daConfermare.some((d) => d.campo === 'data') ? undefined : data;
+---
+
+<Base
+  titolo={titolo}
+  descrizione={meta}
+  indirizzo={indirizzo}
+  briciole={briciole}
+  jsonld={[
+    ...(tipo === 'evento'
+      ? [
+          eventoJsonLd(
+            { slug: voce.id, titolo, descrizione: meta, data: dataSicura, dataFine, ora, luogo },
+            Astro.site!,
+          ),
+        ]
+      : []),
+    briciolaJsonLd(briciole, indirizzo, Astro.site!),
+  ]}
+>
+  <article class="evento">
+    <div class="intestazione">
+      <h1>{titolo}</h1>
+      <Dubbi stato={stato} dubbi={daConfermare} />
+    </div>
+    <div class="corpo">
+      <div class="testo">
+        <Content />
+      </div>
+      <dl class="fatti">
+        {testoData(voce.data) && (
+          <div>
+            <dt>{t('eventi.quando')}</dt>
+            <dd>
+              {testoData(voce.data)}
+              {ora && `, ${ora}`}
+            </dd>
+          </div>
+        )}
+        {luogo && (
+          <div>
+            <dt>{t('eventi.dove')}</dt>
+            <dd>{luogo}</dd>
+          </div>
+        )}
+        {link && (
+          <div>
+            <dt>Link</dt>
+            <dd>
+              <a href={link} rel="noopener">
+                {link}
+              </a>
+            </dd>
+          </div>
+        )}
+      </dl>
+    </div>
+    {immagine && (
+      <figure class="figura">
+        <Foto id={immagine.id} sizes="(min-width: 56em) 50rem, 100vw" />
+      </figure>
+    )}
+  </article>
+</Base>
+
+<style>
+  .evento {
+    padding-block-end: var(--spazio-6);
+  }
+  .intestazione {
+    padding-block: var(--spazio-5) var(--spazio-4);
+    border-block-end: 1px solid var(--colore-bordo);
+    margin-block-end: var(--spazio-5);
+  }
+  h1 {
+    font-size: var(--testo-3xl);
+    margin-block-end: 0;
+  }
+  .corpo {
+    display: grid;
+    gap: var(--spazio-5);
+  }
+  @media (min-width: 56em) {
+    .corpo {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 18rem);
+      align-items: start;
+    }
+  }
+  .testo {
+    max-width: var(--larghezza-testo);
+    font-size: var(--testo-l);
+  }
+  .fatti {
+    margin: 0;
+    padding: var(--spazio-4) var(--spazio-5);
+    background: var(--colore-superficie-calda);
+    border-radius: var(--raggio-m);
+  }
+  .fatti div + div {
+    margin-block-start: var(--spazio-3);
+  }
+  dt {
+    font-size: var(--testo-s);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--colore-testo-tenue);
+  }
+  dd {
+    margin: 0;
+    font-weight: 600;
+  }
+  .figura {
+    margin: var(--spazio-5) 0 0;
+  }
+  .figura :global(img) {
+    display: block;
+    width: 100%;
+    border-radius: var(--raggio-m);
+  }
+</style>

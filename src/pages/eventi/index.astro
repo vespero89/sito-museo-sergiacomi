@@ -1,0 +1,92 @@
+---
+// Events and initiatives (task 14). "Next" is worked out at build time (spec 5.8): the site shows
+// the day of its last build until the next deploy.
+import CartaVoce from '../../components/CartaVoce.astro';
+import ProssimoEvento from '../../components/ProssimoEvento.astro';
+import { t } from '../../i18n/index.ts';
+import Base from '../../layouts/Base.astro';
+import { briciole as briciolaJsonLd } from '../../lib/jsonld.ts';
+import { indirizzoEvento, leggiEventi, testoData, type VoceEvento } from '../../lib/eventi-dati.ts';
+
+const elenco = await leggiEventi();
+const indirizzo = '/eventi/';
+const briciole = [{ titolo: t('briciole.home'), href: '/' }, { titolo: t('eventi.titolo') }];
+const gruppi = [
+  { titolo: t('eventi.prossimi'), voci: elenco.prossimi },
+  { titolo: t('eventi.iniziative'), voci: elenco.iniziative, nota: t('eventi.senzaDate') },
+  { titolo: t('eventi.passati'), voci: elenco.passati },
+].filter((g) => g.voci.length > 0);
+const carta = (e: VoceEvento) => ({
+  titolo: e.data.titolo,
+  href: indirizzoEvento(e.id),
+  dati: testoData(e.data),
+  testo: e.data.descrizione,
+  stato: e.data.stato,
+  dubbi: e.data.daConfermare,
+});
+---
+
+<Base
+  titolo={t('eventi.titolo')}
+  descrizione={t('eventi.descrizione')}
+  indirizzo={indirizzo}
+  briciole={briciole}
+  jsonld={[briciolaJsonLd(briciole, indirizzo, Astro.site!)]}
+>
+  <div class="pagina">
+    <div class="intestazione">
+      <h1>{t('eventi.titolo')}</h1>
+      <p class="intro">{t('eventi.intro')}</p>
+    </div>
+    <ProssimoEvento evidenza={elenco.evidenza} />
+    {gruppi.map((gruppo) => (
+      <section class="gruppo">
+        <h2>{gruppo.titolo}</h2>
+        {gruppo.nota && <p class="nota">{gruppo.nota}</p>}
+        <ul class="schede">
+          {gruppo.voci.map((e) => (
+            <li>
+              <CartaVoce {...carta(e)} />
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </div>
+</Base>
+
+<style>
+  .pagina {
+    padding-block-end: var(--spazio-6);
+  }
+  .intestazione {
+    padding-block: var(--spazio-5) var(--spazio-4);
+  }
+  h1 {
+    font-size: var(--testo-3xl);
+    margin-block-end: var(--spazio-2);
+  }
+  .intro,
+  .nota {
+    max-width: var(--larghezza-testo);
+    margin: 0;
+    font-size: var(--testo-l);
+    color: var(--colore-testo-tenue);
+  }
+  .gruppo {
+    margin-block-start: var(--spazio-6);
+  }
+  h2 {
+    margin-block: 0 var(--spazio-4);
+    font-size: var(--testo-2xl);
+    color: var(--colore-accento-scuro);
+  }
+  .schede {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+    gap: var(--spazio-5);
+    margin: var(--spazio-4) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+</style>

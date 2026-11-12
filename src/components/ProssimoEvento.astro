@@ -1,0 +1,54 @@
+---
+// The next event, worked out at build time in the Europe/Rome day (spec 5.8). It shows the
+// latest past event, labelled as such, when none is ahead, and nothing when there are no dated events.
+import { t } from '../i18n/index.ts';
+import { indirizzoEvento, testoData, type ElencoEventi } from '../lib/eventi-dati.ts';
+
+interface Props {
+  evidenza: ElencoEventi['evidenza'];
+}
+const { evidenza } = Astro.props;
+---
+
+{evidenza && (
+  <aside class="prossimo" aria-labelledby="prossimo-titolo">
+    <p class="etichetta" id="prossimo-titolo">
+      {evidenza.passato ? t('eventi.ultimo') : t('eventi.prossimo')}
+    </p>
+    <h2>
+      <a href={indirizzoEvento(evidenza.evento.id)}>{evidenza.evento.data.titolo}</a>
+    </h2>
+    <p class="quando">{testoData(evidenza.evento.data)}</p>
+    {evidenza.evento.data.luogo && <p>{evidenza.evento.data.luogo}</p>}
+  </aside>
+)}
+
+<style>
+  .prossimo {
+    margin-block: var(--spazio-5) 0;
+    padding: var(--spazio-5);
+    background: var(--colore-scuro);
+    color: var(--colore-sul-scuro);
+    border-radius: var(--raggio-m);
+  }
+  .prossimo p {
+    margin: 0;
+  }
+  .etichetta {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: var(--testo-s);
+    color: var(--colore-sul-scuro-tenue);
+  }
+  h2 {
+    margin-block: var(--spazio-2);
+    font-size: var(--testo-2xl);
+  }
+  h2 a {
+    color: inherit;
+  }
+  .quando {
+    font-size: var(--testo-l);
+    font-weight: 600;
+  }
+</style>

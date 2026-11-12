@@ -118,3 +118,28 @@ main:focus {
     navigation: auto;
   }
 }
+
+/* Print (spec 14): the pages lose the header, the footer and the bars; what stays is the text,
+   in black on white, so an itinerary prints as its numbered stops. */
+@media print {
+  .salta,
+  .testata,
+  .piede,
+  .briciole,
+  .barra,
+  .no-stampa {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+    color: #000;
+    padding-block-end: 0;
+  }
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+  li {
+    break-inside: avoid;
+  }
+}

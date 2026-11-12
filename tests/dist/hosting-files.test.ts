@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
@@ -40,6 +40,11 @@ describe('hosting files in dist/', () => {
     for (const riga of righe) expect(riga).toMatch(/ 301$/);
   });
 
-  // Activated at the end of task 14 (spec 4.1): every destination exists in dist/.
-  it.todo('every redirect destination exists in dist/');
+  it('send every redirect to a page that exists in dist/', () => {
+    const righe = redirects.split('\n').filter((r) => r !== '' && !r.startsWith('#'));
+    const mancanti = righe
+      .map((riga) => riga.split(' ')[1]!)
+      .filter((verso) => !existsSync(join(DIST, verso.replace(/#.*$/, ''), 'index.html')));
+    expect(mancanti).toEqual([]);
+  });
 });

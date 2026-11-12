@@ -1,0 +1,185 @@
+---
+// An itinerary (task 14): the numbered stops, in groups when the itinerary has them, with the
+// Google Maps link of each group and a print version (the stops only, numbered).
+import { render } from 'astro:content';
+import Dubbi from '../../components/Dubbi.astro';
+import { t, type ChiaveUi } from '../../i18n/index.ts';
+import Base from '../../layouts/Base.astro';
+import { briciole as briciolaJsonLd, itinerario as itinerarioJsonLd } from '../../lib/jsonld.ts';
+import { raggruppaTappe } from '../../lib/itinerari.ts';
+import { indirizzoItinerario, leggiItinerari, mappaTappe } from '../../lib/itinerari-dati.ts';
+
+export async function getStaticPaths() {
+  return (await leggiItinerari()).map((i) => ({ params: { slug: i.slug } }));
+}
+
+const tutti = await leggiItinerari();
+const itinerario = tutti.find((i) => i.slug === Astro.params.slug)!;
+const { titolo, descrizione, modo, durataMinuti, stato, daConfermare } = itinerario.voce.data;
+const { Content } = await render(itinerario.voce);
+const meta = descrizione ?? t('itinerario.descrizioneBase');
+const gruppi = raggruppaTappe(itinerario.tappe);
+const altri = tutti.filter((i) => i.slug !== itinerario.slug);
+
+const indirizzo = indirizzoItinerario(itinerario.slug);
+const briciole = [
+  { titolo: t('briciole.home'), href: '/' },
+  { titolo: t('itinerari.titolo'), href: '/itinerari/' },
+  { titolo },
+];
+const dati = [
+  modo && t(`itinerari.modo.${modo}` as ChiaveUi),
+  durataMinuti && t('itinerari.durata').replace('{n}', String(durataMinuti)),
+].filter(Boolean);
+---
+
+<Base
+  titolo={titolo}
+  descrizione={meta}
+  indirizzo={indirizzo}
+  briciole={briciole}
+  jsonld={[
+    itinerarioJsonLd(
+      {
+        slug: itinerario.slug,
+        titolo,
+        descrizione: meta,
+        modo: modo && t(`itinerari.modo.${modo}` as ChiaveUi),
+        tappe: itinerario.tappe.map((x) => ({ nome: x.titolo, url: x.href })),
+      },
+      Astro.site!,
+    ),
+    briciolaJsonLd(briciole, indirizzo, Astro.site!),
+  ]}
+>
+  <article class="itinerario">
+    <div class="intestazione">
+      <h1>{titolo}</h1>
+      <Dubbi stato={stato} dubbi={daConfermare} />
+      {dati.length > 0 && <p class="dati">{dati.join(' · ')}</p>}
+    </div>
+    <div class="testo">
+      <Content />
+    </div>
+
+    <section aria-labelledby="tappe-titolo">
+      <h2 id="tappe-titolo">{t('itinerario.tappe')}</h2>
+      {gruppi.map((gruppo) => (
+        <div class="gruppo">
+          {gruppo.gruppo && <h3>{gruppo.gruppo}</h3>}
+          <ol class="tappe" start={gruppo.tappe[0]!.numero}>
+            {gruppo.tappe.map(({ tappa }) => (
+              <li>
+                {tappa.href ? <a href={tappa.href}>{tappa.titolo}</a> : <span>{tappa.titolo}</span>}
+                <span class="comune">{tappa.comune}</span>
+                {tappa.nota && <span class="nota">{tappa.nota}</span>}
+              </li>
+            ))}
+          </ol>
+          <p class="mappa no-stampa">
+            <a
+              class="pulsante"
+              href={mappaTappe(
+                gruppo.tappe.map((x) => x.tappa),
+                modo,
+              )}
+              rel="noopener"
+            >
+              {gruppo.gruppo
+                ? t('itinerario.mappaGruppo').replace('{gruppo}', gruppo.gruppo)
+                : t('itinerario.mappa')}
+            </a>
+          </p>
+        </div>
+      ))}
+      <p class="partenza no-stampa">
+        {t('itinerario.partenza')} {t('itinerario.stampa')}
+      </p>
+    </section>
+
+    {altri.length > 0 && (
+      <section class="altri no-stampa" aria-labelledby="altri-titolo">
+        <h2 id="altri-titolo">{t('itinerario.altri')}</h2>
+        <ul>
+          {altri.map((i) => (
+            <li>
+              <a href={indirizzoItinerario(i.slug)}>{i.voce.data.titolo}</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+  </article>
+</Base>
+
+<style>
+  .itinerario {
+    padding-block-end: var(--spazio-6);
+  }
+  .intestazione {
+    padding-block: var(--spazio-5) var(--spazio-4);
+    border-block-end: 1px solid var(--colore-bordo);
+    margin-block-end: var(--spazio-5);
+  }
+  h1 {
+    font-size: var(--testo-3xl);
+    margin-block-end: var(--spazio-2);
+  }
+  .dati {
+    margin: var(--spazio-2) 0 0;
+    color: var(--colore-testo-tenue);
+  }
+  .testo {
+    max-width: var(--larghezza-testo);
+    font-size: var(--testo-l);
+  }
+  h2 {
+    margin-block: var(--spazio-6) var(--spazio-4);
+    font-size: var(--testo-2xl);
+    color: var(--colore-accento-scuro);
+  }
+  h3 {
+    margin-block: var(--spazio-5) var(--spazio-3);
+    font-size: var(--testo-xl);
+  }
+  /* The numbers are the native ones of the list, so they print as they are. */
+  .tappe {
+    margin: 0;
+    padding-inline-start: 2.5rem;
+  }
+  .tappe li {
+    padding-block: var(--spazio-3);
+    border-block-end: 1px solid var(--colore-bordo);
+    font-size: var(--testo-l);
+  }
+  .tappe li::marker {
+    color: var(--colore-accento-scuro);
+    font-weight: 700;
+  }
+  .comune,
+  .nota {
+    display: block;
+    color: var(--colore-testo-tenue);
+    font-size: var(--testo-m);
+  }
+  .mappa {
+    margin-block: var(--spazio-4) 0;
+  }
+  .pulsante {
+    display: inline-block;
+    padding: var(--spazio-3) var(--spazio-5);
+    border-radius: var(--raggio-m);
+    background: var(--colore-accento-scuro);
+    color: var(--colore-sull-accento);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .partenza {
+    margin-block: var(--spazio-4) 0;
+    color: var(--colore-testo-tenue);
+  }
+  .altri ul {
+    margin: 0;
+    padding-inline-start: var(--spazio-5);
+  }
+</style>

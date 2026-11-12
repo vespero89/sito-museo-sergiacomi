@@ -45,6 +45,9 @@ const quante = (n: number) => (n === 1 ? t('opere.una') : t('opere.piu').replace
   <div class="intestazione">
     <h1>{titolo}</h1>
     <p class="intro">{t('opere.intro')}</p>
+    <p class="intro">
+      <a href="/itinerari/">{t('opere.versoItinerari')}</a>.
+    </p>
   </div>
   {comuni.map(({ comune, id, lista }) => (
     <section class="comune" aria-labelledby={id}>

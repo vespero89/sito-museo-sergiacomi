@@ -1,12 +1,27 @@
 ---
-import Base from '../layouts/Base.astro';
+// Placeholder home until task 16: the next event and the four entrances by audience (spec 5.8).
+import { getCollection } from 'astro:content';
+import ProssimoEvento from '../components/ProssimoEvento.astro';
 import { t } from '../i18n/index.ts';
+import Base from '../layouts/Base.astro';
+import { leggiEventi } from '../lib/eventi-dati.ts';
 import { leggiSito } from '../lib/sito-dati.ts';
 
 const sito = leggiSito();
+const { evidenza } = await leggiEventi();
+const percorsi = (await getCollection('percorsi')).sort((a, b) => a.id.localeCompare(b.id));
 ---
 
 <Base descrizione={t('home.descrizione')} indirizzo="/">
   <h1>{sito.nome}</h1>
   <p>{t('home.costruzione')}</p>
+  <ProssimoEvento evidenza={evidenza} />
+  <h2>{t('home.percorsi')}</h2>
+  <ul>
+    {percorsi.map((p) => (
+      <li>
+        <a href={`/percorsi/${p.id}/`}>{p.data.titolo}</a>
+      </li>
+    ))}
+  </ul>
 </Base>

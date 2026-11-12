@@ -6,7 +6,8 @@ import { parseYaml } from '../../src/lib/yaml.ts';
 import { DIST, walk } from './helpers';
 
 const PESO_MAX_IMMAGINE = 400 * 1024; // spec 7: no served image file above 400 KB
-const PESO_MAX_DIST = 25 * 1024 * 1024; // spec 7: the whole dist/ folder below 25 MB in the prototype
+// Spec 7 says 25 MB. Raised to 32 MB in task 14 (Fabio: build first, optimise later); bring it back to 25 when the photos are optimised.
+const PESO_MAX_DIST = 32 * 1024 * 1024;
 const ESTENSIONI_IMMAGINE = /\.(jpe?g|png|webp|avif|gif|svg|ico)$/i;
 
 describe('image budget on dist/ (spec 7)', () => {
@@ -19,7 +20,7 @@ describe('image budget on dist/ (spec 7)', () => {
     expect(grandi).toEqual([]);
   });
 
-  it('weighs less than 25 MB in total', () => {
+  it('weighs less than 32 MB in total', () => {
     const totale = walk(DIST).reduce((somma, f) => somma + statSync(f).size, 0);
     expect(totale).toBeLessThan(PESO_MAX_DIST);
   });

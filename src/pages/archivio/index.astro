@@ -1,0 +1,89 @@
+---
+// The archive (task 14): static list by type. Filters come with task 20.
+import { getCollection } from 'astro:content';
+import CartaVoce from '../../components/CartaVoce.astro';
+import { t, type ChiaveUi } from '../../i18n/index.ts';
+import Base from '../../layouts/Base.astro';
+import { briciole as briciolaJsonLd } from '../../lib/jsonld.ts';
+import { TIPI_ARCHIVIO } from '../../lib/schemi.ts';
+
+const voci = (await getCollection('archivio')).sort((a, b) =>
+  a.data.data.localeCompare(b.data.data),
+);
+const gruppi = TIPI_ARCHIVIO.map((tipo) => ({
+  tipo,
+  voci: voci.filter((v) => v.data.tipo === tipo),
+})).filter((g) => g.voci.length > 0);
+const indirizzo = '/archivio/';
+const briciole = [{ titolo: t('briciole.home'), href: '/' }, { titolo: t('archivio.titolo') }];
+---
+
+<Base
+  titolo={t('archivio.titolo')}
+  descrizione={t('archivio.descrizione')}
+  indirizzo={indirizzo}
+  briciole={briciole}
+  jsonld={[briciolaJsonLd(briciole, indirizzo, Astro.site!)]}
+>
+  <div class="pagina">
+    <div class="intestazione">
+      <h1>{t('archivio.titolo')}</h1>
+      <p class="intro">{t('archivio.intro')}</p>
+    </div>
+    {gruppi.map((gruppo) => (
+      <section class="gruppo">
+        <h2>{t(`archivio.tipo.${gruppo.tipo}` as ChiaveUi)}</h2>
+        <ul class="schede">
+          {gruppo.voci.map((v) => (
+            <li>
+              <CartaVoce
+                titolo={v.data.titolo}
+                href={`/archivio/${v.id}/`}
+                dati={v.data.dataTesto ?? v.data.data}
+                testo={v.data.descrizione}
+                foto={v.data.file?.id}
+                stato={v.data.stato}
+                dubbi={v.data.daConfermare}
+              />
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </div>
+</Base>
+
+<style>
+  .pagina {
+    padding-block-end: var(--spazio-6);
+  }
+  .intestazione {
+    padding-block: var(--spazio-5) var(--spazio-4);
+  }
+  h1 {
+    font-size: var(--testo-3xl);
+    margin-block-end: var(--spazio-2);
+  }
+  .intro {
+    max-width: var(--larghezza-testo);
+    margin: 0;
+    font-size: var(--testo-l);
+    color: var(--colore-testo-tenue);
+  }
+  .gruppo {
+    margin-block-start: var(--spazio-6);
+  }
+  h2 {
+    margin-block: 0 var(--spazio-4);
+    font-size: var(--testo-2xl);
+    color: var(--colore-accento-scuro);
+  }
+  .schede {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+    gap: var(--spazio-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+</style>

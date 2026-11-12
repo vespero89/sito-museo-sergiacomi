@@ -16,4 +16,4 @@ Static Astro site for the Museo Aldo Sergiacomi. See `README.md` for commands an
   into `dist/`, never written by hand. Mode decisions come from `decidiModalita`, not from env variables.
 - Photos: masters only in `src/assets/foto/` (made by `npm run images`, at most 1 MB each), each with an `alt`
   in `immagini.yaml`; pages use `Foto.astro`, never an `<img>` by hand and never `public/`. No served image
-  over 400 KB, `dist/` under 25 MB (tests on `dist/`).
+  over 400 KB, `dist/` under 25 MB, temporarily 32 MB while the photos are not optimised (tests on `dist/`).

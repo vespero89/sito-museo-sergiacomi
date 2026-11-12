@@ -1,0 +1,50 @@
+---
+// The list of itineraries (task 14). The introduction is the text of the `itinerari` page entry.
+import { getEntry } from 'astro:content';
+import CartaVoce from '../../components/CartaVoce.astro';
+import { t, type ChiaveUi } from '../../i18n/index.ts';
+import PaginaTesto from '../../layouts/PaginaTesto.astro';
+import { indirizzoItinerario, leggiItinerari } from '../../lib/itinerari-dati.ts';
+
+const voce = (await getEntry('pagine', 'itinerari'))!;
+const itinerari = await leggiItinerari();
+const dati = (i: (typeof itinerari)[number]) =>
+  [
+    i.voce.data.modo && t(`itinerari.modo.${i.voce.data.modo}` as ChiaveUi),
+    t('itinerari.tappe').replace('{n}', String(i.tappe.length)),
+    i.voce.data.durataMinuti &&
+      t('itinerari.durata').replace('{n}', String(i.voce.data.durataMinuti)),
+  ]
+    .filter(Boolean)
+    .join(' · ');
+---
+
+<PaginaTesto voce={voce}>
+  <ul class="schede">
+    {itinerari.map((i) => (
+      <li>
+        <CartaVoce
+          livello={2}
+          titolo={i.voce.data.titolo}
+          href={indirizzoItinerario(i.slug)}
+          dati={dati(i)}
+          testo={i.voce.data.descrizione}
+          foto={i.voce.data.immagine?.id}
+          stato={i.voce.data.stato}
+          dubbi={i.voce.data.daConfermare}
+        />
+      </li>
+    ))}
+  </ul>
+</PaginaTesto>
+
+<style>
+  .schede {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+    gap: var(--spazio-5);
+    margin: var(--spazio-6) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+</style>

@@ -1,0 +1,72 @@
+---
+// One of the four entrances by audience (task 14): an introduction and a few chosen links. The
+// breadcrumb is Home and the title: /percorsi/ is not a page (spec 4).
+import { getCollection } from 'astro:content';
+import CartaVoce from '../../components/CartaVoce.astro';
+import Dubbi from '../../components/Dubbi.astro';
+import { t } from '../../i18n/index.ts';
+import Base from '../../layouts/Base.astro';
+import { briciole as briciolaJsonLd } from '../../lib/jsonld.ts';
+
+export async function getStaticPaths() {
+  return (await getCollection('percorsi')).map((voce) => ({
+    params: { slug: voce.id },
+    props: { voce },
+  }));
+}
+
+const { voce } = Astro.props;
+const { titolo, descrizione, intro, voci, stato, daConfermare } = voce.data;
+const indirizzo = `/percorsi/${voce.id}/`;
+const briciole = [{ titolo: t('briciole.home'), href: '/' }, { titolo }];
+---
+
+<Base
+  titolo={titolo}
+  descrizione={descrizione ?? t('percorso.descrizioneBase')}
+  indirizzo={indirizzo}
+  briciole={briciole}
+  jsonld={[briciolaJsonLd(briciole, indirizzo, Astro.site!)]}
+>
+  <div class="pagina">
+    <div class="intestazione">
+      <h1>{titolo}</h1>
+      <Dubbi stato={stato} dubbi={daConfermare} />
+      <p class="intro">{intro}</p>
+    </div>
+    <ul class="schede">
+      {voci.map((v) => (
+        <li>
+          <CartaVoce livello={2} titolo={v.titolo} href={v.percorso} testo={v.descrizione} />
+        </li>
+      ))}
+    </ul>
+  </div>
+</Base>
+
+<style>
+  .pagina {
+    padding-block-end: var(--spazio-6);
+  }
+  .intestazione {
+    padding-block: var(--spazio-5) var(--spazio-4);
+  }
+  h1 {
+    font-size: var(--testo-3xl);
+    margin-block-end: var(--spazio-2);
+  }
+  .intro {
+    max-width: var(--larghezza-testo);
+    margin: var(--spazio-3) 0 0;
+    font-size: var(--testo-l);
+    color: var(--colore-testo-tenue);
+  }
+  .schede {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+    gap: var(--spazio-5);
+    margin: var(--spazio-5) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+</style>
