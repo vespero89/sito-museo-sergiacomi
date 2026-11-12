@@ -33,6 +33,11 @@ export interface Problema {
 interface Opzioni {
   /** Does `src/assets/foto/<file>` exist? */
   fotoEsiste: (file: string) => boolean;
+  /**
+   * The files that are in `src/assets/foto/`. When given, each one must have an entry in the
+   * `immagini` collection: that is where its `alt` is, and a photo without `alt` is not allowed.
+   */
+  fotoPresenti?: readonly string[];
 }
 
 const vuoto = (): Contenuti =>
@@ -105,6 +110,17 @@ export function controllaContenuti(contenuti: Contenuti, opzioni: Opzioni): Prob
     const file = (voce.dati as { file?: unknown } | null)?.file;
     if (typeof file === 'string' && !opzioni.fotoEsiste(file)) {
       errore(voce.etichetta, `the file src/assets/foto/${file} does not exist`);
+    }
+  }
+  const conVoce = new Set(
+    contenuti.immagini.map((v) => (v.dati as { file?: unknown } | null)?.file),
+  );
+  for (const file of opzioni.fotoPresenti ?? []) {
+    if (!conVoce.has(file)) {
+      errore(
+        `src/assets/foto/${file}`,
+        'the photo has no entry in the immagini collection, so no alt: add one to immagini.yaml',
+      );
     }
   }
 
@@ -195,6 +211,12 @@ export function leggiContenuti(radice: string, problemi: Problema[]): Contenuti 
   return contenuti;
 }
 
+/** The photo files in `src/assets/foto/` (none when the folder does not exist yet). */
+function elencaFoto(radice: string): string[] {
+  const cartella = join(radice, 'src', 'assets', 'foto');
+  return existsSync(cartella) ? readdirSync(cartella).filter((f) => !f.startsWith('.')) : [];
+}
+
 /** Validates the parsed sito.yaml. */
 function controllaSito(dati: unknown, file: string): Problema[] {
   const r = sitoSchema.safeParse(dati);
@@ -213,6 +235,7 @@ export function controllaRepo(radice: string): { problemi: Problema[]; voci: num
   problemi.push(
     ...controllaContenuti(contenuti, {
       fotoEsiste: (file) => existsSync(join(radice, 'src', 'assets', 'foto', file)),
+      fotoPresenti: elencaFoto(radice),
     }),
   );
 

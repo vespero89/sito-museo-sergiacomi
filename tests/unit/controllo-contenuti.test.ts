@@ -169,6 +169,20 @@ describe('controllaContenuti', () => {
     expect(e).toHaveLength(1);
     expect(e[0]).toContain('le-merlettaie-bozzetto-1.jpg');
   });
+
+  it('fails on a master photo that has no entry (so no alt) in the immagini collection', () => {
+    const e = controllaContenuti(mondo(), {
+      fotoEsiste: tuttoPresente,
+      fotoPresenti: ['le-merlettaie-bozzetto-1.jpg', 'senza-alt-1.jpg'],
+    }).map((p) => `${p.file}: ${p.messaggio}`);
+    expect(e).toHaveLength(1);
+    expect(e[0]).toContain('src/assets/foto/senza-alt-1.jpg');
+    expect(e[0]).toContain('alt');
+  });
+
+  it('does not check unlisted master photos when the list of files is not given', () => {
+    expect(problemi(mondo())).toEqual([]);
+  });
 });
 
 describe('dividiFrontmatter', () => {

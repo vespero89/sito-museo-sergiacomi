@@ -1,1 +1,261 @@
-[]
+# Photos of src/assets/foto (spec 3.2, 7). Every alt was written by looking at the photo and is not verified yet
+# (altVerificato: false): the Foundation reads them and sets the flag to true.
+- id: le-merlettaie-ritratto-1
+  file: le-merlettaie-ritratto-1.jpg
+  alt: Aldo Sergiacomi con coppola e giacca di tweed, seduto accanto alle statue in bronzo delle Merlettaie, davanti a un muro di mattoni
+  origine: fondazione
+  stato: confermato
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/1 - Le Merlettaie/Le Merlettaie - Aldo Sergiacomi.jpg
+- id: le-merlettaie-bozzetto-1
+  file: le-merlettaie-bozzetto-1.jpg
+  alt: 'Bozzetto della bambina delle Merlettaie: una bimba seduta su un basamento lavora al tombolo, foto in bianco e nero'
+  origine: fondazione
+  stato: confermato
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/1 - Le Merlettaie/Le Merlettaie - bambina - bozzetto.jpg
+- id: le-merlettaie-bozzetto-2
+  file: le-merlettaie-bozzetto-2.jpg
+  alt: Bozzetto della signora anziana delle Merlettaie con il fazzoletto in testa; accanto un uomo in camice lavora alla scultura, foto in bianco e nero
+  origine: fondazione
+  stato: confermato
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/1 - Le Merlettaie/Le Merlettaie - signora anziana - bozzetto.jpg
+- id: le-merlettaie-bozzetto-3
+  file: le-merlettaie-bozzetto-3.jpg
+  alt: 'Due foto affiancate in bianco e nero del bozzetto della signora anziana: la figura intera con il tombolo e il volto in primo piano'
+  origine: fondazione
+  stato: confermato
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/1 - Le Merlettaie/Le Merlettaie - signora anziana - particolare bozzetto.jpg
+- id: le-merlettaie-fonderia-1
+  file: le-merlettaie-fonderia-1.jpg
+  alt: 'La signora anziana delle Merlettaie in fonderia: figura seduta con il tombolo, di colore rossastro, su un carrello di legno'
+  origine: fondazione
+  stato: confermato
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/1 - Le Merlettaie/Le Merlettaie - signora anziana - fonderia.jpg
+- id: le-merlettaie-in-loco-1
+  file: le-merlettaie-in-loco-1.jpg
+  alt: 'Particolare della bambina delle Merlettaie in bronzo: il volto chino, i capelli con il nastro e il colletto in pizzo'
+  origine: fondazione
+  stato: confermato
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/1 - Le Merlettaie/Le Merlettaie - bambina - particolare in loco.jpg
+- id: le-merlettaie-in-loco-2
+  file: le-merlettaie-in-loco-2.jpg
+  alt: La donna delle Merlettaie in bronzo, seduta di profilo con il tombolo, davanti a una torre di mattoni
+  origine: fondazione
+  stato: confermato
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/1 - Le Merlettaie/Le Merlettaie - donna - in loco.jpg
+- id: le-merlettaie-in-loco-3
+  file: le-merlettaie-in-loco-3.jpg
+  alt: Particolare del volto della donna delle Merlettaie in bronzo, di profilo, con la torre di mattoni sullo sfondo
+  origine: fondazione
+  stato: confermato
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/1 - Le Merlettaie/Le Merlettaie - donna - particolare in loco.jpg
+- id: le-merlettaie-in-loco-4
+  file: le-merlettaie-in-loco-4.jpg
+  alt: Particolare del volto della signora anziana delle Merlettaie in bronzo, chino e di profilo, su sfondo sfocato
+  origine: fondazione
+  stato: confermato
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/1 - Le Merlettaie/Le Merlettaie - signora anziana - particolare in loco.jpg
+- id: le-merlettaie-monumento-1
+  file: le-merlettaie-monumento-1.jpg
+  alt: 'Il gruppo in bronzo delle Merlettaie: la bambina, la donna e la signora anziana sedute con il tombolo, davanti a un muro di mattoni'
+  origine: fondazione
+  stato: confermato
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/1 - Le Merlettaie/Le Merlettaie - monumento.jpg
+- id: sogno-del-pescatore-bozzetto-1
+  file: sogno-del-pescatore-bozzetto-1.jpg
+  alt: 'Bozzetto in miniatura del Sogno del pescatore: un uomo solleva una donna che tiene in alto un bambino, su un blocco di pietra rosata'
+  origine: fondazione
+  stato: confermato
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/5 - Il sogno del pescatore/Il sogno del pescatore - bozzetto in miniatura.jpg
+- id: sogno-del-pescatore-fonderia-1
+  file: sogno-del-pescatore-fonderia-1.jpg
+  alt: Il gruppo del Sogno del pescatore in fonderia, circondato dai ponteggi, in una foto in bianco e nero
+  origine: fondazione
+  stato: confermato
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/5 - Il sogno del pescatore/Il sogno del pescatore - fonderia.jpg
+- id: sogno-del-pescatore-fonderia-2
+  file: sogno-del-pescatore-fonderia-2.jpg
+  alt: 'Particolare in fonderia del Sogno del pescatore: la donna che solleva il bambino, tra le impalcature, foto in bianco e nero'
+  origine: fondazione
+  stato: confermato
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/5 - Il sogno del pescatore/Il sogno del pescatore - fonderia - particolare donna e bambino.jpg
+- id: sogno-del-pescatore-fonderia-3
+  file: sogno-del-pescatore-fonderia-3.jpg
+  alt: 'Particolare in fonderia del Sogno del pescatore: il volto del pescatore ripreso dal basso, tra i tubi del ponteggio, foto in bianco e nero'
+  origine: fondazione
+  stato: confermato
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/5 - Il sogno del pescatore/Il sogno del pescatore - fonderia - particolare uomo.jpg
+- id: sogno-del-pescatore-monumento-1
+  file: sogno-del-pescatore-monumento-1.jpg
+  alt: "Il Sogno del pescatore in bronzo: l'uomo solleva la donna e il bambino, con un'ancora ai piedi, davanti a un edificio"
+  origine: fondazione
+  stato: confermato
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/5 - Il sogno del pescatore/Il sogno del pescatore - monumento.jpg
+- id: la-retara-bozzetto-1
+  file: la-retara-bozzetto-1.jpg
+  alt: 'Bozzetto della Retara: donna con il fazzoletto in testa, seduta su una sedia, intenta a rammendare una grande rete, foto in seppia'
+  origine: fondazione
+  stato: confermato
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/6 - La retara/La retara - bozzetto.jpg
+- id: la-retara-ispirazione-1
+  file: la-retara-ispirazione-1.jpg
+  alt: "Due donne rammendano reti davanti a una casa di pietra: foto d'epoca in bianco e nero dell'archivio Sgattoni che ispirò la Retara"
+  origine: terzi
+  stato: da-confermare
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/6 - La retara/La retara - ispirazione archivio Sgattoni SbT.jpg
+  credito: Archivio Sgattoni, San Benedetto del Tronto
+  daConfermare:
+    - campo: credito
+      nota: Forma del credito e autorizzazione dell'archivio Sgattoni da confermare
+- id: beato-bernardo-monumento-1
+  file: beato-bernardo-monumento-1.jpg
+  alt: Statua del Beato Bernardo, frate barbuto con bastone e bisaccia, visto di profilo su un basamento bianco, tra gli alberi
+  origine: fondazione
+  stato: confermato
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/4 - Beato Bernardo/Beato Bernardo - monumento.jpg
+- id: monumento-ai-caduti-fermo-monumento-1
+  file: monumento-ai-caduti-fermo-monumento-1.jpg
+  alt: "Monumento ai caduti di Fermo: gruppo scultoreo di soldati intorno a un'asta con bandiera, su una base circolare in un parco"
+  origine: fondazione
+  stato: confermato
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/7 - Monumento ai caduti Fermo/Monumento ai caduti Fermo - monumento.jpg
+- id: stemmi-palazzo-comunale-1
+  file: stemmi-palazzo-comunale-1.jpg
+  alt: Stemma in pietra chiara con una fascia diagonale e due figure ai lati, in cornice ottagonale su un muro di mattoni
+  origine: fondazione
+  stato: confermato
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/2 - Stemmi Comune/Palazzo comunale Offida - stemma 1.jpg
+- id: stemmi-palazzo-comunale-2
+  file: stemmi-palazzo-comunale-2.jpg
+  alt: Stemma in pietra chiara con una grande croce, in cornice ottagonale con volute, su un muro di mattoni
+  origine: fondazione
+  stato: confermato
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/2 - Stemmi Comune/Palazzo comunale Offida - stemma 2.jpg
+- id: tomba-palmucci-intera
+  file: tomba-palmucci-intera.jpg
+  alt: 'Tomba Palmucci: scultura in marmo bianco di una figura femminile in ginocchio che china il capo, davanti a una parete di marmo scuro'
+  origine: fondazione
+  stato: confermato
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/12 - Cimitero Offida/Tomba Palmucci - Offida .png
+- id: tomba-palmucci-particolare-1
+  file: tomba-palmucci-particolare-1.jpg
+  alt: 'Particolare della Tomba Palmucci: il volto e i lunghi capelli della figura femminile in marmo bianco, con il capo reclinato sul braccio'
+  origine: fondazione
+  stato: confermato
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/12 - Cimitero Offida/Tomba Palmucci - Particolare 1 - Offida.png
+- id: via-crucis-1
+  file: via-crucis-1.jpg
+  alt: 'Formella in bassorilievo di una Via crucis: un uomo cade sotto la croce, tra un cavallo e alcuni soldati'
+  origine: fondazione
+  stato: da-confermare
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/3 - Via crucis/Via Crucis - I.jpg
+  daConfermare:
+    - campo: soggetto
+      nota: 'Non si sa se è la Via crucis di Offida (1952) o quella di Teramo (1974): da chiarire con la Fondazione'
+- id: via-crucis-2
+  file: via-crucis-2.jpg
+  alt: 'Formella in bassorilievo di una Via crucis: un corpo disteso sorretto da una figura con il cappuccio, con un soldato a destra'
+  origine: fondazione
+  stato: da-confermare
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/3 - Via crucis/Via Crucis - II.jpg
+  daConfermare:
+    - campo: soggetto
+      nota: 'Non si sa se è la Via crucis di Offida (1952) o quella di Teramo (1974): da chiarire con la Fondazione'
+- id: via-crucis-3
+  file: via-crucis-3.jpg
+  alt: 'Formella in bassorilievo di una Via crucis: due uomini portano un corpo verso un muro di mattoni, con una scritta in basso'
+  origine: fondazione
+  stato: da-confermare
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/3 - Via crucis/Via Crucis - III.jpg
+  daConfermare:
+    - campo: soggetto
+      nota: 'Non si sa se è la Via crucis di Offida (1952) o quella di Teramo (1974): da chiarire con la Fondazione'
+    - campo: soggetto
+      nota: 'L''iscrizione sulla formella legge "Modello Aldo Sergiacomi Offida 1952": indizio a favore di Offida'
+- id: via-crucis-4
+  file: via-crucis-4.jpg
+  alt: 'Formella in bassorilievo di una Via crucis: un uomo con la croce sulle spalle, circondato da donne e bambini'
+  origine: fondazione
+  stato: da-confermare
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/3 - Via crucis/Via Crucis - IV.jpg
+  daConfermare:
+    - campo: soggetto
+      nota: 'Non si sa se è la Via crucis di Offida (1952) o quella di Teramo (1974): da chiarire con la Fondazione'
+- id: via-crucis-5
+  file: via-crucis-5.jpg
+  alt: 'Formella in bassorilievo di una Via crucis: un soldato a cavallo e una figura a terra sotto una croce di legno'
+  origine: fondazione
+  stato: da-confermare
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/3 - Via crucis/Via Crucis - V.jpg
+  daConfermare:
+    - campo: soggetto
+      nota: 'Non si sa se è la Via crucis di Offida (1952) o quella di Teramo (1974): da chiarire con la Fondazione'
+- id: museo-tavolo-1
+  file: museo-tavolo-1.jpg
+  alt: 'Angolo del museo: bassorilievi chiari alle pareti di mattoni e, in primo piano, il tavolo di lavoro con carte e strumenti'
+  origine: fondazione
+  stato: confermato
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/2 - Il Museo/Imagini - Museo - Sito Web/11- Tavolo Sergiacomi.jpeg
+- id: museo-tavolo-particolare-1
+  file: museo-tavolo-particolare-1.jpg
+  alt: "Particolare del tavolo di lavoro: due lenti d'ingrandimento, un martello e frammenti di pietra, con altri rilievi sfocati sullo sfondo"
+  origine: fondazione
+  stato: confermato
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/2 - Il Museo/Imagini - Museo - Sito Web/12 -Particolare tavolo.jpeg
+- id: strumenti-1
+  file: strumenti-1.jpg
+  alt: 'Strumenti da scultore su un ripiano di legno: punte e mole abrasive montate su aste, una sfera e un blocco metallico a griglia'
+  origine: fondazione
+  stato: confermato
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/2 - Il Museo/Imagini - Museo - Sito Web/Strumenti Sergiacomi 1 .png
+- id: strumenti-2
+  file: strumenti-2.jpg
+  alt: Fila di scalpelli e piccoli attrezzi allineati in una teca incassata in un muro di mattoni
+  origine: fondazione
+  stato: confermato
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/2 - Il Museo/Imagini - Museo - Sito Web/Strumenti Sergiacomi 2.png
+- id: strumenti-3
+  file: strumenti-3.jpg
+  alt: Banco da lavoro in legno con martelli, tenaglie, scalpelli e un blocco di pietra bianca con un mazzuolo, davanti a un muro di mattoni
+  origine: fondazione
+  stato: confermato
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/2 - Il Museo/Imagini - Museo - Sito Web/Strumenti Sergiacomi 3.png
+- id: sala-1-vista-1
+  file: sala-1-vista-1.jpg
+  alt: 'Sala 1 del museo: file di sedie pieghevoli bianche davanti a una parete di mattoni con un televisore, sotto un soffitto a travi di legno'
+  origine: fondazione
+  stato: confermato
+  altVerificato: false
+  fileOriginale: 3 - Sito Web/2 - Il Museo/Imagini - Museo - Sito Web/13 - SALA1.jpg
