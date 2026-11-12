@@ -1,7 +1,15 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { briciole, clean, fondazione, museo, persona, serializza } from '../../src/lib/jsonld.ts';
+import {
+  briciole,
+  clean,
+  fondazione,
+  museo,
+  opera,
+  persona,
+  serializza,
+} from '../../src/lib/jsonld.ts';
 import { sitoSchema, type Sito } from '../../src/lib/sito.ts';
 import { parseYaml } from '../../src/lib/yaml.ts';
 
@@ -205,5 +213,45 @@ describe('serializza', () => {
     const urls = [...testo.matchAll(/"(?:url|@id|item)":"([^"]+)"/g)].map((m) => m[1]!);
     expect(urls.length).toBeGreaterThan(3);
     for (const u of urls) expect(u).toMatch(/^https:\/\/esempio\.test\//);
+  });
+});
+
+describe('opera', () => {
+  const dati = {
+    slug: 'portale-duomo-di-fermo',
+    titolo: 'Portale del Duomo di Fermo',
+    categoria: 'portale',
+    anno: 1980,
+    materiali: ['bronzo'],
+    immagine: '/_astro/portale.jpg',
+    descrizione:
+      'Portale del Duomo di Fermo: opera in bronzo dello scultore Aldo Sergiacomi, 1980.',
+  };
+
+  it('is a Sculpture with absolute URLs and the sculptor by @id', () => {
+    const nodo = opera(dati, ORIGINE);
+    expect(nodo['@type']).toBe('Sculpture');
+    expect(nodo['@id']).toBe('https://esempio.test/opere/portale-duomo-di-fermo/#opera');
+    expect(nodo['url']).toBe('https://esempio.test/opere/portale-duomo-di-fermo/');
+    expect(nodo['image']).toBe('https://esempio.test/_astro/portale.jpg');
+    expect(nodo['creator']).toEqual({ '@id': 'https://esempio.test/aldo-sergiacomi/#persona' });
+    expect(nodo['dateCreated']).toBe('1980');
+    expect(nodo['material']).toEqual(['bronzo']);
+  });
+
+  it('is a VisualArtwork for a painting', () => {
+    expect(opera({ ...dati, categoria: 'dipinto' }, ORIGINE)['@type']).toBe('VisualArtwork');
+  });
+
+  it('leaves out the year, the materials and the image when there are none', () => {
+    const nodo = opera({ ...dati, anno: undefined, materiali: [], immagine: undefined }, ORIGINE);
+    expect(Object.keys(nodo)).not.toContain('dateCreated');
+    expect(Object.keys(nodo)).not.toContain('material');
+    expect(Object.keys(nodo)).not.toContain('image');
+  });
+
+  it('never says where the work was made or what it shows', () => {
+    const nodo = JSON.stringify(opera(dati, ORIGINE));
+    expect(nodo).not.toMatch(/locationCreated|contentLocation/);
   });
 });

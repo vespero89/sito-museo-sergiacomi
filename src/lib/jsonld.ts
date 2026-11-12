@@ -117,6 +117,40 @@ export function fondazione(sito: Sito, origine: string | URL): NodoJsonLd {
   });
 }
 
+export interface DatiOperaJsonLd {
+  slug: string;
+  titolo: string;
+  /** Category of the work: a painting is a `VisualArtwork`, everything else a `Sculpture`. */
+  categoria: string;
+  /** Year, or undefined when it is missing or doubtful. */
+  anno?: number | undefined;
+  /** Materials, only when known. */
+  materiali: readonly string[];
+  /** Address of the main photo, absolute or not. */
+  immagine?: string | undefined;
+  descrizione: string;
+}
+
+/**
+ * A work (spec 6.2). The `@type` comes from the category, not from the material. There is no
+ * `locationCreated` and no `contentLocation`: they say where a work was made or what it shows,
+ * not where it stands. The place is in the text, the facts and the breadcrumb.
+ */
+export function opera(dati: DatiOperaJsonLd, origine: string | URL): NodoJsonLd {
+  const url = urlAssoluto(`/opere/${dati.slug}/`, origine);
+  return pulito({
+    '@type': dati.categoria === 'dipinto' ? 'VisualArtwork' : 'Sculpture',
+    '@id': `${url}#opera`,
+    url,
+    name: dati.titolo,
+    description: dati.descrizione,
+    creator: { '@id': urlAssoluto(percorsoPersona, origine) },
+    dateCreated: dati.anno === undefined ? undefined : String(dati.anno),
+    material: dati.materiali.length > 0 ? [...dati.materiali] : undefined,
+    image: dati.immagine === undefined ? undefined : urlAssoluto(dati.immagine, origine),
+  });
+}
+
 /** Breadcrumb trail: the last item is the current page (`indirizzoCorrente`). */
 export function briciole(
   voci: { titolo: string; href?: string }[],
