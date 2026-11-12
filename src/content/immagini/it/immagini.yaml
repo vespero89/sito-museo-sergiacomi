@@ -13,6 +13,7 @@
 - id: le-merlettaie-bozzetto-1
   file: le-merlettaie-bozzetto-1.jpg
   alt: 'Bozzetto della bambina delle Merlettaie: una bimba seduta su un basamento lavora al tombolo, foto in bianco e nero'
+  didascalia: 'Il bozzetto della bambina'
   origine: fondazione
   stato: confermato
   altVerificato: false
@@ -23,6 +24,7 @@
 - id: le-merlettaie-bozzetto-2
   file: le-merlettaie-bozzetto-2.jpg
   alt: Bozzetto della signora anziana delle Merlettaie con il fazzoletto in testa; accanto un uomo in camice lavora alla scultura, foto in bianco e nero
+  didascalia: 'Il bozzetto della signora anziana, mentre viene modellato'
   origine: fondazione
   stato: confermato
   altVerificato: false
@@ -33,6 +35,7 @@
 - id: le-merlettaie-bozzetto-3
   file: le-merlettaie-bozzetto-3.jpg
   alt: 'Due foto affiancate in bianco e nero del bozzetto della signora anziana: la figura intera con il tombolo e il volto in primo piano'
+  didascalia: 'La signora anziana: bozzetto della figura intera e del volto'
   origine: fondazione
   stato: confermato
   altVerificato: false
@@ -43,6 +46,7 @@
 - id: le-merlettaie-fonderia-1
   file: le-merlettaie-fonderia-1.jpg
   alt: 'La signora anziana delle Merlettaie in fonderia: figura seduta con il tombolo, di colore rossastro, su un carrello di legno'
+  didascalia: 'La signora anziana in fonderia'
   origine: fondazione
   stato: confermato
   altVerificato: false
@@ -53,6 +57,7 @@
 - id: le-merlettaie-in-loco-1
   file: le-merlettaie-in-loco-1.jpg
   alt: 'Particolare della bambina delle Merlettaie in bronzo: il volto chino, i capelli con il nastro e il colletto in pizzo'
+  didascalia: 'La bambina, particolare del bronzo in loco'
   origine: fondazione
   stato: confermato
   altVerificato: false
@@ -63,6 +68,7 @@
 - id: le-merlettaie-in-loco-2
   file: le-merlettaie-in-loco-2.jpg
   alt: La donna delle Merlettaie in bronzo, seduta di profilo con il tombolo, davanti a una torre di mattoni
+  didascalia: 'La donna, il bronzo in loco'
   origine: fondazione
   stato: confermato
   altVerificato: false
@@ -73,6 +79,7 @@
 - id: le-merlettaie-in-loco-3
   file: le-merlettaie-in-loco-3.jpg
   alt: Particolare del volto della donna delle Merlettaie in bronzo, di profilo, con la torre di mattoni sullo sfondo
+  didascalia: 'La donna, particolare del bronzo in loco'
   origine: fondazione
   stato: confermato
   altVerificato: false
@@ -83,6 +90,7 @@
 - id: le-merlettaie-in-loco-4
   file: le-merlettaie-in-loco-4.jpg
   alt: Particolare del volto della signora anziana delle Merlettaie in bronzo, chino e di profilo, su sfondo sfocato
+  didascalia: 'La signora anziana, particolare del bronzo in loco'
   origine: fondazione
   stato: confermato
   altVerificato: false
@@ -93,6 +101,7 @@
 - id: le-merlettaie-monumento-1
   file: le-merlettaie-monumento-1.jpg
   alt: 'Il gruppo in bronzo delle Merlettaie: la bambina, la donna e la signora anziana sedute con il tombolo, davanti a un muro di mattoni'
+  didascalia: 'Il monumento alle Merlettaie'
   origine: fondazione
   stato: confermato
   altVerificato: false
@@ -103,6 +112,7 @@
 - id: sogno-del-pescatore-bozzetto-1
   file: sogno-del-pescatore-bozzetto-1.jpg
   alt: 'Bozzetto in miniatura del Sogno del pescatore: un uomo solleva una donna che tiene in alto un bambino, su un blocco di pietra rosata'
+  didascalia: 'Il bozzetto in miniatura'
   origine: fondazione
   stato: confermato
   altVerificato: false
@@ -113,6 +123,7 @@
 - id: sogno-del-pescatore-fonderia-1
   file: sogno-del-pescatore-fonderia-1.jpg
   alt: Il gruppo del Sogno del pescatore in fonderia, circondato dai ponteggi, in una foto in bianco e nero
+  didascalia: 'Il gruppo in fonderia'
   origine: fondazione
   stato: confermato
   altVerificato: false
@@ -123,6 +134,7 @@
 - id: sogno-del-pescatore-fonderia-2
   file: sogno-del-pescatore-fonderia-2.jpg
   alt: 'Particolare in fonderia del Sogno del pescatore: la donna che solleva il bambino, tra le impalcature, foto in bianco e nero'
+  didascalia: 'In fonderia: particolare della donna e del bambino'
   origine: fondazione
   stato: confermato
   altVerificato: false
@@ -133,6 +145,7 @@
 - id: sogno-del-pescatore-fonderia-3
   file: sogno-del-pescatore-fonderia-3.jpg
   alt: 'Particolare in fonderia del Sogno del pescatore: il volto del pescatore ripreso dal basso, tra i tubi del ponteggio, foto in bianco e nero'
+  didascalia: 'In fonderia: particolare del pescatore'
   origine: fondazione
   stato: confermato
   altVerificato: false
@@ -143,6 +156,7 @@
 - id: sogno-del-pescatore-monumento-1
   file: sogno-del-pescatore-monumento-1.jpg
   alt: "Il Sogno del pescatore in bronzo: l'uomo solleva la donna e il bambino, con un'ancora ai piedi, davanti a un edificio"
+  didascalia: 'Il monumento in bronzo'
   origine: fondazione
   stato: confermato
   altVerificato: false

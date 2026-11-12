@@ -1,0 +1,215 @@
+---
+// "Dall'idea all'opera" (spec 5.1). Without JavaScript, and on a phone: one <section> per phase,
+// in a column, with title, text and figures. With JavaScript, a wide screen and motion allowed,
+// the script shows a sticky stage beside the text (an aria-hidden copy of the first photo of each
+// phase) and fades to the photo of the phase in view. The figures stay in the DOM with their
+// `alt`; they are only hidden from sight. The stage has no aria-live: the text is already in the flow.
+import { getEntry } from 'astro:content';
+import { t } from '../i18n/index.ts';
+import Foto from './Foto.astro';
+
+interface Fase {
+  titolo: string;
+  testo: string;
+  immagini: { id: string }[];
+}
+interface Props {
+  fasi: Fase[];
+  /** Makes the element ids unique. */
+  id: string;
+}
+const { fasi, id } = Astro.props;
+
+const sezioni = await Promise.all(
+  fasi.map(async (fase) => ({
+    ...fase,
+    foto: await Promise.all(
+      fase.immagini.map(async ({ id: idFoto }) => {
+        const voce = await getEntry('immagini', idFoto);
+        if (!voce)
+          throw new Error(`Fasi: there is no photo "${idFoto}" in the immagini collection`);
+        return { id: idFoto, didascalia: voce.data.didascalia };
+      }),
+    ),
+  })),
+);
+const numero = (n: number) =>
+  t('fasi.numero').replace('{n}', String(n)).replace('{tot}', String(sezioni.length));
+---
+
+<div class="fasi" data-fasi>
+  <div class="riquadro" data-riquadro hidden aria-hidden="true"></div>
+  <ol class="elenco">
+    {sezioni.map((s, i) => (
+      <li>
+        <section class="fase" aria-labelledby={`${id}-${i}`} data-fase={i}>
+          <p class="numero">{numero(i + 1)}</p>
+          <h3 id={`${id}-${i}`}>{s.titolo}</h3>
+          <p class="testo">{s.testo}</p>
+          <div class="figure">
+            {s.foto.map((f) => (
+              <figure>
+                <Foto id={f.id} sizes="(min-width: 64em) 26rem, (min-width: 40em) 24rem, 100vw" />
+                {f.didascalia && <figcaption>{f.didascalia}</figcaption>}
+              </figure>
+            ))}
+          </div>
+        </section>
+      </li>
+    ))}
+  </ol>
+</div>
+
+<script>
+  const SIZES_RIQUADRO = '(min-width: 64em) 36rem, 100vw';
+  // Same condition the CSS uses for the layout: wide, and the visitor accepts motion.
+  const CONDIZIONE = '(min-width: 64em) and (prefers-reduced-motion: no-preference)';
+
+  function avvia(radice: HTMLElement) {
+    const riquadro = radice.querySelector<HTMLElement>('[data-riquadro]');
+    const sezioni = [...radice.querySelectorAll<HTMLElement>('section[data-fase]')];
+    if (!riquadro || sezioni.length === 0 || !('IntersectionObserver' in window)) return;
+
+    // One layer per phase: a copy of its first photo. Built once, shown or hidden with the media query.
+    sezioni.forEach((sezione, i) => {
+      const picture = sezione.querySelector('figure picture');
+      if (!picture) return;
+      const strato = document.createElement('div');
+      strato.className = 'strato';
+      strato.dataset['fase'] = String(i);
+      const copia = picture.cloneNode(true) as HTMLElement;
+      copia.querySelectorAll('source, img').forEach((e) => e.setAttribute('sizes', SIZES_RIQUADRO));
+      strato.append(copia);
+      riquadro.append(strato);
+    });
+    const strati = [...riquadro.querySelectorAll<HTMLElement>('.strato')];
+
+    const attiva = (i: number) =>
+      strati.forEach((strato) =>
+        strato.classList.toggle('attivo', strato.dataset['fase'] === String(i)),
+      );
+    attiva(0);
+
+    // The phase that crosses the middle band of the screen is the one in view.
+    const osservatore = new IntersectionObserver(
+      (voci) => {
+        for (const voce of voci) {
+          if (voce.isIntersecting) attiva(Number((voce.target as HTMLElement).dataset['fase']));
+        }
+      },
+      { rootMargin: '-45% 0px -45% 0px' },
+    );
+
+    const condizione = window.matchMedia(CONDIZIONE);
+    const aggiorna = () => {
+      radice.classList.toggle('con-riquadro', condizione.matches);
+      riquadro.hidden = !condizione.matches;
+      if (condizione.matches) sezioni.forEach((s) => osservatore.observe(s));
+      else osservatore.disconnect();
+    };
+    condizione.addEventListener('change', aggiorna);
+    aggiorna();
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-fasi]').forEach(avvia);
+</script>
+
+<style>
+  .elenco {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--spazio-6);
+  }
+  .fase {
+    max-width: var(--larghezza-testo);
+  }
+  .numero {
+    margin: 0 0 var(--spazio-1);
+    font-size: var(--testo-s);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--colore-accento);
+  }
+  h3 {
+    margin: 0 0 var(--spazio-3);
+    font-size: var(--testo-2xl);
+    color: var(--colore-accento-scuro);
+  }
+  .testo {
+    margin: 0 0 var(--spazio-4);
+    font-size: var(--testo-l);
+  }
+  .figure {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+    gap: var(--spazio-4);
+  }
+  figure {
+    margin: 0;
+  }
+  figure :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: var(--raggio-m);
+    box-shadow: var(--ombra-m);
+  }
+  figcaption {
+    margin-block-start: var(--spazio-2);
+    font-size: var(--testo-s);
+    color: var(--colore-testo-tenue);
+  }
+
+  /* Wide, with motion: sticky stage on the left, text on the right. */
+  .con-riquadro {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--spazio-6);
+    align-items: start;
+  }
+  .riquadro {
+    position: sticky;
+    inset-block-start: calc(var(--spazio-6) + var(--spazio-4));
+    height: min(36rem, calc(100vh - 8rem));
+    border-radius: var(--raggio-m);
+    box-shadow: var(--ombra-m);
+    background: var(--colore-superficie-calda);
+    overflow: hidden;
+  }
+  .riquadro :global(.strato) {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 200ms ease;
+  }
+  .riquadro :global(.strato.attivo) {
+    opacity: 1;
+  }
+  .riquadro :global(.strato img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .con-riquadro .fase {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-block-size: 70vh;
+  }
+  /* The first figure of each phase is already in the stage: hidden from sight, not from the reader. */
+  .con-riquadro .figure > figure:first-child {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .con-riquadro .figure {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 9rem), 1fr));
+  }
+</style>

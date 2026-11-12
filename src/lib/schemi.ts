@@ -209,6 +209,8 @@ export function creaSchemi<R extends z.ZodType = z.ZodString>(opzioni: Opzioni<R
             prima: rimando('immagini'),
             dopo: rimando('immagini'),
             descrizione: testo,
+            // Two photos that do not line up are better compared with two buttons than with a slider (spec 5.2).
+            modo: z.enum(['cursore', 'pulsanti']).default('cursore'),
           }),
         )
         .optional(),

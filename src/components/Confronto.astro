@@ -1,0 +1,235 @@
+---
+// Comparison of the sketch and the monument (spec 5.2). Without JavaScript: the two figures one
+// above the other, each with its caption, and the written description. With JavaScript the two
+// photos overlap. `modo="cursore"`: a range input writes `--posizione` (setProperty, allowed by the
+// CSP) and the monument is cut with clip-path; `aria-valuetext` is updated on `change`, not on
+// `input`, so the reader does not announce every step. `modo="pulsanti"`: two toggle buttons
+// (aria-pressed) for photos that do not line up. The photos stay the same in both modes.
+import { t } from '../i18n/index.ts';
+import Foto from './Foto.astro';
+
+interface Props {
+  /** Id of the sketch photo. */
+  prima: string;
+  /** Id of the monument photo. */
+  dopo: string;
+  /** What differs between the two, written out for the reader. */
+  descrizione: string;
+  modo: 'cursore' | 'pulsanti';
+  /** Makes the element ids unique. */
+  id: string;
+}
+const { prima, dopo, descrizione, modo, id } = Astro.props;
+const sizes = '(min-width: 48em) 32rem, 100vw';
+const valore = (p: number) =>
+  t('confronto.valore')
+    .replace('{p}', String(p))
+    .replace('{m}', String(100 - p));
+---
+
+<div
+  class="confronto"
+  data-confronto
+  data-modo={modo}
+  data-mostra="prima"
+  data-valore={t('confronto.valore')}
+>
+  <div class="coppia">
+    <figure class="prima">
+      <Foto id={prima} sizes={sizes} />
+      <figcaption>{t('confronto.prima')}</figcaption>
+    </figure>
+    <figure class="dopo">
+      <Foto id={dopo} sizes={sizes} />
+      <figcaption>{t('confronto.dopo')}</figcaption>
+    </figure>
+  </div>
+  <p class="descrizione">{descrizione}</p>
+  <div class="controlli" data-controlli hidden>
+    {modo === 'cursore' ? (
+      <>
+        <label for={`${id}-cursore`}>{t('confronto.titolo')}</label>
+        <input
+          id={`${id}-cursore`}
+          type="range"
+          min="0"
+          max="100"
+          step="5"
+          value="50"
+          aria-valuetext={valore(50)}
+        />
+      </>
+    ) : (
+      <div class="pulsanti" role="group" aria-label={t('confronto.titolo')}>
+        <button type="button" data-mostra="prima" aria-pressed="true">
+          {t('confronto.mostraPrima')}
+        </button>
+        <button type="button" data-mostra="dopo" aria-pressed="false">
+          {t('confronto.mostraDopo')}
+        </button>
+      </div>
+    )}
+  </div>
+</div>
+
+<script>
+  function avvia(radice: HTMLElement) {
+    const controlli = radice.querySelector<HTMLElement>('[data-controlli]');
+    if (!controlli) return;
+    radice.classList.add('attivo');
+    controlli.hidden = false;
+
+    const cursore = radice.querySelector<HTMLInputElement>('input[type="range"]');
+    if (cursore) {
+      const modello = radice.dataset['valore'] ?? 'Bozzetto {p}%, monumento {m}%';
+      const scrivi = () => radice.style.setProperty('--posizione', `${cursore.value}%`);
+      scrivi();
+      cursore.addEventListener('input', scrivi);
+      cursore.addEventListener('change', () => {
+        const p = Number(cursore.value);
+        cursore.setAttribute(
+          'aria-valuetext',
+          modello.replace('{p}', String(p)).replace('{m}', String(100 - p)),
+        );
+      });
+      return;
+    }
+    const pulsanti = [...radice.querySelectorAll<HTMLButtonElement>('button[data-mostra]')];
+    pulsanti.forEach((pulsante) =>
+      pulsante.addEventListener('click', () => {
+        radice.dataset['mostra'] = pulsante.dataset['mostra']!;
+        pulsanti.forEach((p) => p.setAttribute('aria-pressed', String(p === pulsante)));
+      }),
+    );
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-confronto]').forEach(avvia);
+</script>
+
+<style>
+  .coppia {
+    display: grid;
+    gap: var(--spazio-4);
+  }
+  figure {
+    margin: 0;
+  }
+  figure :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: var(--raggio-m);
+    box-shadow: var(--ombra-m);
+  }
+  figcaption {
+    margin-block-start: var(--spazio-2);
+    font-size: var(--testo-s);
+    font-weight: 600;
+    color: var(--colore-testo-tenue);
+  }
+  .descrizione {
+    max-width: var(--larghezza-testo);
+    margin: var(--spazio-4) 0 0;
+    font-size: var(--testo-l);
+  }
+  .controlli {
+    max-width: 28rem;
+    margin-block-start: var(--spazio-4);
+  }
+  label {
+    display: block;
+    margin-block-end: var(--spazio-2);
+    font-weight: 600;
+  }
+  input[type='range'] {
+    width: 100%;
+    min-height: var(--bersaglio-min);
+    accent-color: var(--colore-accento);
+  }
+  .pulsanti {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spazio-2);
+  }
+  button {
+    min-height: var(--bersaglio-min);
+    padding: var(--spazio-2) var(--spazio-4);
+    border: 2px solid var(--colore-accento);
+    border-radius: var(--raggio-pieno);
+    background: var(--colore-superficie);
+    color: var(--colore-accento-scuro);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button[aria-pressed='true'] {
+    background: var(--colore-accento);
+    color: var(--colore-sull-accento);
+  }
+
+  /* With JavaScript the two photos overlap in one frame. */
+  .attivo .coppia {
+    position: relative;
+    grid-template: 1fr / 1fr;
+    max-width: 32rem;
+    aspect-ratio: 2 / 3;
+    max-height: 44rem;
+    border-radius: var(--raggio-m);
+    box-shadow: var(--ombra-m);
+    overflow: hidden;
+    background: var(--colore-superficie-calda);
+  }
+  .attivo figure {
+    grid-area: 1 / 1;
+    position: relative;
+    min-height: 0;
+  }
+  .attivo figure :global(img) {
+    height: 100%;
+    border-radius: 0;
+    box-shadow: none;
+    object-fit: cover;
+  }
+  .attivo figure :global(picture) {
+    display: block;
+    height: 100%;
+  }
+  .attivo figcaption {
+    position: absolute;
+    inset-block-start: var(--spazio-3);
+    margin: 0;
+    padding: var(--spazio-1) var(--spazio-3);
+    border-radius: var(--raggio-pieno);
+    background: var(--colore-scuro);
+    color: var(--colore-sul-scuro);
+  }
+  .attivo .prima figcaption {
+    inset-inline-start: var(--spazio-3);
+  }
+  .attivo .dopo figcaption {
+    inset-inline-end: var(--spazio-3);
+  }
+  /* Slider: the monument shows from the handle to the right. */
+  .attivo[data-modo='cursore'] .dopo {
+    clip-path: inset(0 0 0 var(--posizione, 50%));
+  }
+  .attivo[data-modo='cursore'] .coppia::after {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: var(--posizione, 50%);
+    width: 3px;
+    margin-inline-start: -1.5px;
+    background: var(--colore-superficie);
+    box-shadow: 0 0 0.5rem var(--colore-ombra);
+    pointer-events: none;
+  }
+  /* Buttons: one photo at a time, with a short fade (zero under reduced motion, through the token). */
+  .attivo[data-modo='pulsanti'] .dopo {
+    opacity: 0;
+    transition: opacity var(--durata-m) var(--curva);
+  }
+  .attivo[data-modo='pulsanti'][data-mostra='dopo'] .dopo {
+    opacity: 1;
+  }
+</style>

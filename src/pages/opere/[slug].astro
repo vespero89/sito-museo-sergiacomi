@@ -7,6 +7,8 @@ import CartaOpera from '../../components/CartaOpera.astro';
 import Continua from '../../components/Continua.astro';
 import Dubbi from '../../components/Dubbi.astro';
 import FotoOpera from '../../components/FotoOpera.astro';
+import Confronto from '../../components/Confronto.astro';
+import Fasi from '../../components/Fasi.astro';
 import Galleria from '../../components/Galleria.astro';
 import SchedaOpera from '../../components/SchedaOpera.astro';
 import { t } from '../../i18n/index.ts';
@@ -22,7 +24,8 @@ export async function getStaticPaths() {
 
 const tutte = await leggiOpere();
 const opera = tutte.find((o) => o.slug === Astro.params.slug) as OperaCompleta;
-const { titolo, categoria, anno, materiali, stato, daConfermare, immagini } = opera.voce.data;
+const { titolo, categoria, anno, materiali, stato, daConfermare, immagini, fasi, confronti } =
+  opera.voce.data;
 const { Content } = await render(opera.voce);
 
 const altre = immagini.map((i) => i.immagine.id).filter((id) => id !== opera.foto);
@@ -93,6 +96,33 @@ const datiJsonLd = {
         <SchedaOpera opera={opera} />
       </aside>
     </div>
+
+    {fasi && (
+      <section class="idea" aria-labelledby="idea-titolo">
+        <h2 id="idea-titolo">{t('fasi.titolo')}</h2>
+        <Fasi
+          id="fase"
+          fasi={fasi.map((f) => ({
+            titolo: f.titolo,
+            testo: f.testo,
+            immagini: f.immagini.map((i) => ({ id: i.id })),
+          }))}
+        />
+      </section>
+    )}
+
+    {confronti?.map((c, i) => (
+      <section class="idea" aria-labelledby={`confronto-titolo-${i}`}>
+        <h2 id={`confronto-titolo-${i}`}>{t('confronto.titolo')}</h2>
+        <Confronto
+          id={`confronto-${i}`}
+          prima={c.prima.id}
+          dopo={c.dopo.id}
+          descrizione={c.descrizione}
+          modo={c.modo}
+        />
+      </section>
+    ))}
 
     {altre.length > 0 && (
       <section class="altre" aria-labelledby="altre-titolo">
@@ -182,6 +212,7 @@ const datiJsonLd = {
     border-inline-start: 3px solid var(--colore-accento);
     color: var(--colore-testo-tenue);
   }
+  .idea,
   .altre,
   .vicine {
     padding-block: var(--spazio-6) 0;
