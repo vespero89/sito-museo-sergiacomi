@@ -227,8 +227,73 @@ function controllaSito(dati: unknown, file: string): Problema[] {
   }));
 }
 
+/**
+ * Works of the Foundation's list (`nellElenco: true`) for each comune, from the docx and the
+ * exploration (spec 3.3): 25 in all. With the two extra cards Offida has 9.
+ */
+export const CONTEGGIO_OPERE_PER_COMUNE: Readonly<Record<string, number>> = {
+  Offida: 7,
+  Teramo: 4,
+  'Ascoli Piceno': 3,
+  'San Benedetto del Tronto': 3,
+  Fermo: 2,
+  Loreto: 2,
+  Grottammare: 1,
+  "Montefiore dell'Aso": 1,
+  "Sant'Egidio alla Vibrata": 1,
+  Folignano: 1,
+};
+
+/**
+ * Checks that the import has the number of works the docx lists (spec 3.3), in total and for each
+ * comune. Only for the real repository: a small test repo has no reason to have 25 works.
+ */
+export function controllaConteggi(contenuti: Contenuti): Problema[] {
+  const comuneDi = new Map<string, string>();
+  for (const l of contenuti.luoghi) {
+    const comune = (l.dati as { comune?: unknown } | null)?.comune;
+    if (typeof comune === 'string') comuneDi.set(l.id, comune);
+  }
+
+  const trovate: Record<string, number> = {};
+  let totale = 0;
+  for (const o of contenuti.opere) {
+    const dati = o.dati as { nellElenco?: unknown; luogo?: unknown } | null;
+    if (dati?.nellElenco !== true) continue;
+    totale += 1;
+    const comune = comuneDi.get(String(dati.luogo)) ?? '(unknown place)';
+    trovate[comune] = (trovate[comune] ?? 0) + 1;
+  }
+
+  const attesa = Object.values(CONTEGGIO_OPERE_PER_COMUNE).reduce((a, b) => a + b, 0);
+  const problemi: Problema[] = [];
+  const file = 'src/content/opere/it';
+  if (totale !== attesa) {
+    problemi.push({ file, messaggio: `expected ${attesa} works of the list, found ${totale}` });
+  }
+  for (const comune of new Set([
+    ...Object.keys(CONTEGGIO_OPERE_PER_COMUNE),
+    ...Object.keys(trovate),
+  ])) {
+    const attese = CONTEGGIO_OPERE_PER_COMUNE[comune] ?? 0;
+    const viste = trovate[comune] ?? 0;
+    if (attese !== viste) {
+      problemi.push({ file, messaggio: `expected ${attese} works in ${comune}, found ${viste}` });
+    }
+  }
+  return problemi;
+}
+
+interface OpzioniRepo {
+  /** Also check the counts of the import (`controllaConteggi`). `npm run content:check` does. */
+  conteggi?: boolean;
+}
+
 /** Runs every check on the repository at `radice`. */
-export function controllaRepo(radice: string): { problemi: Problema[]; voci: number } {
+export function controllaRepo(
+  radice: string,
+  { conteggi = false }: OpzioniRepo = {},
+): { problemi: Problema[]; voci: number } {
   const problemi: Problema[] = [];
 
   const contenuti = leggiContenuti(radice, problemi);
@@ -238,6 +303,7 @@ export function controllaRepo(radice: string): { problemi: Problema[]; voci: num
       fotoPresenti: elencaFoto(radice),
     }),
   );
+  if (conteggi) problemi.push(...controllaConteggi(contenuti));
 
   const fileSito = 'src/data/sito.yaml';
   try {

@@ -3,6 +3,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import {
+  CONTEGGIO_OPERE_PER_COMUNE,
+  controllaConteggi,
   controllaContenuti,
   controllaRepo,
   dividiFrontmatter,
@@ -185,6 +187,60 @@ describe('controllaContenuti', () => {
   });
 });
 
+describe('controllaConteggi (import counts, spec 3.3)', () => {
+  const comuni = Object.entries(CONTEGGIO_OPERE_PER_COMUNE);
+
+  /** The expected import: one place per comune, and the works of the list spread as expected. */
+  function importCompleto(): Contenuti {
+    const c = mondo();
+    c.luoghi = comuni.map(([comune]) =>
+      voce(`luogo-${comune}`, { ...f.LUOGO, nome: comune, comune }),
+    );
+    c.opere = comuni.flatMap(([comune, quante]) =>
+      Array.from({ length: quante }, (_, i) =>
+        voce(`opera-${comune}-${i}`, { ...f.OPERA, luogo: `luogo-${comune}` }),
+      ),
+    );
+    return c;
+  }
+  const messaggi = (c: Contenuti) => controllaConteggi(c).map((p) => p.messaggio);
+
+  it('expects 25 works of the list, spread over the comuni of the exploration', () => {
+    expect(comuni.reduce((somma, [, n]) => somma + n, 0)).toBe(25);
+    expect(CONTEGGIO_OPERE_PER_COMUNE['Offida']).toBe(7);
+    expect(CONTEGGIO_OPERE_PER_COMUNE['Teramo']).toBe(4);
+  });
+
+  it('passes the expected import', () => {
+    expect(messaggi(importCompleto())).toEqual([]);
+  });
+
+  it('does not count the works outside the list (the two extra cards)', () => {
+    const c = importCompleto();
+    c.opere.push(
+      voce('stemmi', { ...f.OPERA, nellElenco: false, luogo: 'luogo-Offida' }),
+      voce('palmucci', { ...f.OPERA, nellElenco: false, luogo: 'luogo-Offida' }),
+    );
+    expect(messaggi(c)).toEqual([]);
+  });
+
+  it('fails on a missing work, naming the number found', () => {
+    const c = importCompleto();
+    c.opere.pop();
+    const e = messaggi(c);
+    expect(e.some((m) => m.includes('25') && m.includes('24'))).toBe(true);
+  });
+
+  it('fails when a comune has the wrong number of works', () => {
+    const c = importCompleto();
+    const i = c.opere.findIndex((o) => o.id.startsWith('opera-Teramo'));
+    c.opere[i] = voce('opera-spostata', { ...f.OPERA, luogo: 'luogo-Offida' });
+    const e = messaggi(c).join('\n');
+    expect(e).toContain('Teramo');
+    expect(e).toContain('Offida');
+  });
+});
+
 describe('dividiFrontmatter', () => {
   it('splits the frontmatter from the body', () => {
     const r = dividiFrontmatter('---\ntitolo: A\n---\nCorpo.\n');
@@ -315,5 +371,10 @@ describe('controllaRepo', () => {
   it('passes on the real repository', () => {
     const radice = join(import.meta.dirname, '..', '..');
     expect(controllaRepo(radice).problemi).toEqual([]);
+  });
+
+  it('checks the import counts only when asked', () => {
+    expect(controllaRepo(base()).problemi).toEqual([]);
+    expect(controllaRepo(base(), { conteggi: true }).problemi.length).toBeGreaterThan(0);
   });
 });
