@@ -18,20 +18,24 @@ npm install
 local to each clone and does not travel with `git clone`, so run `npm install` once after every fresh clone
 to turn the pre-commit hook on.
 
+For the browser tests, download the browser once with `npx playwright install chromium`.
+
 ## Commands
 
-| Command                    | What it does                                                                                        |
-| -------------------------- | --------------------------------------------------------------------------------------------------- |
-| `npm run dev`              | Development server.                                                                                 |
-| `npm run build`            | Build into `dist/`, then write `dist/_headers` and `dist/_redirects` (see "Hosting").               |
-| `npm run serve`            | Serve `dist/` with the hosting rules applied (`--port`, `--fake-tiles`), for the browser tests.     |
-| `npm run build:production` | Production build. Stops with a list while anything is not confirmed (see "Unconfirmed content").    |
-| `npm test`                 | Vitest: unit tests and tests on the built `dist/` (run `npm run build` first).                      |
-| `npm run content:check`    | Content schemas, references, import counts (25 works) and `src/data/sito.yaml`.                     |
-| `npm run content:report`   | What is not confirmed yet, by collection and type.                                                  |
-| `npm run images`           | Rebuild the master photos in `src/assets/foto/` from `materiali/` (see "Photos").                   |
-| `npm run check`            | Everything the pre-commit hook runs: type check, ESLint, Prettier, content check, build and Vitest. |
-| `npm run format`           | Format all files with Prettier.                                                                     |
+| Command                    | What it does                                                                                                |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `npm run dev`              | Development server.                                                                                         |
+| `npm run build`            | Build into `dist/`, then write `dist/_headers` and `dist/_redirects` (see "Hosting").                       |
+| `npm run serve`            | Serve `dist/` with the hosting rules applied (`--port`, `--fake-tiles`), for the browser tests.             |
+| `npm run build:production` | Production build. Stops with a list while anything is not confirmed (see "Unconfirmed content").            |
+| `npm test`                 | Vitest: unit tests and tests on the built `dist/` (run `npm run build` first).                              |
+| `npm run test:e2e`         | Build, then Playwright (Chromium) on `dist/`: axe, keyboard, no JS, no outside request, CSP (`tests/e2e/`). |
+| `npm run test:lh`          | Build, then Lighthouse CI on the home page (`lighthouserc.json`). Needs Google Chrome.                      |
+| `npm run content:check`    | Content schemas, references, import counts (25 works) and `src/data/sito.yaml`.                             |
+| `npm run content:report`   | What is not confirmed yet, by collection and type.                                                          |
+| `npm run images`           | Rebuild the master photos in `src/assets/foto/` from `materiali/` (see "Photos").                           |
+| `npm run check`            | Everything the pre-commit hook runs: type check, ESLint, Prettier, content check, build and Vitest.         |
+| `npm run format`           | Format all files with Prettier.                                                                             |
 
 The `check` command grows as the project does: later tasks add their own steps to it.
 
