@@ -75,7 +75,7 @@ const fasi = ['bozzetto', 'fonderia', 'monumento']
 >
   <section class="apertura" aria-labelledby="titolo-home">
     <figure class="foto">
-      <Foto id={FOTO_APERTURA} sizes="100vw" priorita />
+      <Foto id={FOTO_APERTURA} sizes="(max-width: 48em) 60vw, 100vw" priorita />
       {credito && <figcaption>{t('home.credito').replace('{credito}', credito)}</figcaption>}
     </figure>
     <div class="cont">
@@ -135,7 +135,7 @@ const fasi = ['bozzetto', 'fonderia', 'monumento']
         {aree.map((a) => (
           <li>
             <a href={a.href}>
-              <Foto id={a.foto} sizes="(min-width: 48em) 24rem, 100vw" larghezzaMax={800} />
+              <Foto id={a.foto} sizes="(min-width: 48em) 24rem, 100vw" larghezzaMax={480} />
               <span class="didascalia">
                 <span class="nome">{a.nome}</span>
                 <span class="testo">{a.testo}</span>
@@ -158,7 +158,7 @@ const fasi = ['bozzetto', 'fonderia', 'monumento']
         <ol class="fasi">
           {fasi.map((f) => (
             <li>
-              <Foto id={f.foto} sizes="(min-width: 48em) 18rem, 90vw" larghezzaMax={800} />
+              <Foto id={f.foto} sizes="(min-width: 48em) 18rem, 90vw" larghezzaMax={480} />
               <span class="nome">{f.titolo}</span>
             </li>
           ))}

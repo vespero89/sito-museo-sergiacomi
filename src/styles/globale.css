@@ -92,6 +92,11 @@ main:focus {
   padding-inline: var(--margine-laterale);
 }
 
+.contenitore.larga {
+  max-width: none;
+  padding-inline: 0;
+}
+
 /* Text for screen readers only. */
 .solo-lettori {
   position: absolute;
