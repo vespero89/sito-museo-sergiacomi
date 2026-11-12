@@ -29,6 +29,7 @@ to turn the pre-commit hook on.
 | `npm test`                 | Vitest: unit tests and tests on the built `dist/` (run `npm run build` first).                      |
 | `npm run content:check`    | Content schemas, references between collections and `src/data/sito.yaml`.                           |
 | `npm run content:report`   | What is not confirmed yet, by collection and type.                                                  |
+| `npm run images`           | Rebuild the master photos in `src/assets/foto/` from `materiali/` (see "Photos").                   |
 | `npm run check`            | Everything the pre-commit hook runs: type check, ESLint, Prettier, content check, build and Vitest. |
 | `npm run format`           | Format all files with Prettier.                                                                     |
 
@@ -40,6 +41,18 @@ Content lives in `src/content/<collection>/it/` (Markdown with frontmatter, or Y
 `src/data/sito.yaml`. The schemas are in `src/lib/schemi.ts` and `src/lib/sito.ts`; the services registry
 is `src/data/servizi.ts`. Astro only logs a broken reference between collections and goes on, so
 `npm run content:check` checks every reference itself and lists all the bad ones.
+
+## Photos
+
+Photos live only in `src/assets/foto/` (JPEG masters, at most 2400 px and 1 MB, no metadata, versioned);
+the originals stay in `materiali/` (not in git). `npm run images` rebuilds the masters from the originals
+following the table in `scripts/immagini-tabella.mjs`, which also lists the originals that are not
+imported. Every master needs an entry with its `alt` in `src/content/immagini/it/immagini.yaml`
+(`content:check` fails without it). A page shows a photo with `src/components/Foto.astro` (AVIF and WebP
+with a JPEG fallback, `srcset`, real `width` and `height`; `priorita` for the one largest image in view,
+one per page at most). Never put a photo in `public/`. Open Graph images (1200x630) are written to
+`dist/og/` for every photo, plus `/og/predefinita.jpg`. Encoder quality is set in `astro.config.mjs`; Astro
+caches the transformed images by name and size only, so after changing it delete `node_modules/.astro/assets`.
 
 ## Unconfirmed content
 
