@@ -1,0 +1,175 @@
+---
+// Schematic plan of the museum (spec 5.6, change of 12/11): an SVG with four boxes, one for each
+// environment, each a link to its page; under it the same four links as a text list. The plan is
+// a placeholder: the Foundation or Claude Design replaces the drawing and keeps the same links.
+// It is not the only way to reach the environments: the list is. Hover and focus change the
+// colours in CSS only, with no transition.
+import { t } from '../i18n/index.ts';
+import type { Ambiente } from '../lib/ambienti.ts';
+import { leggiAmbienti } from '../lib/ambienti-dati.ts';
+import DaConfermare from './DaConfermare.astro';
+
+const ambienti = await leggiAmbienti();
+
+// Where each environment sits in the drawing (viewBox 640 x 360) and how its box is labelled.
+const RIQUADRI: Record<Ambiente, { x: number; y: number; w: number; h: number; sigla: string }> = {
+  'le-sale': { x: 20, y: 20, w: 390, h: 150, sigla: '1 · 2 · 3' },
+  'il-laboratorio': { x: 20, y: 190, w: 190, h: 150, sigla: '4' },
+  'il-chiostro': { x: 230, y: 190, w: 180, h: 150, sigla: '' },
+  'spazi-fondazione': { x: 430, y: 20, w: 190, h: 320, sigla: '' },
+};
+
+/** Splits a title in lines of about `max` characters, on spaces. */
+function righe(titolo: string, max = 18): string[] {
+  const parole = titolo.split(' ');
+  const out: string[] = [];
+  for (const parola of parole) {
+    const ultima = out.at(-1);
+    if (ultima !== undefined && `${ultima} ${parola}`.length <= max)
+      out[out.length - 1] = `${ultima} ${parola}`;
+    else out.push(parola);
+  }
+  return out;
+}
+
+const riquadri = ambienti.map(({ ambiente, voce, indirizzo }) => {
+  const r = RIQUADRI[ambiente];
+  const linee = righe(voce.data.titolo);
+  const altezzaTesto = linee.length * 24;
+  const y0 = r.y + r.h / 2 - altezzaTesto / 2 + (r.sigla ? 14 : 4);
+  return {
+    indirizzo,
+    titolo: voce.data.titolo,
+    descrizione: voce.data.descrizione,
+    ...r,
+    linee,
+    xTesto: r.x + r.w / 2,
+    y0,
+    ySigla: r.y + 34,
+  };
+});
+---
+
+<section class="pianta-sezione" aria-labelledby="pianta-titolo-sezione">
+  <h2 id="pianta-titolo-sezione">{t('pianta.titolo')}</h2>
+  <p class="nota">
+    <DaConfermare tipo="segnaposto" /> Pianta schematica provvisoria.
+  </p>
+
+  <svg
+    class="pianta"
+    viewBox="0 0 640 360"
+    role="group"
+    aria-labelledby="pianta-titolo pianta-desc"
+  >
+    <title id="pianta-titolo">{t('pianta.etichetta')}</title>
+    <desc id="pianta-desc">{t('pianta.descrizione')}</desc>
+    {riquadri.map((r) => (
+      <a href={r.indirizzo}>
+        <rect x={r.x} y={r.y} width={r.w} height={r.h} rx="10" />
+        {r.sigla && (
+          <text class="sigla" x={r.xTesto} y={r.ySigla} text-anchor="middle">
+            {r.sigla + ' '}
+          </text>
+        )}
+        <text class="nome" text-anchor="middle">
+          {r.linee.map((linea, i) => (
+            <tspan x={r.xTesto} y={r.y0 + i * 24}>
+              {i < r.linee.length - 1 ? `${linea} ` : linea}
+            </tspan>
+          ))}
+        </text>
+      </a>
+    ))}
+  </svg>
+
+  <ul class="elenco-ambienti">
+    {riquadri.map((r) => (
+      <li>
+        <a href={r.indirizzo}>{r.titolo}</a>
+        <span>{r.descrizione}</span>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .pianta-sezione {
+    padding-block: var(--spazio-6) 0;
+    border-block-start: 1px solid var(--colore-bordo);
+    margin-block-start: var(--spazio-6);
+  }
+  h2 {
+    margin-block: 0 var(--spazio-3);
+    font-size: var(--testo-2xl);
+    color: var(--colore-accento-scuro);
+  }
+  .nota {
+    margin-block: 0 var(--spazio-4);
+    color: var(--colore-testo-tenue);
+  }
+  .pianta {
+    display: block;
+    width: 100%;
+    max-width: 44rem;
+    height: auto;
+    margin-block-end: var(--spazio-5);
+  }
+  .pianta a {
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .pianta rect {
+    fill: var(--colore-superficie-calda);
+    stroke: var(--colore-accento);
+    stroke-width: 2;
+  }
+  .pianta text {
+    fill: var(--colore-testo);
+    font-family: var(--font-titoli);
+    font-size: 19px;
+    font-weight: 700;
+  }
+  .pianta .sigla {
+    fill: var(--colore-accento-scuro);
+    font-family: var(--font-testo);
+    font-size: 14px;
+    letter-spacing: 0.15em;
+  }
+  .pianta a:hover rect,
+  .pianta a:focus-visible rect {
+    fill: var(--colore-accento);
+  }
+  .pianta a:hover text,
+  .pianta a:focus-visible text {
+    fill: var(--colore-sull-accento);
+  }
+  .pianta a:focus-visible {
+    outline: 3px solid var(--colore-focus);
+    outline-offset: 3px;
+  }
+  .elenco-ambienti {
+    display: grid;
+    gap: var(--spazio-3);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .elenco-ambienti li {
+    display: grid;
+    gap: var(--spazio-1);
+    padding: var(--spazio-4);
+    background: var(--colore-superficie);
+    border: 1px solid var(--colore-bordo);
+    border-radius: var(--raggio-m);
+  }
+  .elenco-ambienti a {
+    font-family: var(--font-titoli);
+    font-size: var(--testo-xl);
+    font-weight: 700;
+  }
+  .elenco-ambienti span {
+    color: var(--colore-testo-tenue);
+  }
+</style>

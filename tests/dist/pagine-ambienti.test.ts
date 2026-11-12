@@ -91,3 +91,28 @@ describe('the Foundation spaces and Didattica', () => {
     expect(documento('/didattica/').querySelector(`a[href="${indirizzo}"]`)).not.toBeNull();
   });
 });
+
+describe('the plan on /il-museo/', () => {
+  const d = documento('/il-museo/');
+  const href = (el: Element) => el.getAttribute('href');
+
+  it('is an SVG with a title and a description and four links to the four environments', () => {
+    const svg = d.querySelector('svg.pianta')!;
+    expect(svg.querySelector('title')!.textContent!.trim().length).toBeGreaterThan(3);
+    expect(svg.querySelector('desc')!.textContent!.trim().length).toBeGreaterThan(20);
+    expect([...svg.querySelectorAll('a')].map(href)).toEqual(AMBIENTI.map(([indirizzo]) => indirizzo));
+    // The name of each link is its visible text: the title of the environment.
+    const nomi = [...svg.querySelectorAll('a')].map((a) => a.textContent!.replace(/\s+/g, ' ').trim());
+    nomi.forEach((nome, i) => expect(nome).toContain(AMBIENTI[i]![1].replaceAll('  ', ' ')));
+  });
+
+  it('has the same four links as a text list under the plan', () => {
+    const elenco = [...d.querySelectorAll('ul.elenco-ambienti a')];
+    expect(elenco.map(href)).toEqual(AMBIENTI.map(([indirizzo]) => indirizzo));
+    expect(elenco.map((a) => a.textContent!.trim())).toEqual(AMBIENTI.map(([, titolo]) => titolo));
+  });
+
+  it('is marked as a placeholder', () => {
+    expect(etichette('/il-museo/')).toContain('Segnaposto');
+  });
+});
