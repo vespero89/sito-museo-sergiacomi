@@ -8,6 +8,7 @@ import PiedeSito from '../components/PiedeSito.astro';
 import Seo from '../components/Seo.astro';
 import Testata from '../components/Testata.astro';
 import { LINGUA_PREDEFINITA, t, type Lingua } from '../i18n/index.ts';
+import { serializza, type NodoJsonLd } from '../lib/jsonld.ts';
 import { decidiModalita } from '../lib/modalita.ts';
 import { leggiSito } from '../lib/sito-dati.ts';
 
@@ -24,6 +25,8 @@ interface Props {
   altOg?: string;
   /** Breadcrumb trail from the home page, the last item being the current page. */
   briciole?: { titolo: string; href?: string }[];
+  /** JSON-LD nodes of the page (spec 6.2), written as one `@graph` of data, not as code. */
+  jsonld?: NodoJsonLd[];
   lingua?: Lingua;
 }
 const {
@@ -34,6 +37,7 @@ const {
   immagineOg,
   altOg,
   briciole,
+  jsonld,
   lingua = LINGUA_PREDEFINITA,
 } = Astro.props;
 
@@ -59,6 +63,7 @@ const modalita = decidiModalita(process.env);
       immagineOg={immagineOg}
       altOg={altOg}
     />
+    {jsonld && <script type="application/ld+json" set:html={serializza(jsonld)} />}
   </head>
   <body>
     <a class="salta" href="#contenuto">
