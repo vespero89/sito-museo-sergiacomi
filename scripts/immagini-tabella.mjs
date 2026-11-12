@@ -58,6 +58,9 @@ export const TABELLA = [
     originale: `${OPERE}/1 - Le Merlettaie/Le Merlettaie - monumento.jpg`,
     nuovo: 'le-merlettaie-monumento-1.jpg',
   },
+  // Loose file in the root of the folder: the whole group in a courtyard. A cover photo for the
+  // home page, not one of the 10 photos of the phases.
+  { originale: 'merlettaie1.jpeg', nuovo: 'le-merlettaie-copertina-1.jpg' },
   // Il sogno del pescatore: 5 photos
   {
     originale: `${OPERE}/5 - Il sogno del pescatore/Il sogno del pescatore - bozzetto in miniatura.jpg`,
@@ -140,8 +143,4 @@ export const SCARTATE = [
     motivo: 'drawing of the old proposal, not a photo',
   },
   { originale: '7 - Logo/Prova Logo.jpg', motivo: 'logo, not a photo: goes in the design brief' },
-  {
-    originale: 'merlettaie1.jpeg',
-    motivo: 'loose file outside the photo folders, not in the spec inventory: waiting for Fabio',
-  },
 ];
