@@ -64,6 +64,16 @@ value). `npm run build:production` stops, with the list, while any of these is o
 lets a production build go on, but only as a private preview: noindex, no sitemap, no `llms.txt`.
 `npm run content:report` is the working list for the content team.
 
+## Layout, menu and addresses
+
+`src/layouts/Base.astro` gives every page the head (`Seo.astro`), skip link, header, footer and, below
+768 px, the fixed bar with the two visit actions. Menu, actions and footer links come from
+`src/data/sito.yaml` (`navigazione`, `azioni`), so moving an item from `principale` to `piede` is one edit.
+The menu is a native `popover`: no JavaScript. Interface texts are in `src/i18n/it.json`; `percorso()` in
+`src/i18n/index.ts` builds the address for a language. Canonical and Open Graph addresses use the origin in
+`SITE_URL` (a placeholder domain until the real one is decided). Pages that the menu points at but that do
+not exist yet are listed in `tests/dist/pagine-future.json`: each task removes its own entries.
+
 ## Hosting
 
 `config/hosting.mjs` is the single source of the security headers, the CSP and the 301 redirects from the
