@@ -4,7 +4,9 @@ import { describe, expect, it } from 'vitest';
 import {
   briciole,
   clean,
+  evento,
   fondazione,
+  itinerario,
   museo,
   opera,
   persona,
@@ -253,5 +255,60 @@ describe('opera', () => {
   it('never says where the work was made or what it shows', () => {
     const nodo = JSON.stringify(opera(dati, ORIGINE));
     expect(nodo).not.toMatch(/locationCreated|contentLocation/);
+  });
+});
+
+describe('itinerario', () => {
+  it('is a TouristTrip with the stops in order', () => {
+    const nodo = itinerario(
+      {
+        slug: 'i-portali',
+        titolo: 'I portali',
+        descrizione: 'Portali in bronzo.',
+        modo: 'in auto',
+        tappe: [
+          { nome: 'Offida', url: '/opere/a/' },
+          { nome: 'Teramo', url: '/opere/b/' },
+        ],
+      },
+      ORIGINE,
+    );
+    expect(nodo['@type']).toBe('TouristTrip');
+    expect(nodo['url']).toBe('https://esempio.test/itinerari/i-portali/');
+    const voci = (
+      nodo['itinerary'] as { itemListElement: { position: number; name: string; url: string }[] }
+    ).itemListElement;
+    expect(voci.map((v) => [v.position, v.name, v.url])).toEqual([
+      [1, 'Offida', 'https://esempio.test/opere/a/'],
+      [2, 'Teramo', 'https://esempio.test/opere/b/'],
+    ]);
+  });
+});
+
+describe('evento', () => {
+  const base = { slug: 'centenario', titolo: 'Centenario', descrizione: 'Due giorni a Offida.' };
+
+  it('has the day, the end day and the Foundation as organiser', () => {
+    const nodo = evento(
+      { ...base, data: '2012-07-27', dataFine: '2012-07-28', luogo: 'Offida' },
+      ORIGINE,
+    );
+    expect(nodo['@type']).toBe('Event');
+    expect(nodo['startDate']).toBe('2012-07-27');
+    expect(nodo['endDate']).toBe('2012-07-28');
+    expect(nodo['organizer']).toEqual({ '@id': 'https://esempio.test/chi-siamo/#fondazione' });
+  });
+
+  it('adds the offset of Rome when the time is known', () => {
+    expect(evento({ ...base, data: '2012-07-27', ora: '21:00' }, ORIGINE)['startDate']).toBe(
+      '2012-07-27T21:00:00+02:00',
+    );
+    expect(evento({ ...base, data: '2026-01-10', ora: '10:30' }, ORIGINE)['startDate']).toBe(
+      '2026-01-10T10:30:00+01:00',
+    );
+  });
+
+  it('gives nothing without a day', () => {
+    expect(evento(base, ORIGINE)).toEqual({});
   });
 });

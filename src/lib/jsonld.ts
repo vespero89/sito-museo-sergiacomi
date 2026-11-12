@@ -1,6 +1,7 @@
 // JSON-LD of the pages (spec 6.2): pure functions, one per type. Every value passes through
 // `clean`, so a doubtful or empty value never reaches the page (spec 3.5). The `@id` of each
 // node is stable and absolute, so the nodes can point at each other.
+import { scostamentoRoma } from './date.ts';
 import { urlAssoluto } from './seo.ts';
 import { campoSito, type Sito } from './sito.ts';
 
@@ -148,6 +149,74 @@ export function opera(dati: DatiOperaJsonLd, origine: string | URL): NodoJsonLd 
     dateCreated: dati.anno === undefined ? undefined : String(dati.anno),
     material: dati.materiali.length > 0 ? [...dati.materiali] : undefined,
     image: dati.immagine === undefined ? undefined : urlAssoluto(dati.immagine, origine),
+  });
+}
+
+export interface DatiItinerarioJsonLd {
+  slug: string;
+  titolo: string;
+  descrizione: string;
+  /** How people move: shown as `touristType`. */
+  modo?: string | undefined;
+  /** The stops in order. */
+  tappe: readonly { nome: string; url?: string | undefined }[];
+}
+
+/** An itinerary (spec 6.2): a `TouristTrip` whose `itinerary` lists the stops in order. */
+export function itinerario(dati: DatiItinerarioJsonLd, origine: string | URL): NodoJsonLd {
+  const url = urlAssoluto(`/itinerari/${dati.slug}/`, origine);
+  return pulito({
+    '@type': 'TouristTrip',
+    '@id': `${url}#itinerario`,
+    url,
+    name: dati.titolo,
+    description: dati.descrizione,
+    touristType: dati.modo,
+    itinerary: {
+      '@type': 'ItemList',
+      itemListElement: dati.tappe.map((tappa, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: tappa.nome,
+        url: tappa.url === undefined ? undefined : urlAssoluto(tappa.url, origine),
+      })),
+    },
+  });
+}
+
+export interface DatiEventoJsonLd {
+  slug: string;
+  titolo: string;
+  descrizione: string;
+  /** Day AAAA-MM-GG. Without a confirmed day there is no Event: the function gives `{}`. */
+  data?: string | undefined;
+  dataFine?: string | undefined;
+  /** HH:MM in Rome. */
+  ora?: string | undefined;
+  luogo?: string | undefined;
+}
+
+/**
+ * An event (spec 6.2), only with a confirmed day: the date carries the offset of Rome when the
+ * time is known. The organiser is the Foundation, by `@id`.
+ */
+export function evento(dati: DatiEventoJsonLd, origine: string | URL): NodoJsonLd {
+  if (dati.data === undefined) return {};
+  const url = urlAssoluto(`/eventi/${dati.slug}/`, origine);
+  return pulito({
+    '@type': 'Event',
+    '@id': `${url}#evento`,
+    url,
+    name: dati.titolo,
+    description: dati.descrizione,
+    startDate:
+      dati.ora === undefined
+        ? dati.data
+        : `${dati.data}T${dati.ora}:00${scostamentoRoma(dati.data)}`,
+    endDate: dati.dataFine,
+    eventStatus: 'https://schema.org/EventScheduled',
+    location: dati.luogo === undefined ? undefined : { '@type': 'Place', name: dati.luogo },
+    organizer: { '@id': urlAssoluto(percorsoFondazione, origine) },
   });
 }
 
