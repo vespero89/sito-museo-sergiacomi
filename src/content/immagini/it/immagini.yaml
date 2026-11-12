@@ -6,6 +6,9 @@
   origine: fondazione
   stato: confermato
   altVerificato: false
+  soggetto:
+    tipo: opera
+    id: le-merlettaie
   fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/1 - Le Merlettaie/Le Merlettaie - Aldo Sergiacomi.jpg
 - id: le-merlettaie-bozzetto-1
   file: le-merlettaie-bozzetto-1.jpg
@@ -13,6 +16,9 @@
   origine: fondazione
   stato: confermato
   altVerificato: false
+  soggetto:
+    tipo: opera
+    id: le-merlettaie
   fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/1 - Le Merlettaie/Le Merlettaie - bambina - bozzetto.jpg
 - id: le-merlettaie-bozzetto-2
   file: le-merlettaie-bozzetto-2.jpg
@@ -20,6 +26,9 @@
   origine: fondazione
   stato: confermato
   altVerificato: false
+  soggetto:
+    tipo: opera
+    id: le-merlettaie
   fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/1 - Le Merlettaie/Le Merlettaie - signora anziana - bozzetto.jpg
 - id: le-merlettaie-bozzetto-3
   file: le-merlettaie-bozzetto-3.jpg
@@ -27,6 +36,9 @@
   origine: fondazione
   stato: confermato
   altVerificato: false
+  soggetto:
+    tipo: opera
+    id: le-merlettaie
   fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/1 - Le Merlettaie/Le Merlettaie - signora anziana - particolare bozzetto.jpg
 - id: le-merlettaie-fonderia-1
   file: le-merlettaie-fonderia-1.jpg
@@ -34,6 +46,9 @@
   origine: fondazione
   stato: confermato
   altVerificato: false
+  soggetto:
+    tipo: opera
+    id: le-merlettaie
   fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/1 - Le Merlettaie/Le Merlettaie - signora anziana - fonderia.jpg
 - id: le-merlettaie-in-loco-1
   file: le-merlettaie-in-loco-1.jpg
@@ -41,6 +56,9 @@
   origine: fondazione
   stato: confermato
   altVerificato: false
+  soggetto:
+    tipo: opera
+    id: le-merlettaie
   fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/1 - Le Merlettaie/Le Merlettaie - bambina - particolare in loco.jpg
 - id: le-merlettaie-in-loco-2
   file: le-merlettaie-in-loco-2.jpg
@@ -48,6 +66,9 @@
   origine: fondazione
   stato: confermato
   altVerificato: false
+  soggetto:
+    tipo: opera
+    id: le-merlettaie
   fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/1 - Le Merlettaie/Le Merlettaie - donna - in loco.jpg
 - id: le-merlettaie-in-loco-3
   file: le-merlettaie-in-loco-3.jpg
@@ -55,6 +76,9 @@
   origine: fondazione
   stato: confermato
   altVerificato: false
+  soggetto:
+    tipo: opera
+    id: le-merlettaie
   fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/1 - Le Merlettaie/Le Merlettaie - donna - particolare in loco.jpg
 - id: le-merlettaie-in-loco-4
   file: le-merlettaie-in-loco-4.jpg
@@ -62,6 +86,9 @@
   origine: fondazione
   stato: confermato
   altVerificato: false
+  soggetto:
+    tipo: opera
+    id: le-merlettaie
   fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/1 - Le Merlettaie/Le Merlettaie - signora anziana - particolare in loco.jpg
 - id: le-merlettaie-monumento-1
   file: le-merlettaie-monumento-1.jpg
@@ -69,6 +96,9 @@
   origine: fondazione
   stato: confermato
   altVerificato: false
+  soggetto:
+    tipo: opera
+    id: le-merlettaie
   fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/1 - Le Merlettaie/Le Merlettaie - monumento.jpg
 - id: sogno-del-pescatore-bozzetto-1
   file: sogno-del-pescatore-bozzetto-1.jpg
@@ -76,6 +106,9 @@
   origine: fondazione
   stato: confermato
   altVerificato: false
+  soggetto:
+    tipo: opera
+    id: il-sogno-del-pescatore
   fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/5 - Il sogno del pescatore/Il sogno del pescatore - bozzetto in miniatura.jpg
 - id: sogno-del-pescatore-fonderia-1
   file: sogno-del-pescatore-fonderia-1.jpg
@@ -83,6 +116,9 @@
   origine: fondazione
   stato: confermato
   altVerificato: false
+  soggetto:
+    tipo: opera
+    id: il-sogno-del-pescatore
   fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/5 - Il sogno del pescatore/Il sogno del pescatore - fonderia.jpg
 - id: sogno-del-pescatore-fonderia-2
   file: sogno-del-pescatore-fonderia-2.jpg
@@ -90,6 +126,9 @@
   origine: fondazione
   stato: confermato
   altVerificato: false
+  soggetto:
+    tipo: opera
+    id: il-sogno-del-pescatore
   fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/5 - Il sogno del pescatore/Il sogno del pescatore - fonderia - particolare donna e bambino.jpg
 - id: sogno-del-pescatore-fonderia-3
   file: sogno-del-pescatore-fonderia-3.jpg
@@ -97,6 +136,9 @@
   origine: fondazione
   stato: confermato
   altVerificato: false
+  soggetto:
+    tipo: opera
+    id: il-sogno-del-pescatore
   fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/5 - Il sogno del pescatore/Il sogno del pescatore - fonderia - particolare uomo.jpg
 - id: sogno-del-pescatore-monumento-1
   file: sogno-del-pescatore-monumento-1.jpg
@@ -104,6 +146,9 @@
   origine: fondazione
   stato: confermato
   altVerificato: false
+  soggetto:
+    tipo: opera
+    id: il-sogno-del-pescatore
   fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/5 - Il sogno del pescatore/Il sogno del pescatore - monumento.jpg
 - id: la-retara-bozzetto-1
   file: la-retara-bozzetto-1.jpg
@@ -111,6 +156,9 @@
   origine: fondazione
   stato: confermato
   altVerificato: false
+  soggetto:
+    tipo: opera
+    id: la-retara
   fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/6 - La retara/La retara - bozzetto.jpg
 - id: la-retara-ispirazione-1
   file: la-retara-ispirazione-1.jpg
@@ -118,6 +166,9 @@
   origine: terzi
   stato: da-confermare
   altVerificato: false
+  soggetto:
+    tipo: opera
+    id: la-retara
   fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/6 - La retara/La retara - ispirazione archivio Sgattoni SbT.jpg
   credito: Archivio Sgattoni, San Benedetto del Tronto
   daConfermare:
@@ -129,6 +180,9 @@
   origine: fondazione
   stato: confermato
   altVerificato: false
+  soggetto:
+    tipo: opera
+    id: monumento-beato-bernardo-offida
   fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/4 - Beato Bernardo/Beato Bernardo - monumento.jpg
 - id: monumento-ai-caduti-fermo-monumento-1
   file: monumento-ai-caduti-fermo-monumento-1.jpg
@@ -136,6 +190,9 @@
   origine: fondazione
   stato: confermato
   altVerificato: false
+  soggetto:
+    tipo: opera
+    id: monumento-ai-caduti-fermo
   fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/7 - Monumento ai caduti Fermo/Monumento ai caduti Fermo - monumento.jpg
 - id: stemmi-palazzo-comunale-1
   file: stemmi-palazzo-comunale-1.jpg
@@ -143,6 +200,9 @@
   origine: fondazione
   stato: confermato
   altVerificato: false
+  soggetto:
+    tipo: opera
+    id: stemmi-palazzo-comunale-offida
   fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/2 - Stemmi Comune/Palazzo comunale Offida - stemma 1.jpg
 - id: stemmi-palazzo-comunale-2
   file: stemmi-palazzo-comunale-2.jpg
@@ -150,6 +210,9 @@
   origine: fondazione
   stato: confermato
   altVerificato: false
+  soggetto:
+    tipo: opera
+    id: stemmi-palazzo-comunale-offida
   fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/2 - Stemmi Comune/Palazzo comunale Offida - stemma 2.jpg
 - id: tomba-palmucci-intera
   file: tomba-palmucci-intera.jpg
@@ -157,6 +220,9 @@
   origine: fondazione
   stato: confermato
   altVerificato: false
+  soggetto:
+    tipo: opera
+    id: tomba-palmucci-offida
   fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/12 - Cimitero Offida/Tomba Palmucci - Offida .png
 - id: tomba-palmucci-particolare-1
   file: tomba-palmucci-particolare-1.jpg
@@ -164,6 +230,9 @@
   origine: fondazione
   stato: confermato
   altVerificato: false
+  soggetto:
+    tipo: opera
+    id: tomba-palmucci-offida
   fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/12 - Cimitero Offida/Tomba Palmucci - Particolare 1 - Offida.png
 - id: via-crucis-1
   file: via-crucis-1.jpg
@@ -189,14 +258,12 @@
   file: via-crucis-3.jpg
   alt: 'Formella in bassorilievo di una Via crucis: due uomini portano un corpo verso un muro di mattoni, con una scritta in basso'
   origine: fondazione
-  stato: da-confermare
+  stato: confermato
   altVerificato: false
+  soggetto:
+    tipo: opera
+    id: via-crucis-offida
   fileOriginale: 3 - Sito Web/5 - Archivio Sergiacomi/12 - Immagini Opere/3 - Via crucis/Via Crucis - III.jpg
-  daConfermare:
-    - campo: soggetto
-      nota: 'Non si sa se è la Via crucis di Offida (1952) o quella di Teramo (1974): da chiarire con la Fondazione'
-    - campo: soggetto
-      nota: 'L''iscrizione sulla formella legge "Modello Aldo Sergiacomi Offida 1952": indizio a favore di Offida'
 - id: via-crucis-4
   file: via-crucis-4.jpg
   alt: 'Formella in bassorilievo di una Via crucis: un uomo con la croce sulle spalle, circondato da donne e bambini'
@@ -265,4 +332,7 @@
   origine: fondazione
   stato: confermato
   altVerificato: false
+  soggetto:
+    tipo: opera
+    id: le-merlettaie
   fileOriginale: 3 - Sito Web/merlettaie1.jpeg

@@ -1,0 +1,12 @@
+stato: da-confermare
+daConfermare:
+  - campo: 'lat'
+    nota: 'Il docx dice "Chiesa di S. Lucia". Punto preso da OpenStreetMap (Collegiata di Santa Lucia): confermare'
+nome: 'Chiesa di S. Lucia'
+comune: "Montefiore dell'Aso"
+provincia: AP
+regione: Marche
+lat: 43.051769
+lon: 13.750567
+precisione: punto
+verificato: false

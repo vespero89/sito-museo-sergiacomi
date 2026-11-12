@@ -1,0 +1,12 @@
+stato: da-confermare
+daConfermare:
+  - campo: 'lat'
+    nota: 'Posizione non trovata su OpenStreetMap: indicato il centro di Offida, da sostituire con quella vera'
+nome: 'Santuario del Beato Bernardo'
+comune: 'Offida'
+provincia: AP
+regione: Marche
+lat: 42.935
+lon: 13.6912
+precisione: centro-comune
+verificato: false

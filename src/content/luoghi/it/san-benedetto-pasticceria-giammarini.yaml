@@ -1,0 +1,12 @@
+stato: da-confermare
+daConfermare:
+  - campo: 'lat'
+    nota: "Il docx non dà l'indirizzo dei saloni Giammarini: indicato il centro di San Benedetto del Tronto"
+nome: 'Pasticceria Giammarini'
+comune: 'San Benedetto del Tronto'
+provincia: AP
+regione: Marche
+lat: 42.9525
+lon: 13.8807
+precisione: centro-comune
+verificato: false

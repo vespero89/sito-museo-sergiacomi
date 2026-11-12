@@ -1,10 +1,11 @@
-// `npm run content:check`: schemas, references between collections and sito.yaml (spec 3.1, 8-A).
+// `npm run content:check`: schemas, references between collections, counts of the import and
+// sito.yaml (spec 3.1, 3.3, 8-A).
 // Exits with 1 and lists every problem when something is wrong.
 import { fileURLToPath } from 'node:url';
 import { controllaRepo } from '../src/lib/controllo-contenuti.ts';
 
 const radice = fileURLToPath(new URL('..', import.meta.url));
-const { problemi, voci } = controllaRepo(radice);
+const { problemi, voci } = controllaRepo(radice, { conteggi: true });
 
 if (problemi.length > 0) {
   console.error(`content:check: ${problemi.length} problem(s)\n`);

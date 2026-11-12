@@ -1,0 +1,12 @@
+stato: da-confermare
+daConfermare:
+  - campo: 'lat'
+    nota: 'Il vecchio sito colloca il monumento di fronte al Comune (il docx non lo dice): punto preso al Comune di San Benedetto del Tronto su OpenStreetMap'
+nome: 'Il sogno del Pescatore'
+comune: 'San Benedetto del Tronto'
+provincia: AP
+regione: Marche
+lat: 42.943386
+lon: 13.882966
+precisione: approssimata
+verificato: false

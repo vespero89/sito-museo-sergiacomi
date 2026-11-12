@@ -368,9 +368,9 @@ describe('controllaRepo', () => {
     expect(controllaRepo(radice).problemi.map((p) => p.file)).toContain('src/data/sito.yaml');
   });
 
-  it('passes on the real repository', () => {
+  it('passes on the real repository, counts of the import included', () => {
     const radice = join(import.meta.dirname, '..', '..');
-    expect(controllaRepo(radice).problemi).toEqual([]);
+    expect(controllaRepo(radice, { conteggi: true }).problemi).toEqual([]);
   });
 
   it('checks the import counts only when asked', () => {

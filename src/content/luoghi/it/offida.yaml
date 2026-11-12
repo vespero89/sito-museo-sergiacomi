@@ -1,0 +1,12 @@
+stato: da-confermare
+daConfermare:
+  - campo: 'lat'
+    nota: 'Il docx non dice dove sorge il monumento al Beato Bernardo: indicato il centro di Offida, da sostituire con il luogo vero'
+nome: 'Offida'
+comune: 'Offida'
+provincia: AP
+regione: Marche
+lat: 42.935
+lon: 13.6912
+precisione: centro-comune
+verificato: false

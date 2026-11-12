@@ -1,0 +1,13 @@
+stato: da-confermare
+daConfermare:
+  - campo: 'lat'
+    nota: 'Il vecchio sito colloca la Retara in viale Secondo Moretti (il docx non lo dice): punto preso a metà della via su OpenStreetMap'
+nome: 'Viale Secondo Moretti'
+comune: 'San Benedetto del Tronto'
+provincia: AP
+regione: Marche
+indirizzo: 'Viale Secondo Moretti'
+lat: 42.951752
+lon: 13.882532
+precisione: approssimata
+verificato: false

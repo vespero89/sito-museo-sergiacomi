@@ -1,0 +1,13 @@
+stato: da-confermare
+daConfermare:
+  - campo: 'lat'
+    nota: 'Il docx dice solo "Chiesa Collegiata". Punto preso da OpenStreetMap (Collegiata di Santa Maria Assunta): confermare'
+nome: 'Chiesa Collegiata'
+comune: 'Offida'
+provincia: AP
+regione: Marche
+indirizzo: 'Piazza del Popolo'
+lat: 42.934684
+lon: 13.690534
+precisione: punto
+verificato: false

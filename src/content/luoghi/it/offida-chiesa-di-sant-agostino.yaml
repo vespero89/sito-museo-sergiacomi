@@ -1,0 +1,12 @@
+stato: da-confermare
+daConfermare:
+  - campo: 'lat'
+    nota: 'Punto preso da OpenStreetMap (Santuario Diocesano del Miracolo Eucaristico): confermare che sia la chiesa di S. Agostino'
+nome: 'Chiesa di S. Agostino (Santuario Eucaristico)'
+comune: 'Offida'
+provincia: AP
+regione: Marche
+lat: 42.934759
+lon: 13.692037
+precisione: punto
+verificato: false

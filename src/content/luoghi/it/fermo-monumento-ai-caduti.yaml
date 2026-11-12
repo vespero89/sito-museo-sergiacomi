@@ -1,0 +1,12 @@
+stato: da-confermare
+daConfermare:
+  - campo: 'lat'
+    nota: 'Su OpenStreetMap ci sono due monumenti ai caduti a Fermo e non si sa quale sia questo: indicato il centro di Fermo'
+nome: 'Monumento ai caduti'
+comune: 'Fermo'
+provincia: FM
+regione: Marche
+lat: 43.1616
+lon: 13.7182
+precisione: centro-comune
+verificato: false
