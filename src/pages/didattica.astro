@@ -1,0 +1,79 @@
+---
+import { getCollection, getEntry, render } from 'astro:content';
+import Dubbi from '../components/Dubbi.astro';
+import { t } from '../i18n/index.ts';
+import PaginaTesto from '../layouts/PaginaTesto.astro';
+
+const voce = (await getEntry('pagine', 'didattica'))!;
+const tutte = await getCollection('didattica');
+const gruppi = await Promise.all(
+  [
+    { tipo: 'progetto-svolto', titolo: t('didattica.progetti') },
+    { tipo: 'proposta', titolo: t('didattica.proposte') },
+  ].map(async ({ tipo, titolo }) => ({
+    titolo,
+    schede: await Promise.all(
+      tutte
+        .filter((d) => d.data.tipo === tipo)
+        .sort((a, b) => a.id.localeCompare(b.id))
+        .map(async (d) => ({ ...d, Contenuto: (await render(d)).Content })),
+    ),
+  })),
+);
+---
+
+<PaginaTesto voce={voce}>
+  {gruppi
+    .filter((g) => g.schede.length > 0)
+    .map((gruppo) => (
+      <section class="gruppo">
+        <h2>{gruppo.titolo}</h2>
+        <ul class="schede">
+          {gruppo.schede.map((scheda) => (
+            <li class="scheda">
+              <h3>{scheda.data.titolo}</h3>
+              {scheda.data.destinatari && (
+                <p class="destinatari">
+                  {t('didattica.destinatari')} {scheda.data.destinatari}
+                </p>
+              )}
+              <scheda.Contenuto />
+              <Dubbi stato={scheda.data.stato} dubbi={scheda.data.daConfermare} />
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+</PaginaTesto>
+
+<style>
+  .gruppo {
+    margin-block-start: var(--spazio-6);
+  }
+  h2 {
+    font-size: var(--testo-2xl);
+    margin-block: 0 var(--spazio-4);
+  }
+  .schede {
+    display: grid;
+    gap: var(--spazio-4);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .scheda {
+    padding: var(--spazio-5);
+    background: var(--colore-superficie);
+    border: 1px solid var(--colore-bordo);
+    border-radius: var(--raggio-m);
+  }
+  h3 {
+    margin-block: 0 var(--spazio-2);
+    font-size: var(--testo-xl);
+  }
+  .destinatari {
+    margin-block: 0 var(--spazio-2);
+    color: var(--colore-testo-tenue);
+  }
+</style>

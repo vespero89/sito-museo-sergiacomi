@@ -1,0 +1,61 @@
+---
+import { getEntry } from 'astro:content';
+import DatoSito from '../components/DatoSito.astro';
+import { t } from '../i18n/index.ts';
+import PaginaTesto from '../layouts/PaginaTesto.astro';
+
+const voce = (await getEntry('pagine', 'sostieni'))!;
+---
+
+<PaginaTesto voce={voce}>
+  <section class="bonifico" aria-labelledby="bonifico">
+    <h2 id="bonifico">{t('sostieni.dati')}</h2>
+    <dl>
+      <dt>{t('sostieni.intestatario')}</dt>
+      <dd>
+        <DatoSito percorso="sostegno.intestatario" />
+      </dd>
+      <dt>{t('sostieni.iban')}</dt>
+      <dd>
+        <DatoSito percorso="sostegno.iban" />
+      </dd>
+      <dt>{t('sostieni.causale')}</dt>
+      <dd>
+        <DatoSito percorso="sostegno.causale" />
+      </dd>
+    </dl>
+  </section>
+</PaginaTesto>
+
+<style>
+  .bonifico {
+    max-width: var(--larghezza-testo);
+    margin-block-start: var(--spazio-6);
+    padding: var(--spazio-5);
+    background: var(--colore-superficie-calda);
+    border-radius: var(--raggio-m);
+  }
+  h2 {
+    margin-block: 0 var(--spazio-4);
+    font-size: var(--testo-xl);
+  }
+  dl {
+    display: grid;
+    gap: var(--spazio-1) var(--spazio-5);
+    margin: 0;
+  }
+  dt {
+    font-weight: 600;
+  }
+  dd {
+    margin: 0 0 var(--spazio-3);
+  }
+  @media (min-width: 48em) {
+    dl {
+      grid-template-columns: 8rem 1fr;
+    }
+    dd {
+      margin: 0;
+    }
+  }
+</style>

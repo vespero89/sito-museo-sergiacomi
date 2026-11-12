@@ -1,0 +1,27 @@
+---
+// A field of sito.yaml in a page: the value, or the "da confermare" label while the field is
+// listed in `daConfermare` (spec 3.5). The IBAN is never printed before it is confirmed.
+import { leggiSito } from '../lib/sito-dati.ts';
+import { campoSito } from '../lib/sito.ts';
+import DaConfermare from './DaConfermare.astro';
+
+interface Props {
+  /** Dotted path in sito.yaml, like `sostegno.iban`. */
+  percorso: string;
+  /** Show the value as a mail link. */
+  email?: boolean;
+}
+const { percorso, email = false } = Astro.props;
+const campo = campoSito(leggiSito(), percorso);
+const valore = campo.visibile && typeof campo.valore === 'string' ? campo.valore : '';
+---
+
+{!campo.visibile ? (
+  <DaConfermare motivo={campo.nota} />
+) : valore === '' ? (
+  <DaConfermare tipo="segnaposto" />
+) : email ? (
+  <a href={`mailto:${valore}`}>{valore}</a>
+) : (
+  valore
+)}

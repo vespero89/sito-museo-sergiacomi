@@ -1,9 +1,15 @@
-// Existing pages (placeholder home, 404): axe, no sideways scroll, no cookies, no outside requests.
+// Existing pages (placeholder home, 404, text pages): axe, no sideways scroll, no cookies, no outside requests.
 import { LARGO, TELEFONO, expect, scorrimentoOrizzontale, test, violazioniAxe } from './helpers.ts';
 
 const PAGINE = [
   { nome: 'home', indirizzo: '/', stato: 200 },
   { nome: '404', indirizzo: '/non-esiste/', stato: 404 },
+  { nome: 'Aldo Sergiacomi', indirizzo: '/aldo-sergiacomi/', stato: 200 },
+  { nome: 'Visita', indirizzo: '/visita/', stato: 200 },
+  { nome: 'Contatti', indirizzo: '/contatti/', stato: 200 },
+  { nome: 'Sostieni', indirizzo: '/sostieni/', stato: 200 },
+  { nome: 'Didattica', indirizzo: '/didattica/', stato: 200 },
+  { nome: 'Pubblicazioni', indirizzo: '/pubblicazioni/', stato: 200 },
 ];
 const SCHERMI = [
   { nome: 'phone 390', vista: TELEFONO },

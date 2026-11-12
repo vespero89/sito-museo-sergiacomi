@@ -1,0 +1,18 @@
+---
+import { getEntry } from 'astro:content';
+import Foto from '../components/Foto.astro';
+import PaginaTesto from '../layouts/PaginaTesto.astro';
+import { fondazione } from '../lib/jsonld.ts';
+import { leggiSito } from '../lib/sito-dati.ts';
+
+const voce = (await getEntry('pagine', 'chi-siamo'))!;
+---
+
+<PaginaTesto voce={voce} jsonld={[fondazione(leggiSito(), Astro.site!)]}>
+  <Foto
+    slot="foto"
+    id="le-merlettaie-copertina-1"
+    sizes="(min-width: 72rem) 1120px, 100vw"
+    priorita
+  />
+</PaginaTesto>

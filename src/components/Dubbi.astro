@@ -1,0 +1,39 @@
+---
+// The labels of a content entry that is not confirmed (spec 3.5): one for its `stato` and one for
+// each item of its `daConfermare`. Shows nothing for a confirmed entry. In the preview only.
+import DaConfermare from './DaConfermare.astro';
+
+interface Props {
+  stato: 'confermato' | 'da-confermare' | 'segnaposto';
+  dubbi?: { campo: string; nota: string }[] | undefined;
+}
+const { stato, dubbi = [] } = Astro.props;
+const visibile = stato !== 'confermato' || dubbi.length > 0;
+---
+
+{visibile && (
+  <ul class="dubbi">
+    {stato !== 'confermato' && (
+      <li>
+        <DaConfermare tipo={stato} />
+      </li>
+    )}
+    {dubbi.map((dubbio) => (
+      <li>
+        <DaConfermare motivo={dubbio.nota} />
+      </li>
+    ))}
+  </ul>
+)}
+
+<style>
+  .dubbi {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spazio-2);
+    list-style: none;
+    margin: var(--spazio-3) 0;
+    padding: 0;
+    color: var(--colore-testo-tenue);
+  }
+</style>

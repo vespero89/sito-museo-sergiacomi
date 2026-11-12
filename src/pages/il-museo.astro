@@ -1,0 +1,11 @@
+---
+import { getEntry } from 'astro:content';
+import Foto from '../components/Foto.astro';
+import PaginaTesto from '../layouts/PaginaTesto.astro';
+
+const voce = (await getEntry('pagine', 'il-museo'))!;
+---
+
+<PaginaTesto voce={voce}>
+  <Foto slot="foto" id="museo-tavolo-1" sizes="(min-width: 72rem) 1120px, 100vw" priorita />
+</PaginaTesto>

@@ -1,0 +1,48 @@
+---
+import { getCollection, getEntry, render } from 'astro:content';
+import Foto from '../components/Foto.astro';
+import LineaTempo from '../components/LineaTempo.astro';
+import { t } from '../i18n/index.ts';
+import PaginaTesto from '../layouts/PaginaTesto.astro';
+import { persona } from '../lib/jsonld.ts';
+import { ordinaVoci } from '../lib/linea-tempo.ts';
+import { leggiSito } from '../lib/sito-dati.ts';
+
+const voce = (await getEntry('pagine', 'aldo-sergiacomi'))!;
+const biografia = ordinaVoci(await getCollection('biografia'));
+const voci = await Promise.all(
+  biografia.map(async (b) => ({
+    anno: b.data.anno,
+    titolo: b.data.titolo,
+    tipo: b.data.tipo,
+    dataTesto: b.data.dataTesto,
+    stato: b.data.stato,
+    dubbi: b.data.daConfermare,
+    Contenuto: (await render(b)).Content,
+  })),
+);
+---
+
+<PaginaTesto voce={voce} jsonld={[persona(leggiSito(), Astro.site!)]}>
+  <Foto
+    slot="foto"
+    id="le-merlettaie-ritratto-1"
+    sizes="(min-width: 72rem) 1120px, 100vw"
+    priorita
+  />
+  <section class="tempo" aria-labelledby="linea-del-tempo">
+    <h2 id="linea-del-tempo">{t('lineaTempo.titolo')}</h2>
+    <LineaTempo voci={voci} />
+  </section>
+</PaginaTesto>
+
+<style>
+  .tempo {
+    max-width: var(--larghezza-testo);
+    margin-block-start: var(--spazio-7);
+  }
+  h2 {
+    font-size: var(--testo-2xl);
+    margin-block: 0 var(--spazio-5);
+  }
+</style>

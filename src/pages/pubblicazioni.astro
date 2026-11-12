@@ -1,0 +1,76 @@
+---
+import { getCollection } from 'astro:content';
+import Dubbi from '../components/Dubbi.astro';
+import { t } from '../i18n/index.ts';
+import Base from '../layouts/Base.astro';
+import { briciole as briciolaJsonLd } from '../lib/jsonld.ts';
+
+const titolo = t('pubblicazioni.titolo');
+const indirizzo = '/pubblicazioni/';
+const briciole = [{ titolo: t('briciole.home'), href: '/' }, { titolo }];
+const pubblicazioni = (await getCollection('pubblicazioni')).sort((a, b) =>
+  a.id.localeCompare(b.id),
+);
+---
+
+<Base
+  titolo={titolo}
+  descrizione={t('pubblicazioni.descrizione')}
+  indirizzo={indirizzo}
+  briciole={briciole}
+  jsonld={[briciolaJsonLd(briciole, indirizzo, Astro.site!)]}
+>
+  <article class="pagina">
+    <div class="intestazione">
+      <h1>{titolo}</h1>
+    </div>
+    <p class="intro">{t('pubblicazioni.intro')}</p>
+    <ul class="elenco">
+      {pubblicazioni.map((p) => (
+        <li class="libro">
+          <h2>{p.data.titolo}</h2>
+          {p.data.autore && <p class="autore">{p.data.autore}</p>}
+          <p>{p.data.descrizione}</p>
+          <Dubbi stato={p.data.stato} dubbi={p.data.daConfermare} />
+        </li>
+      ))}
+    </ul>
+  </article>
+</Base>
+
+<style>
+  .intestazione {
+    padding-block: var(--spazio-5) var(--spazio-4);
+    border-block-end: 1px solid var(--colore-bordo);
+    margin-block-end: var(--spazio-5);
+  }
+  .intestazione h1 {
+    margin-block-end: 0;
+  }
+  .intro {
+    max-width: var(--larghezza-testo);
+    font-size: var(--testo-l);
+  }
+  .elenco {
+    display: grid;
+    gap: var(--spazio-4);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    list-style: none;
+    margin: var(--spazio-5) 0 var(--spazio-6);
+    padding: 0;
+  }
+  .libro {
+    padding: var(--spazio-5);
+    background: var(--colore-superficie);
+    border: 1px solid var(--colore-bordo);
+    border-radius: var(--raggio-m);
+  }
+  h2 {
+    margin-block: 0 var(--spazio-2);
+    font-size: var(--testo-xl);
+  }
+  .autore {
+    margin-block: 0 var(--spazio-2);
+    color: var(--colore-testo-tenue);
+  }
+</style>

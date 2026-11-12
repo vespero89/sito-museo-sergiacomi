@@ -1,0 +1,110 @@
+---
+// The biography timeline (task 10): one item per entry, in the order given. A year inside
+// 1934-1994 links to the works up to that year (`/opere/?fino=`).
+import type { render } from 'astro:content';
+import { LINGUA_PREDEFINITA, t, type ChiaveUi, type Lingua } from '../i18n/index.ts';
+import { indirizzoOpere } from '../lib/linea-tempo.ts';
+import Dubbi from './Dubbi.astro';
+
+interface Voce {
+  anno: number;
+  titolo: string;
+  tipo: 'vita' | 'premio' | 'mostra' | 'museo';
+  dataTesto?: string | undefined;
+  stato: 'confermato' | 'da-confermare' | 'segnaposto';
+  dubbi?: { campo: string; nota: string }[] | undefined;
+  /** The rendered Markdown body of the entry. */
+  Contenuto: Awaited<ReturnType<typeof render>>['Content'];
+}
+interface Props {
+  voci: Voce[];
+  lingua?: Lingua;
+}
+const { voci, lingua = LINGUA_PREDEFINITA } = Astro.props;
+---
+
+<ol class="linea-tempo" aria-label={t('lineaTempo.titolo', lingua)}>
+  {voci.map((voce) => {
+    const opere = indirizzoOpere(voce.anno);
+    return (
+      <li class="voce">
+        <p class="anno">{voce.anno}</p>
+        <div class="corpo">
+          <p class="tipo">{t(`biografia.tipo.${voce.tipo}` as ChiaveUi, lingua)}</p>
+          <h3>{voce.titolo}</h3>
+          {voce.dataTesto && <p class="data">{voce.dataTesto}</p>}
+          <div class="testo-voce">
+            <voce.Contenuto />
+          </div>
+          {opere && (
+            <p>
+              <a href={opere}>
+                {t('lineaTempo.opere', lingua).replace('{anno}', String(voce.anno))}
+              </a>
+            </p>
+          )}
+          <Dubbi stato={voce.stato} dubbi={voce.dubbi} />
+        </div>
+      </li>
+    );
+  })}
+</ol>
+
+<style>
+  .linea-tempo {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-inline-start: 2px solid var(--colore-bordo);
+  }
+  .voce {
+    position: relative;
+    display: grid;
+    gap: var(--spazio-1) var(--spazio-5);
+    padding: 0 0 var(--spazio-5) var(--spazio-5);
+  }
+  .voce::before {
+    content: '';
+    position: absolute;
+    inset-block-start: 0.55em;
+    inset-inline-start: calc(-0.375rem - 1px);
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: var(--raggio-pieno);
+    background: var(--colore-accento);
+    border: 2px solid var(--colore-sfondo);
+  }
+  .anno {
+    margin: 0;
+    font-family: var(--font-titoli);
+    font-size: var(--testo-xl);
+    font-weight: 600;
+    color: var(--colore-accento);
+  }
+  .tipo {
+    margin: 0;
+    font-size: var(--testo-s);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--colore-testo-tenue);
+  }
+  h3 {
+    margin: 0;
+    font-size: var(--testo-l);
+  }
+  .data {
+    margin: 0;
+    color: var(--colore-testo-tenue);
+  }
+  .corpo p {
+    margin-block: var(--spazio-2);
+  }
+  .testo-voce :global(p) {
+    margin-block: var(--spazio-2);
+  }
+  @media (min-width: 48em) {
+    .voce {
+      grid-template-columns: 6rem 1fr;
+    }
+  }
+</style>

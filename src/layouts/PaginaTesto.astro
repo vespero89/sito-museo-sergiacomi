@@ -1,0 +1,95 @@
+---
+// A text page of the site (task 10): title, optional photo, the Markdown body of its `pagine`
+// entry, then whatever the page puts in the slot. Breadcrumb, description and address come from
+// the entry. The labels of an entry that is not confirmed show under the title (spec 3.5).
+import { render, type CollectionEntry } from 'astro:content';
+import Dubbi from '../components/Dubbi.astro';
+import { t } from '../i18n/index.ts';
+import { briciole as briciolaJsonLd, type NodoJsonLd } from '../lib/jsonld.ts';
+import Base from './Base.astro';
+
+interface Props {
+  voce: CollectionEntry<'pagine'>;
+  /** JSON-LD nodes of the page, besides the breadcrumb which is added here. */
+  jsonld?: NodoJsonLd[];
+}
+const { voce, jsonld = [] } = Astro.props;
+const { titolo, descrizione, slug, stato, daConfermare } = voce.data;
+const indirizzo = `/${slug}/`;
+const { Content } = await render(voce);
+const briciole = [{ titolo: t('briciole.home'), href: '/' }, { titolo }];
+---
+
+<Base
+  titolo={titolo}
+  descrizione={descrizione}
+  indirizzo={indirizzo}
+  briciole={briciole}
+  jsonld={[...jsonld, briciolaJsonLd(briciole, indirizzo, Astro.site!)]}
+>
+  <article class="pagina">
+    <div class="intestazione">
+      <h1>{titolo}</h1>
+      <Dubbi stato={stato} dubbi={daConfermare} />
+    </div>
+    {Astro.slots.has('foto') && (
+      <figure class="figura">
+        <slot name="foto" />
+      </figure>
+    )}
+    <div class="testo">
+      <Content />
+    </div>
+    <slot />
+  </article>
+</Base>
+
+<style>
+  .pagina {
+    padding-block-end: var(--spazio-6);
+  }
+  .intestazione {
+    padding-block: var(--spazio-5) var(--spazio-4);
+    border-block-end: 1px solid var(--colore-bordo);
+    margin-block-end: var(--spazio-5);
+  }
+  .intestazione h1 {
+    font-size: var(--testo-3xl);
+    margin-block-end: 0;
+  }
+  .figura {
+    margin: 0 0 var(--spazio-5);
+  }
+  .figura :global(img) {
+    display: block;
+    width: 100%;
+    max-height: 32rem;
+    object-fit: cover;
+    border-radius: var(--raggio-m);
+    box-shadow: var(--ombra-m);
+  }
+  .testo {
+    max-width: var(--larghezza-testo);
+    font-size: var(--testo-l);
+  }
+  .testo :global(h2) {
+    font-size: var(--testo-xl);
+    margin-block: var(--spazio-6) var(--spazio-3);
+    color: var(--colore-accento-scuro);
+  }
+  .testo :global(p),
+  .testo :global(ul) {
+    margin-block: 0 var(--spazio-4);
+  }
+  .testo :global(ul) {
+    padding-inline-start: var(--spazio-5);
+  }
+  .testo :global(li) {
+    margin-block-end: var(--spazio-2);
+  }
+  /* The first paragraph of a page opens the text. */
+  .testo > :global(p:first-child) {
+    font-size: var(--testo-xl);
+    line-height: 1.5;
+  }
+</style>

@@ -1,0 +1,10 @@
+---
+import { getEntry } from 'astro:content';
+import PaginaTesto from '../layouts/PaginaTesto.astro';
+import { museo } from '../lib/jsonld.ts';
+import { leggiSito } from '../lib/sito-dati.ts';
+
+const voce = (await getEntry('pagine', 'visita'))!;
+---
+
+<PaginaTesto voce={voce} jsonld={[museo(leggiSito(), Astro.site!)]} />

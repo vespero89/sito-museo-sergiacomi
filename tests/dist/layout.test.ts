@@ -21,7 +21,8 @@ describe('layout of every built page', () => {
     const menu = document.getElementById(bottone!.getAttribute('popovertarget')!);
     expect(menu?.tagName).toBe('NAV');
     expect(menu?.hasAttribute('popover')).toBe(true);
-    expect(document.querySelectorAll('script')).toHaveLength(0);
+    // A JSON-LD script is data, not code.
+    expect(document.querySelectorAll('script:not([type="application/ld+json"])')).toHaveLength(0);
   });
 
   it.each(pagine)('%s: the menu items come from sito.yaml', (_path, document) => {
