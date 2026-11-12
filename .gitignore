@@ -4,7 +4,7 @@ appunti/
 
 # Dependencies and build output
 node_modules/
-dist*/
+/dist*/
 .astro/
 
 # Local files
