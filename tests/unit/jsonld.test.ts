@@ -110,12 +110,25 @@ describe('persona', () => {
       url: 'https://esempio.test/aldo-sergiacomi/',
       name: 'Aldo Sergiacomi',
       alternateName: 'Romoaldo Sergiacomi',
-      birthDate: '1912-07-27',
-      deathDate: '1994-08-05',
       jobTitle: 'scultore',
       sameAs: ['https://www.wikidata.org/wiki/Q105686429'],
     });
     expect(p['birthPlace']).toEqual({ '@type': 'Place', name: 'Offida' });
+  });
+
+  it('leaves out the birth and death dates while sito.yaml lists them in daConfermare', () => {
+    const p = persona(reale(), ORIGINE);
+    expect(p).not.toHaveProperty('birthDate');
+    expect(p).not.toHaveProperty('deathDate');
+  });
+
+  it('adds the dates once they are confirmed', () => {
+    const sito = reale();
+    sito.daConfermare = sito.daConfermare.filter((d) => !d.campo.startsWith('artista.'));
+    expect(persona(sito, ORIGINE)).toMatchObject({
+      birthDate: '1912-07-27',
+      deathDate: '1994-08-05',
+    });
   });
 });
 

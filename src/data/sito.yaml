@@ -11,6 +11,10 @@ daConfermare:
     nota: IBAN preso dal vecchio sito (2012), da confermare con la Fondazione.
   - campo: sostegno.intestatario
     nota: Intestatario ricavato dal piede del vecchio sito, da confermare insieme all'IBAN.
+  - campo: artista.nascita
+    nota: Data presa da Wikidata (27/07/1912), da confermare con la biografia.
+  - campo: artista.morte
+    nota: Data presa da Wikidata (05/08/1994), non è nei testi ricevuti.
   - campo: sostegno.causale
     nota: Causale da concordare con la Fondazione.
 
@@ -42,6 +46,8 @@ fondazione:
 artista:
   nome: Aldo Sergiacomi
   wikidata: Q105686429
+  nascita: '1912-07-27'
+  morte: '1994-08-05'
 
 azioni:
   prenota:

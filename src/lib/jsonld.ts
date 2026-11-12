@@ -6,12 +6,10 @@ import { campoSito, type Sito } from './sito.ts';
 
 export type NodoJsonLd = Record<string, unknown>;
 
-/** Facts about the sculptor that sito.yaml does not hold (spec 6.2; dates from Wikidata, to be confirmed with the biography). */
+/** Facts about the sculptor that sito.yaml does not hold (spec 6.2). The dates are in sito.yaml, where they are listed as to confirm. */
 const PERSONA = {
   alternateName: 'Romoaldo Sergiacomi',
-  nascita: '1912-07-27',
   luogoNascita: 'Offida',
-  morte: '1994-08-05',
   professione: 'scultore',
 };
 
@@ -97,9 +95,9 @@ export function persona(sito: Sito, origine: string | URL): NodoJsonLd {
     url: urlAssoluto('/aldo-sergiacomi/', origine),
     name: sito.artista.nome,
     alternateName: PERSONA.alternateName,
-    birthDate: PERSONA.nascita,
+    birthDate: testoSicuro(sito, 'artista.nascita'),
     birthPlace: { '@type': 'Place', name: PERSONA.luogoNascita },
-    deathDate: PERSONA.morte,
+    deathDate: testoSicuro(sito, 'artista.morte'),
     jobTitle: PERSONA.professione,
     sameAs: [`https://www.wikidata.org/wiki/${sito.artista.wikidata}`],
   });

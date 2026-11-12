@@ -88,6 +88,16 @@ describe('sito schema: bad data', () => {
     rifiuta((d) => imposta(d, 'artista.wikidata', 'Q'), 'artista.wikidata');
   });
 
+  it('rejects a birth or death date that is not a real day', () => {
+    rifiuta((d) => imposta(d, 'artista.nascita', '1912-02-30'), 'artista.nascita');
+    rifiuta((d) => imposta(d, 'artista.morte', '05/08/1994'), 'artista.morte');
+  });
+
+  it('lists the birth and death dates as to confirm', () => {
+    const campi = sitoSchema.parse(reale()).daConfermare.map((d) => d.campo);
+    expect(campi).toEqual(expect.arrayContaining(['artista.nascita', 'artista.morte']));
+  });
+
   it('rejects a menu link that is not an internal address', () => {
     rifiuta((d) => imposta(d, 'navigazione.principale.0.href', 'https://example.org/'), 'href');
     rifiuta((d) => imposta(d, 'navigazione.principale.0.href', '/aldo-sergiacomi'), 'href');

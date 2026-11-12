@@ -1,6 +1,6 @@
 // Schema of src/data/sito.yaml (spec 3.2): the data of the museum and the Foundation, in one place.
 import { z } from 'astro/zod';
-import { INDIRIZZO_INTERNO, daConfermare } from './schemi.ts';
+import { INDIRIZZO_INTERNO, dataValida, daConfermare } from './schemi.ts';
 
 const testo = z.string().trim().min(1);
 const indirizzoInterno = z
@@ -16,6 +16,13 @@ const indirizzo = z.strictObject({
   regione: testo,
   paese: z.string().regex(/^[A-Z]{2}$/, 'must be a two-letter country code, e.g. IT'),
 });
+
+const giorno = z
+  .string()
+  .refine(
+    (v) => /^\d{4}-\d{2}-\d{2}$/.test(v) && dataValida(v),
+    'must be a real day as AAAA-MM-GG',
+  );
 
 const iban = z
   .string()
@@ -36,6 +43,8 @@ const struttura = z.strictObject({
   artista: z.strictObject({
     nome: testo,
     wikidata: z.string().regex(/^Q\d+$/, 'must be like Q123'),
+    nascita: giorno,
+    morte: giorno,
   }),
   azioni: z.strictObject({ prenota: voceMenu, orari: voceMenu }),
   navigazione: z.strictObject({
