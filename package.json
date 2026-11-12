@@ -17,7 +17,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
-    "check": "npm run typecheck && npm run lint && npm run format:check && npm run build && npm run test"
+    "content:check": "node scripts/content-check.mjs",
+    "check": "npm run typecheck && npm run lint && npm run format:check && npm run content:check && npm run build && npm run test"
   },
   "dependencies": {
     "@astrojs/check": "0.9.12",

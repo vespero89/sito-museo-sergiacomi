@@ -22,6 +22,30 @@ export const COLLEZIONI = [
 ] as const;
 export type Collezione = (typeof COLLEZIONI)[number];
 
+/**
+ * How each collection is stored under src/content/<collection>/it/: Markdown files (frontmatter
+ * plus text), one YAML file per entry, or one YAML list for all the entries (the photos).
+ */
+export const FORMATO: Record<Collezione, 'md' | 'yaml' | 'elenco'> = {
+  opere: 'md',
+  luoghi: 'yaml',
+  itinerari: 'md',
+  sale: 'md',
+  archivio: 'md',
+  eventi: 'md',
+  didattica: 'md',
+  biografia: 'md',
+  strumenti: 'md',
+  pubblicazioni: 'yaml',
+  percorsi: 'yaml',
+  pagine: 'md',
+  immagini: 'elenco',
+};
+/** Name of the list file of a collection stored as `elenco`. */
+export const FILE_ELENCO = 'immagini.yaml';
+/** Collections whose entries must have a text body (the `corpo` field of the spec marked (*)). */
+export const CORPO_OBBLIGATORIO: readonly Collezione[] = ['sale'];
+
 export const STATI = ['confermato', 'da-confermare', 'segnaposto'] as const;
 export const CATEGORIE_OPERA = [
   'altare',
