@@ -1,0 +1,4 @@
+#!/bin/sh
+# Runs the project checks before every commit. Never bypass with --no-verify.
+# Activated by the "prepare" script in package.json (git config core.hooksPath .githooks).
+exec npm run check

@@ -1,0 +1,14 @@
+# Private working folders, never committed
+materiali/
+appunti/
+
+# Dependencies and build output
+node_modules/
+dist*/
+.astro/
+
+# Local files
+.DS_Store
+.env
+.env.*
+!.env.example
