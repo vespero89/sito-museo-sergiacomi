@@ -27,6 +27,8 @@ interface Props {
   briciole?: { titolo: string; href?: string }[];
   /** JSON-LD nodes of the page (spec 6.2), written as one `@graph` of data, not as code. */
   jsonld?: NodoJsonLd[];
+  /** The content runs edge to edge (the home page): the page puts its own side margins. */
+  larga?: boolean;
   lingua?: Lingua;
 }
 const {
@@ -38,6 +40,7 @@ const {
   altOg,
   briciole,
   jsonld,
+  larga = false,
   lingua = LINGUA_PREDEFINITA,
 } = Astro.props;
 
@@ -77,7 +80,7 @@ const modalita = decidiModalita(process.env);
       corrente={indirizzo}
       lingua={lingua}
     />
-    <main id="contenuto" tabindex="-1" class="contenitore">
+    <main id="contenuto" tabindex="-1" class:list={['contenitore', { larga }]}>
       {briciole && <Breadcrumb voci={briciole} lingua={lingua} />}
       <slot />
     </main>
@@ -94,6 +97,10 @@ const modalita = decidiModalita(process.env);
 </html>
 
 <style>
+  main.larga {
+    max-width: none;
+    padding-inline: 0;
+  }
   .salta {
     position: absolute;
     inset-block-start: var(--spazio-2);

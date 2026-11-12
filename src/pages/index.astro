@@ -1,27 +1,464 @@
 ---
-// Placeholder home until task 16: the next event and the four entrances by audience (spec 5.8).
-import { getCollection } from 'astro:content';
+// The home page (spec 5.8, 9.4): the big photo of the Merlettaie first, then a mosaic of entrances
+// by audience, the next event, a summary of "From the idea to the work" and the visit actions.
+// No carousel. The photo is the only high-priority image of the page.
+import { getCollection, getEntry } from 'astro:content';
+import DatoSito from '../components/DatoSito.astro';
+import Foto from '../components/Foto.astro';
 import ProssimoEvento from '../components/ProssimoEvento.astro';
 import { t } from '../i18n/index.ts';
 import Base from '../layouts/Base.astro';
 import { leggiEventi } from '../lib/eventi-dati.ts';
+import { museo, sitoWeb } from '../lib/jsonld.ts';
 import { leggiSito } from '../lib/sito-dati.ts';
 
 const sito = leggiSito();
 const { evidenza } = await leggiEventi();
 const percorsi = (await getCollection('percorsi')).sort((a, b) => a.id.localeCompare(b.id));
+
+const FOTO_APERTURA = 'le-merlettaie-copertina-1';
+const apertura = await getEntry('immagini', FOTO_APERTURA);
+const credito = apertura?.data.credito;
+
+const aree = [
+  {
+    nome: t('home.area.aldo'),
+    testo: t('home.area.aldoTesto'),
+    href: '/aldo-sergiacomi/',
+    foto: 'le-merlettaie-ritratto-1',
+  },
+  {
+    nome: t('home.area.museo'),
+    testo: t('home.area.museoTesto'),
+    href: '/il-museo/',
+    foto: 'sala-1-vista-1',
+  },
+  {
+    nome: t('home.area.opere'),
+    testo: t('home.area.opereTesto'),
+    href: '/opere/',
+    foto: 'sogno-del-pescatore-monumento-1',
+  },
+  {
+    nome: t('home.area.archivio'),
+    testo: t('home.area.archivioTesto'),
+    href: '/archivio/',
+    foto: 'archivio-pergamena-offida-1',
+  },
+  {
+    nome: t('home.area.didattica'),
+    testo: t('home.area.didatticaTesto'),
+    href: '/didattica/',
+    foto: 'strumenti-1',
+  },
+  {
+    nome: t('home.area.itinerari'),
+    testo: t('home.area.itinerariTesto'),
+    href: '/itinerari/',
+    foto: 'monumento-ai-caduti-fermo-monumento-1',
+  },
+];
+
+// One photo from each of three phases of the Merlettaie, in the order they happen.
+const merlettaie = await getEntry('opere', 'le-merlettaie');
+const fasi = ['bozzetto', 'fonderia', 'monumento']
+  .map((ruolo) => merlettaie?.data.fasi?.find((f) => f.ruolo === ruolo))
+  .filter((f) => f !== undefined)
+  .map((f) => ({ titolo: f.titolo, foto: f.immagini[0]!.id }));
 ---
 
-<Base descrizione={t('home.descrizione')} indirizzo="/">
-  <h1>{sito.nome}</h1>
-  <p>{t('home.costruzione')}</p>
-  <ProssimoEvento evidenza={evidenza} />
-  <h2>{t('home.percorsi')}</h2>
-  <ul>
-    {percorsi.map((p) => (
-      <li>
-        <a href={`/percorsi/${p.id}/`}>{p.data.titolo}</a>
-      </li>
-    ))}
-  </ul>
+<Base
+  descrizione={t('home.descrizione')}
+  indirizzo="/"
+  larga
+  jsonld={[museo(sito, Astro.site!), sitoWeb(sito, Astro.site!)]}
+>
+  <section class="apertura" aria-labelledby="titolo-home">
+    <figure class="foto">
+      <Foto id={FOTO_APERTURA} sizes="100vw" priorita />
+      {credito && <figcaption>{t('home.credito').replace('{credito}', credito)}</figcaption>}
+    </figure>
+    <div class="cont">
+      <div class="pannello">
+        <h1 id="titolo-home">{t('home.titolo')}</h1>
+        <p class="lead">{t('home.lead')}</p>
+        <dl class="dove-quando">
+          <div>
+            <dt>{t('home.dove')}</dt>
+            <dd>
+              {sito.museo.indirizzo.via}, {sito.museo.indirizzo.comune}
+            </dd>
+          </div>
+          <div>
+            <dt>{t('home.quando')}</dt>
+            <dd>
+              <DatoSito percorso="orari.testo" />
+            </dd>
+          </div>
+        </dl>
+        <ul class="azioni">
+          <li>
+            <a class="pulsante primario" href={sito.azioni.prenota.href}>
+              {sito.azioni.prenota.titolo}
+            </a>
+          </li>
+          <li>
+            <a class="pulsante" href={sito.azioni.orari.href}>
+              {sito.azioni.orari.titolo}
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <div class="cont">
+    <section class="ingressi" aria-labelledby="titolo-percorsi">
+      <h2 id="titolo-percorsi">{t('home.percorsi')}</h2>
+      <ul>
+        {percorsi.map((p) => (
+          <li>
+            <a href={`/percorsi/${p.id}/`}>
+              <span class="nome">{p.data.titolo}</span>
+              <span class="intro">{p.data.intro}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <ProssimoEvento evidenza={evidenza} />
+
+    <section class="mosaico" aria-labelledby="titolo-aree">
+      <h2 id="titolo-aree">{t('home.aree')}</h2>
+      <ul>
+        {aree.map((a) => (
+          <li>
+            <a href={a.href}>
+              <Foto id={a.foto} sizes="(min-width: 48em) 24rem, 100vw" larghezzaMax={800} />
+              <span class="didascalia">
+                <span class="nome">{a.nome}</span>
+                <span class="testo">{a.testo}</span>
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    {fasi.length === 3 && (
+      <section class="idea" aria-labelledby="idea-titolo">
+        <div class="idea-testo">
+          <h2 id="idea-titolo">{t('home.idea')}</h2>
+          <p>{t('home.ideaTesto')}</p>
+          <a class="pulsante primario" href="/opere/le-merlettaie/">
+            {t('home.ideaLink')}
+          </a>
+        </div>
+        <ol class="fasi">
+          {fasi.map((f) => (
+            <li>
+              <Foto id={f.foto} sizes="(min-width: 48em) 18rem, 90vw" larghezzaMax={800} />
+              <span class="nome">{f.titolo}</span>
+            </li>
+          ))}
+        </ol>
+      </section>
+    )}
+
+    <section class="visita" aria-labelledby="visita-titolo">
+      <h2 id="visita-titolo">{t('home.visita')}</h2>
+      <p>{t('home.visitaTesto')}</p>
+      <ul class="azioni">
+        <li>
+          <a class="pulsante primario" href={sito.azioni.prenota.href}>
+            {sito.azioni.prenota.titolo}
+          </a>
+        </li>
+        <li>
+          <a class="pulsante" href={sito.azioni.orari.href}>
+            {sito.azioni.orari.titolo}
+          </a>
+        </li>
+      </ul>
+    </section>
+  </div>
 </Base>
+
+<style>
+  .cont {
+    width: 100%;
+    max-width: var(--larghezza-pagina);
+    margin-inline: auto;
+    padding-inline: var(--margine-laterale);
+  }
+
+  /* The opening: the photo across the whole width, a solid panel over its lower edge. */
+  .foto {
+    position: relative;
+    margin: 0;
+    background: var(--colore-scuro);
+  }
+  .foto :global(img) {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    object-position: 50% 35%;
+  }
+  .foto figcaption {
+    position: absolute;
+    inset-block-start: var(--spazio-3);
+    inset-inline-end: var(--spazio-3);
+    padding: var(--spazio-1) var(--spazio-3);
+    background: var(--colore-scuro);
+    color: var(--colore-sul-scuro);
+    font-size: var(--testo-s);
+    border-radius: var(--raggio-s);
+  }
+  .pannello {
+    padding: var(--spazio-5);
+    background: var(--colore-scuro);
+    color: var(--colore-sul-scuro);
+  }
+  .pannello h1 {
+    margin: 0 0 var(--spazio-3);
+    font-size: var(--testo-3xl);
+  }
+  .lead {
+    margin: 0 0 var(--spazio-4);
+    font-size: var(--testo-l);
+    max-width: 40rem;
+  }
+  .dove-quando {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spazio-3) var(--spazio-6);
+    margin: 0 0 var(--spazio-5);
+  }
+  .dove-quando dt {
+    font-size: var(--testo-s);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--colore-sul-scuro-tenue);
+  }
+  .dove-quando dd {
+    margin: 0;
+    font-weight: 600;
+  }
+  .azioni {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spazio-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pulsante {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--bersaglio-min);
+    padding-inline: var(--spazio-5);
+    border: 2px solid var(--colore-accento);
+    border-radius: var(--raggio-pieno);
+    background: var(--colore-superficie);
+    color: var(--colore-accento);
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+  }
+  .pulsante.primario {
+    background: var(--colore-accento);
+    color: var(--colore-sull-accento);
+  }
+  .pulsante:hover {
+    background: var(--colore-superficie-calda);
+    color: var(--colore-accento-scuro);
+  }
+  .pulsante.primario:hover {
+    background: var(--colore-accento-scuro);
+    color: var(--colore-sull-accento);
+  }
+  /* On the dark panel the plain button needs its own frame. */
+  .pannello .pulsante:not(.primario) {
+    border-color: var(--colore-sul-scuro);
+  }
+
+  h2 {
+    font-size: var(--testo-2xl);
+    margin: 0 0 var(--spazio-4);
+  }
+  section {
+    margin-block: var(--spazio-7) 0;
+  }
+  .apertura {
+    margin-block: 0;
+  }
+
+  /* Entrances by audience. */
+  .ingressi ul {
+    display: grid;
+    gap: var(--spazio-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  }
+  .ingressi a {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spazio-2);
+    height: 100%;
+    padding: var(--spazio-5);
+    border: 2px solid var(--colore-bordo);
+    border-radius: var(--raggio-m);
+    background: var(--colore-superficie-calda);
+    color: var(--colore-testo);
+    text-decoration: none;
+    transition:
+      border-color var(--durata-s),
+      transform var(--durata-s) var(--curva);
+  }
+  .ingressi a:hover {
+    border-color: var(--colore-accento);
+    transform: translateY(-0.2rem);
+  }
+  .nome {
+    font-family: var(--font-titoli);
+    font-size: var(--testo-xl);
+    font-weight: 700;
+  }
+  .ingressi .intro {
+    color: var(--colore-testo-tenue);
+  }
+
+  /* The mosaic of the areas of the site. */
+  .mosaico ul {
+    display: grid;
+    gap: var(--spazio-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    grid-template-columns: 1fr;
+  }
+  .mosaico a {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    border-radius: var(--raggio-m);
+    background: var(--colore-scuro);
+    color: var(--colore-sul-scuro);
+    text-decoration: none;
+  }
+  .mosaico a :global(img) {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    transition: transform var(--durata-m) var(--curva);
+  }
+  .mosaico a:hover :global(img) {
+    transform: scale(1.04);
+  }
+  .mosaico .didascalia {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spazio-1);
+    padding: var(--spazio-4);
+  }
+  .mosaico .testo {
+    color: var(--colore-sul-scuro-tenue);
+  }
+
+  /* Summary of "From the idea to the work". */
+  .idea {
+    display: grid;
+    gap: var(--spazio-5);
+    padding: var(--spazio-5);
+    border-radius: var(--raggio-m);
+    background: var(--colore-superficie-calda);
+  }
+  .idea h2 {
+    margin-block-start: 0;
+  }
+  .fasi {
+    display: grid;
+    gap: var(--spazio-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .fasi li {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spazio-2);
+  }
+  .fasi :global(img) {
+    display: block;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    border-radius: var(--raggio-s);
+  }
+  .fasi .nome {
+    font-size: var(--testo-m);
+  }
+
+  .visita {
+    margin-block-end: var(--spazio-7);
+    padding: var(--spazio-5);
+    border: 2px solid var(--colore-bordo);
+    border-radius: var(--raggio-m);
+    background: var(--colore-superficie);
+  }
+  .visita h2 {
+    margin-block-start: 0;
+  }
+
+  @media (min-width: 48em) {
+    .foto :global(img) {
+      aspect-ratio: auto;
+      height: clamp(26rem, 78vh, 46rem);
+    }
+    .pannello {
+      position: relative;
+      max-width: 46rem;
+      margin-block-start: calc(-1 * var(--spazio-7) * 1.5);
+      padding: var(--spazio-6);
+      border-radius: var(--raggio-m);
+      box-shadow: var(--ombra-m);
+    }
+    .mosaico ul {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .idea {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
+      align-items: center;
+      padding: var(--spazio-6);
+    }
+  }
+  @media (min-width: 48em) and (prefers-reduced-motion: no-preference) {
+    .pannello {
+      animation: sale var(--durata-m) var(--curva) both;
+    }
+    @keyframes sale {
+      from {
+        transform: translateY(1.5rem);
+      }
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ingressi a,
+    .mosaico a :global(img) {
+      transition: none;
+    }
+    .ingressi a:hover,
+    .mosaico a:hover :global(img) {
+      transform: none;
+    }
+  }
+</style>

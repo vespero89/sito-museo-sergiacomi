@@ -15,6 +15,7 @@ const PERSONA = {
 };
 
 export const percorsoMuseo = '/#museo';
+export const percorsoSito = '/#sito';
 export const percorsoPersona = '/aldo-sergiacomi/#persona';
 export const percorsoFondazione = '/chi-siamo/#fondazione';
 
@@ -87,6 +88,18 @@ export function museo(
         : undefined,
     sameAs: social.visibile ? sito.social.map((s) => s.url) : undefined,
   });
+}
+
+/** The site itself. No search action: the site search is a static page with a client-side index. */
+export function sitoWeb(sito: Sito, origine: string | URL): NodoJsonLd {
+  return {
+    '@type': 'WebSite',
+    '@id': urlAssoluto(percorsoSito, origine),
+    url: urlAssoluto('/', origine),
+    name: sito.nome,
+    inLanguage: 'it',
+    publisher: { '@id': urlAssoluto(percorsoMuseo, origine) },
+  };
 }
 
 export function persona(sito: Sito, origine: string | URL): NodoJsonLd {

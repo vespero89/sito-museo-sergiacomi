@@ -11,6 +11,7 @@ import {
   opera,
   persona,
   serializza,
+  sitoWeb,
 } from '../../src/lib/jsonld.ts';
 import { sitoSchema, type Sito } from '../../src/lib/sito.ts';
 import { parseYaml } from '../../src/lib/yaml.ts';
@@ -310,5 +311,19 @@ describe('evento', () => {
 
   it('gives nothing without a day', () => {
     expect(evento(base, ORIGINE)).toEqual({});
+  });
+});
+
+describe('sitoWeb', () => {
+  it('is a WebSite with a stable id, the home url and the site name', () => {
+    const nodo = sitoWeb(reale(), ORIGINE);
+    expect(nodo).toMatchObject({
+      '@type': 'WebSite',
+      '@id': `${ORIGINE}/#sito`,
+      url: `${ORIGINE}/`,
+      name: 'Museo Aldo Sergiacomi',
+      inLanguage: 'it',
+    });
+    expect(nodo).not.toHaveProperty('potentialAction');
   });
 });

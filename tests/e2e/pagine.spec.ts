@@ -1,4 +1,4 @@
-// Existing pages (placeholder home, 404, text pages): axe, no sideways scroll, no cookies, no outside requests.
+// Existing pages (home, 404, text pages): axe, no sideways scroll, no cookies, no outside requests.
 import { LARGO, TELEFONO, expect, scorrimentoOrizzontale, test, violazioniAxe } from './helpers.ts';
 
 const PAGINE = [
