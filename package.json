@@ -11,8 +11,8 @@
   "scripts": {
     "prepare": "git config core.hooksPath .githooks",
     "dev": "astro dev",
-    "build": "astro build",
-    "build:production": "SITE_ENV=production astro build",
+    "build": "astro build && node scripts/emit-hosting.mjs",
+    "build:production": "export SITE_ENV=production && astro build && node scripts/emit-hosting.mjs",
     "typecheck": "astro check",
     "lint": "eslint .",
     "format": "prettier --write .",
