@@ -18,7 +18,7 @@ interface Props {
   priorita?: boolean;
   class?: string;
   /** Lower the widest version (px), for photos shown small. */
-  larghezzaMax?: number;
+  larghezzaMax?: number | undefined;
 }
 
 const { id, sizes, priorita = false, class: classe, larghezzaMax } = Astro.props;

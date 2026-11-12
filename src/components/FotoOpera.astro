@@ -1,0 +1,49 @@
+---
+// The photo of a work, or a quiet panel in its place while the work has no photo yet. The panel
+// is only layout: it carries the type of the work and the words "Foto in arrivo", never a made-up image.
+import { t, type ChiaveUi } from '../i18n/index.ts';
+import Foto from './Foto.astro';
+
+interface Props {
+  /** Id of the photo in the `immagini` collection, if there is one. */
+  foto?: string | undefined;
+  /** Category of the work, for the panel. */
+  categoria: string;
+  sizes: string;
+  priorita?: boolean;
+  larghezzaMax?: number | undefined;
+}
+const { foto, categoria, sizes, priorita = false, larghezzaMax } = Astro.props;
+const tipo = t(`opera.categoria.${categoria}` as ChiaveUi);
+---
+
+{foto ? (
+  <Foto id={foto} sizes={sizes} priorita={priorita} larghezzaMax={larghezzaMax} />
+) : (
+  <div class="segnaposto">
+    <span class="tipo">{tipo}</span>
+    <span class="avviso">{t('opere.fotoInArrivo')}</span>
+  </div>
+)}
+
+<style>
+  .segnaposto {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: var(--spazio-1);
+    aspect-ratio: 4 / 3;
+    padding: var(--spazio-4);
+    background: linear-gradient(160deg, var(--colore-superficie-calda), var(--colore-bordo));
+    color: var(--colore-accento-scuro);
+  }
+  .tipo {
+    font-family: var(--font-titoli);
+    font-size: var(--testo-xl);
+    line-height: var(--interlinea-titoli);
+  }
+  .avviso {
+    font-size: var(--testo-s);
+    color: var(--colore-testo-tenue);
+  }
+</style>

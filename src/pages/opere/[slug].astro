@@ -1,0 +1,201 @@
+---
+// The page of a work (spec 12, 3.6): the generated sentence, the photo, the written text, the facts
+// with the address and the directions, the other photos, and the nearest works. No map yet.
+import { getImage } from 'astro:assets';
+import { getEntry, render } from 'astro:content';
+import CartaOpera from '../../components/CartaOpera.astro';
+import Dubbi from '../../components/Dubbi.astro';
+import FotoOpera from '../../components/FotoOpera.astro';
+import Galleria from '../../components/Galleria.astro';
+import SchedaOpera from '../../components/SchedaOpera.astro';
+import { t } from '../../i18n/index.ts';
+import Base from '../../layouts/Base.astro';
+import { briciole as briciolaJsonLd, opera as operaJsonLd } from '../../lib/jsonld.ts';
+import { sorgenteFoto } from '../../lib/foto-sorgenti.ts';
+import { indirizzoOpera, leggiOpere, type OperaCompleta } from '../../lib/opere-dati.ts';
+import { opereVicine } from '../../lib/relazioni.ts';
+
+export async function getStaticPaths() {
+  return (await leggiOpere()).map((opera) => ({ params: { slug: opera.slug } }));
+}
+
+const tutte = await leggiOpere();
+const opera = tutte.find((o) => o.slug === Astro.params.slug) as OperaCompleta;
+const { titolo, categoria, anno, materiali, stato, daConfermare, immagini } = opera.voce.data;
+const { Content } = await render(opera.voce);
+
+const altre = immagini.map((i) => i.immagine.id).filter((id) => id !== opera.foto);
+const vicine = opereVicine(
+  opera.slug,
+  tutte.map((o) => ({ ...o, id: o.slug, lat: o.luogo.lat, lon: o.luogo.lon })),
+);
+
+// The lead photo also gives the Open Graph image and the image of the JSON-LD.
+const voceFoto = opera.foto ? await getEntry('immagini', opera.foto) : undefined;
+const fotoUtile = voceFoto && !voceFoto.data.decorativa ? voceFoto : undefined;
+const immagineJsonLd = fotoUtile
+  ? (await getImage({ src: await sorgenteFoto(fotoUtile.data.file), width: 1200, format: 'jpeg' }))
+      .src
+  : undefined;
+
+const indirizzo = indirizzoOpera(opera.slug);
+const briciole = [
+  { titolo: t('briciole.home'), href: '/' },
+  { titolo: t('opere.titolo'), href: '/opere/' },
+  { titolo },
+];
+const datiJsonLd = {
+  slug: opera.slug,
+  titolo,
+  categoria,
+  // A doubtful year is not data.
+  anno: daConfermare.some((d) => d.campo === 'anno') ? undefined : anno,
+  materiali: daConfermare.some((d) => d.campo === 'materiali') ? [] : materiali,
+  immagine: immagineJsonLd,
+  descrizione: opera.frase,
+};
+---
+
+<Base
+  titolo={titolo}
+  descrizione={opera.frase}
+  indirizzo={indirizzo}
+  briciole={briciole}
+  immagineOg={fotoUtile?.id}
+  altOg={fotoUtile?.data.alt}
+  jsonld={[operaJsonLd(datiJsonLd, Astro.site!), briciolaJsonLd(briciole, indirizzo, Astro.site!)]}
+>
+  <article class="opera">
+    <div class="intestazione">
+      <h1>{titolo}</h1>
+      <Dubbi stato={stato} dubbi={daConfermare} />
+      <p class="frase">{opera.frase}</p>
+    </div>
+
+    <div class="corpo">
+      <div class="principale">
+        <figure class="figura">
+          <FotoOpera
+            foto={opera.foto}
+            categoria={categoria}
+            sizes="(min-width: 56em) 50rem, 100vw"
+            priorita
+            larghezzaMax={800}
+          />
+        </figure>
+        <div class="testo">
+          <Content />
+        </div>
+      </div>
+      <aside class="fatti">
+        <SchedaOpera opera={opera} />
+      </aside>
+    </div>
+
+    {altre.length > 0 && (
+      <section class="altre" aria-labelledby="altre-titolo">
+        <h2 id="altre-titolo">{t('opera.altreFoto')}</h2>
+        {altre.length === 1 ? (
+          <figure class="figura">
+            <FotoOpera
+              foto={altre[0]}
+              categoria={categoria}
+              sizes="(min-width: 48em) 40rem, 100vw"
+            />
+          </figure>
+        ) : (
+          <Galleria immagini={altre} titolo={titolo} id="galleria-opera" />
+        )}
+      </section>
+    )}
+
+    <section class="vicine" aria-labelledby="vicine-titolo">
+      <h2 id="vicine-titolo">{t('opera.vicine')}</h2>
+      <ul class="schede">
+        {vicine.map((v) => (
+          <li>
+            <CartaOpera opera={v} conComune />
+          </li>
+        ))}
+      </ul>
+    </section>
+  </article>
+</Base>
+
+<style>
+  .opera {
+    padding-block-end: var(--spazio-6);
+  }
+  .intestazione {
+    padding-block: var(--spazio-5) var(--spazio-4);
+  }
+  h1 {
+    font-size: var(--testo-3xl);
+    margin-block-end: var(--spazio-3);
+  }
+  .frase {
+    max-width: var(--larghezza-testo);
+    margin: var(--spazio-3) 0 0;
+    font-size: var(--testo-xl);
+    line-height: 1.5;
+    color: var(--colore-testo-tenue);
+  }
+  .figura {
+    margin: 0 0 var(--spazio-5);
+    border-radius: var(--raggio-m);
+    box-shadow: var(--ombra-m);
+    overflow: hidden;
+  }
+  .figura :global(img) {
+    display: block;
+    width: 100%;
+    max-height: 36rem;
+    object-fit: cover;
+  }
+  .figura :global(.segnaposto) {
+    aspect-ratio: 16 / 9;
+  }
+  .corpo {
+    display: grid;
+    gap: var(--spazio-5);
+    margin-block-end: var(--spazio-6);
+  }
+  @media (min-width: 56em) {
+    .corpo {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 20rem);
+      align-items: start;
+    }
+  }
+  .testo {
+    max-width: var(--larghezza-testo);
+    font-size: var(--testo-l);
+  }
+  .testo :global(p) {
+    margin-block: 0 var(--spazio-4);
+  }
+  .testo :global(blockquote) {
+    margin: var(--spazio-5) 0;
+    padding-inline-start: var(--spazio-4);
+    border-inline-start: 3px solid var(--colore-accento);
+    color: var(--colore-testo-tenue);
+  }
+  .altre,
+  .vicine {
+    padding-block: var(--spazio-6) 0;
+    border-block-start: 1px solid var(--colore-bordo);
+    margin-block-start: var(--spazio-6);
+  }
+  h2 {
+    margin-block: 0 var(--spazio-4);
+    font-size: var(--testo-2xl);
+    color: var(--colore-accento-scuro);
+  }
+  .schede {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+    gap: var(--spazio-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+</style>

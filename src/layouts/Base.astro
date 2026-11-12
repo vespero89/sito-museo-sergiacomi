@@ -21,8 +21,8 @@ interface Props {
   indirizzo: string;
   /** `errore` (404): no canonical, no Open Graph, noindex. `ricerca`: no Open Graph, noindex. */
   tipo?: 'normale' | 'errore' | 'ricerca';
-  immagineOg?: string;
-  altOg?: string;
+  immagineOg?: string | undefined;
+  altOg?: string | undefined;
   /** Breadcrumb trail from the home page, the last item being the current page. */
   briciole?: { titolo: string; href?: string }[];
   /** JSON-LD nodes of the page (spec 6.2), written as one `@graph` of data, not as code. */

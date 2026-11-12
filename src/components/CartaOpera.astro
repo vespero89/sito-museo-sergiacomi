@@ -1,0 +1,88 @@
+---
+// A work as a card, in the list of works and among the nearby works. The title is the link and
+// it covers the whole card, so the card is one target and the screen reader reads the title once.
+import { indirizzoOpera, type OperaCompleta } from '../lib/opere-dati.ts';
+import { elencoItaliano } from '../lib/frase-opera.ts';
+import DaConfermare from './DaConfermare.astro';
+import FotoOpera from './FotoOpera.astro';
+
+interface Props {
+  opera: OperaCompleta;
+  /** Show the town under the title (nearby works); the list is already grouped by town. */
+  conComune?: boolean;
+}
+const { opera, conComune = false } = Astro.props;
+const { titolo, anno, materiali, categoria, daConfermare } = opera.voce.data;
+const notaAnno = daConfermare.find((d) => d.campo === 'anno')?.nota;
+---
+
+<article class="carta">
+  <div class="foto">
+    <FotoOpera
+      foto={opera.foto}
+      categoria={categoria}
+      sizes="(min-width: 64em) 22rem, (min-width: 40em) 45vw, 100vw"
+      larghezzaMax={800}
+    />
+  </div>
+  <div class="testo">
+    <h3>
+      <a href={indirizzoOpera(opera.slug)}>{titolo}</a>
+    </h3>
+    <p class="dati">
+      {anno ?? <DaConfermare motivo={notaAnno ?? 'anno'} />}
+      {materiali.length > 0 && <span> · {elencoItaliano(materiali)}</span>}
+    </p>
+    <p class="luogo">{conComune ? opera.luogo.comune : opera.luogo.nome}</p>
+  </div>
+</article>
+
+<style>
+  .carta {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--colore-superficie);
+    border: 1px solid var(--colore-bordo);
+    border-radius: var(--raggio-m);
+    overflow: hidden;
+    transition: box-shadow var(--durata-m) var(--curva);
+  }
+  .carta:hover,
+  .carta:focus-within {
+    box-shadow: var(--ombra-m);
+  }
+  .foto :global(img) {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+  .testo {
+    padding: var(--spazio-4);
+  }
+  h3 {
+    margin: 0 0 var(--spazio-2);
+    font-size: var(--testo-l);
+  }
+  /* The link covers the card. */
+  h3 a {
+    color: var(--colore-testo);
+    text-decoration: none;
+  }
+  h3 a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  h3 a:hover {
+    text-decoration: underline;
+  }
+  .dati,
+  .luogo {
+    margin: 0;
+    font-size: var(--testo-m);
+    color: var(--colore-testo-tenue);
+  }
+</style>

@@ -1,0 +1,137 @@
+---
+// The facts of a work (spec 3.6): year, type, material, technique, client, place with address,
+// room of the museum, and the link to the directions. What is missing and still to be confirmed
+// shows as a label (spec 3.5); what is missing and not asked for is left out.
+import { getEntry } from 'astro:content';
+import { t, type ChiaveUi } from '../i18n/index.ts';
+import { indirizzoSala } from '../lib/ambienti.ts';
+import { elencoItaliano } from '../lib/frase-opera.ts';
+import type { OperaCompleta } from '../lib/opere-dati.ts';
+import DaConfermare from './DaConfermare.astro';
+
+interface Props {
+  opera: OperaCompleta;
+}
+const { opera } = Astro.props;
+const { anno, categoria, materiali, tecnica, committente, edificio, sala, daConfermare } =
+  opera.voce.data;
+const { luogo } = opera;
+const nota = (campo: string) => daConfermare.find((d) => d.campo === campo)?.nota;
+
+const voceSala = sala ? await getEntry('sale', sala.id) : undefined;
+const posto = [luogo.indirizzo, `${luogo.comune} (${luogo.provincia})`].filter(Boolean).join(', ');
+// The directions search for the name and the town, not for the coordinates: those are still to be checked.
+const destinazione = [luogo.indirizzo, luogo.nome, luogo.comune].filter(Boolean).join(', ');
+const indicazioni = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destinazione)}`;
+---
+
+<section class="fatti" aria-labelledby="fatti-titolo">
+  <h2 id="fatti-titolo">{t('opera.fatti')}</h2>
+  <dl>
+    <div>
+      <dt>{t('opera.anno')}</dt>
+      <dd>{anno ?? <DaConfermare motivo={nota('anno') ?? 'anno'} />}</dd>
+    </div>
+    <div>
+      <dt>{t('opera.tipo')}</dt>
+      <dd>{t(`opera.categoria.${categoria}` as ChiaveUi)}</dd>
+    </div>
+    {(materiali.length > 0 || nota('materiali')) && (
+      <div>
+        <dt>{t('opera.materiale')}</dt>
+        <dd>
+          {materiali.length > 0 ? (
+            elencoItaliano(materiali)
+          ) : (
+            <DaConfermare motivo={nota('materiali') ?? 'materiale'} />
+          )}
+        </dd>
+      </div>
+    )}
+    {tecnica && (
+      <div>
+        <dt>{t('opera.tecnica')}</dt>
+        <dd>{tecnica}</dd>
+      </div>
+    )}
+    {committente && (
+      <div>
+        <dt>{t('opera.committente')}</dt>
+        <dd>{committente}</dd>
+      </div>
+    )}
+    {edificio && (
+      <div>
+        <dt>{t('opera.edificio')}</dt>
+        <dd>{edificio}</dd>
+      </div>
+    )}
+    <div>
+      <dt>{t('opera.luogo')}</dt>
+      <dd>
+        {luogo.nome}
+        <br />
+        {posto}
+      </dd>
+    </div>
+    {sala && voceSala && (
+      <div>
+        <dt>{t('opera.sala')}</dt>
+        <dd>
+          <a href={indirizzoSala(sala.id)}>{voceSala.data.nome}</a>
+        </dd>
+      </div>
+    )}
+  </dl>
+  <p class="indicazioni">
+    <a class="pulsante" href={indicazioni} rel="noopener">
+      {t('opera.indicazioni')}
+    </a>
+  </p>
+</section>
+
+<style>
+  .fatti {
+    padding: var(--spazio-5);
+    background: var(--colore-superficie-calda);
+    border-radius: var(--raggio-m);
+  }
+  h2 {
+    margin: 0 0 var(--spazio-4);
+    font-size: var(--testo-xl);
+    color: var(--colore-accento-scuro);
+  }
+  dl {
+    display: grid;
+    gap: var(--spazio-3);
+    margin: 0;
+  }
+  dt {
+    font-size: var(--testo-s);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--colore-testo-tenue);
+  }
+  dd {
+    margin: 0;
+    font-size: var(--testo-m);
+  }
+  .indicazioni {
+    margin: var(--spazio-5) 0 0;
+  }
+  .pulsante {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--bersaglio-min);
+    padding: var(--spazio-2) var(--spazio-4);
+    background: var(--colore-accento);
+    color: var(--colore-sull-accento);
+    border-radius: var(--raggio-pieno);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .pulsante:hover {
+    background: var(--colore-accento-scuro);
+  }
+</style>

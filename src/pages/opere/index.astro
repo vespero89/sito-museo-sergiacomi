@@ -1,0 +1,103 @@
+---
+// The list of the works (spec 12): every work, grouped by town. No map and no filters yet.
+// A work with no certain year (Stemmi, Tomba Palmucci) is in the list like the others, with a label.
+import CartaOpera from '../../components/CartaOpera.astro';
+import { t } from '../../i18n/index.ts';
+import Base from '../../layouts/Base.astro';
+import { briciole as briciolaJsonLd } from '../../lib/jsonld.ts';
+import { leggiOpere, type OperaCompleta } from '../../lib/opere-dati.ts';
+
+const opere = await leggiOpere();
+
+// Towns in alphabetical order; inside a town by year, the works with no year last.
+const perComune = new Map<string, OperaCompleta[]>();
+for (const opera of opere) {
+  perComune.set(opera.luogo.comune, [...(perComune.get(opera.luogo.comune) ?? []), opera]);
+}
+const comuni = [...perComune.entries()]
+  .sort(([a], [b]) => a.localeCompare(b, 'it'))
+  .map(([comune, lista]) => ({
+    comune,
+    id: `comune-${comune
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')}`,
+    lista: [...lista].sort(
+      (a, b) =>
+        (a.voce.data.anno ?? 9999) - (b.voce.data.anno ?? 9999) || a.slug.localeCompare(b.slug),
+    ),
+  }));
+
+const titolo = t('opere.titolo');
+const briciole = [{ titolo: t('briciole.home'), href: '/' }, { titolo }];
+const quante = (n: number) => (n === 1 ? t('opere.una') : t('opere.piu').replace('{n}', String(n)));
+---
+
+<Base
+  titolo={titolo}
+  descrizione={t('opere.descrizione')}
+  indirizzo="/opere/"
+  briciole={briciole}
+  jsonld={[briciolaJsonLd(briciole, '/opere/', Astro.site!)]}
+>
+  <div class="intestazione">
+    <h1>{titolo}</h1>
+    <p class="intro">{t('opere.intro')}</p>
+  </div>
+  {comuni.map(({ comune, id, lista }) => (
+    <section class="comune" aria-labelledby={id}>
+      <h2 id={id}>
+        {comune} <span class="numero">{quante(lista.length)}</span>
+      </h2>
+      <ul class="schede">
+        {lista.map((opera) => (
+          <li>
+            <CartaOpera opera={opera} />
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))}
+</Base>
+
+<style>
+  .intestazione {
+    padding-block: var(--spazio-5) var(--spazio-4);
+    border-block-end: 1px solid var(--colore-bordo);
+    margin-block-end: var(--spazio-5);
+  }
+  h1 {
+    font-size: var(--testo-3xl);
+    margin-block-end: var(--spazio-3);
+  }
+  .intro {
+    max-width: var(--larghezza-testo);
+    margin: 0;
+    font-size: var(--testo-l);
+    color: var(--colore-testo-tenue);
+  }
+  .comune {
+    padding-block-end: var(--spazio-6);
+  }
+  h2 {
+    margin-block: 0 var(--spazio-4);
+    font-size: var(--testo-2xl);
+    color: var(--colore-accento-scuro);
+  }
+  .numero {
+    margin-inline-start: var(--spazio-2);
+    font-family: var(--font-testo);
+    font-size: var(--testo-m);
+    font-weight: 400;
+    color: var(--colore-testo-tenue);
+  }
+  .schede {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+    gap: var(--spazio-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+</style>
