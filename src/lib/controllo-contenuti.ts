@@ -244,9 +244,13 @@ export const CONTEGGIO_OPERE_PER_COMUNE: Readonly<Record<string, number>> = {
   Folignano: 1,
 };
 
+/** Prizes, exhibitions and rooms the docx lists (spec 3.3). */
+export const CONTEGGIO_BIOGRAFIA = { premio: 3, mostra: 8 } as const;
+export const CONTEGGIO_SALE = 4;
+
 /**
  * Checks that the import has the number of works the docx lists (spec 3.3), in total and for each
- * comune. Only for the real repository: a small test repo has no reason to have 25 works.
+ * comune, and the prizes, exhibitions and rooms. Only for the real repository: a small test repo has no reason to have 25 works.
  */
 export function controllaConteggi(contenuti: Contenuti): Problema[] {
   const comuneDi = new Map<string, string>();
@@ -280,6 +284,25 @@ export function controllaConteggi(contenuti: Contenuti): Problema[] {
     if (attese !== viste) {
       problemi.push({ file, messaggio: `expected ${attese} works in ${comune}, found ${viste}` });
     }
+  }
+
+  for (const [tipo, attesi] of Object.entries(CONTEGGIO_BIOGRAFIA)) {
+    const viste = contenuti.biografia.filter(
+      (b) => (b.dati as { tipo?: unknown } | null)?.tipo === tipo,
+    ).length;
+    if (viste !== attesi) {
+      const nome = tipo === 'premio' ? 'prizes' : 'exhibitions';
+      problemi.push({
+        file: 'src/content/biografia/it',
+        messaggio: `expected ${attesi} ${nome}, found ${viste}`,
+      });
+    }
+  }
+  if (contenuti.sale.length !== CONTEGGIO_SALE) {
+    problemi.push({
+      file: 'src/content/sale/it',
+      messaggio: `expected ${CONTEGGIO_SALE} rooms, found ${contenuti.sale.length}`,
+    });
   }
   return problemi;
 }

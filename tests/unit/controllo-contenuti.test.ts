@@ -201,6 +201,16 @@ describe('controllaConteggi (import counts, spec 3.3)', () => {
         voce(`opera-${comune}-${i}`, { ...f.OPERA, luogo: `luogo-${comune}` }),
       ),
     );
+    c.biografia = [
+      ...Array.from({ length: 3 }, (_, i) =>
+        voce(`premio-${i}`, { ...f.BIOGRAFIA, tipo: 'premio' }),
+      ),
+      ...Array.from({ length: 8 }, (_, i) =>
+        voce(`mostra-${i}`, { ...f.BIOGRAFIA, tipo: 'mostra' }),
+      ),
+      voce('nascita', f.BIOGRAFIA),
+    ];
+    c.sale = [1, 2, 3, 4].map((numero) => voce(`sala-${numero}`, { ...f.SALA, numero }));
     return c;
   }
   const messaggi = (c: Contenuti) => controllaConteggi(c).map((p) => p.messaggio);
@@ -238,6 +248,42 @@ describe('controllaConteggi (import counts, spec 3.3)', () => {
     const e = messaggi(c).join('\n');
     expect(e).toContain('Teramo');
     expect(e).toContain('Offida');
+  });
+});
+
+describe('controllaConteggi: prizes, exhibitions and rooms (spec 3.3)', () => {
+  const messaggi = (c: Contenuti) => controllaConteggi(c).map((p) => p.messaggio);
+  const senzaOpere = (): Contenuti => {
+    const c = mondo();
+    c.biografia = [
+      ...Array.from({ length: 3 }, (_, i) =>
+        voce(`premio-${i}`, { ...f.BIOGRAFIA, tipo: 'premio' }),
+      ),
+      ...Array.from({ length: 8 }, (_, i) =>
+        voce(`mostra-${i}`, { ...f.BIOGRAFIA, tipo: 'mostra' }),
+      ),
+    ];
+    c.sale = [1, 2, 3, 4].map((numero) => voce(`sala-${numero}`, { ...f.SALA, numero }));
+    return c;
+  };
+  const tutti = (c: Contenuti) => messaggi(c).filter((m) => !/works/.test(m));
+
+  it('passes 3 prizes, 8 exhibitions and 4 rooms', () => {
+    expect(tutti(senzaOpere())).toEqual([]);
+  });
+
+  it('fails on a missing prize, exhibition or room, naming what it found', () => {
+    for (const [tolto, parola] of [
+      ['premio-0', 'prizes'],
+      ['mostra-0', 'exhibitions'],
+    ] as const) {
+      const c = senzaOpere();
+      c.biografia = c.biografia.filter((b) => b.id !== tolto);
+      expect(tutti(c).join('\n')).toContain(parola);
+    }
+    const c = senzaOpere();
+    c.sale.pop();
+    expect(tutti(c).join('\n')).toContain('rooms');
   });
 });
 
