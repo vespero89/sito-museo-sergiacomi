@@ -1,0 +1,17 @@
+titolo: 'In visita a Offida'
+descrizione: 'Il percorso per chi visita Offida: il museo, le opere del paese e come arrivare.'
+intro: 'Per chi è di passaggio a Offida: il museo, le opere del paese e le informazioni per la visita.'
+voci:
+  - titolo: 'Visita il museo'
+    descrizione: 'Orari, prenotazione e come arrivare.'
+    percorso: /visita/
+  - titolo: 'Le opere sul territorio'
+    descrizione: 'La mappa delle opere di Sergiacomi.'
+    percorso: /opere/
+  - titolo: 'Scopriamo Offida con Aldo Sergiacomi'
+    descrizione: 'Itinerario a piedi nel centro storico.'
+    percorso: /itinerari/scopriamo-offida-con-aldo-sergiacomi/
+stato: segnaposto
+daConfermare:
+  - campo: voci
+    nota: 'Le voci sono una proposta nostra, da rivedere con la Fondazione'

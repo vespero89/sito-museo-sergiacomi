@@ -211,6 +211,8 @@ describe('controllaConteggi (import counts, spec 3.3)', () => {
       voce('nascita', f.BIOGRAFIA),
     ];
     c.sale = [1, 2, 3, 4].map((numero) => voce(`sala-${numero}`, { ...f.SALA, numero }));
+    c.itinerari = Array.from({ length: 4 }, (_, i) => voce(`itinerario-${i}`, f.ITINERARIO));
+    c.percorsi = Array.from({ length: 4 }, (_, i) => voce(`percorso-${i}`, f.PERCORSO));
     return c;
   }
   const messaggi = (c: Contenuti) => controllaConteggi(c).map((p) => p.messaggio);
@@ -264,11 +266,13 @@ describe('controllaConteggi: prizes, exhibitions and rooms (spec 3.3)', () => {
       ),
     ];
     c.sale = [1, 2, 3, 4].map((numero) => voce(`sala-${numero}`, { ...f.SALA, numero }));
+    c.itinerari = Array.from({ length: 4 }, (_, i) => voce(`itinerario-${i}`, f.ITINERARIO));
+    c.percorsi = Array.from({ length: 4 }, (_, i) => voce(`percorso-${i}`, f.PERCORSO));
     return c;
   };
   const tutti = (c: Contenuti) => messaggi(c).filter((m) => !/works/.test(m));
 
-  it('passes 3 prizes, 8 exhibitions and 4 rooms', () => {
+  it('passes 3 prizes, 8 exhibitions, 4 rooms, 4 itineraries and 4 paths', () => {
     expect(tutti(senzaOpere())).toEqual([]);
   });
 
@@ -284,6 +288,12 @@ describe('controllaConteggi: prizes, exhibitions and rooms (spec 3.3)', () => {
     const c = senzaOpere();
     c.sale.pop();
     expect(tutti(c).join('\n')).toContain('rooms');
+    const i = senzaOpere();
+    i.itinerari.pop();
+    expect(tutti(i).join('\n')).toContain('itineraries');
+    const p = senzaOpere();
+    p.percorsi.pop();
+    expect(tutti(p).join('\n')).toContain('paths');
   });
 });
 

@@ -1,0 +1,17 @@
+titolo: 'Per studiare Sergiacomi'
+descrizione: 'Il percorso per chi vuole studiare lo scultore: biografia, opere e archivio.'
+intro: "Per studenti e studiosi: la biografia, le schede delle opere e l'archivio."
+voci:
+  - titolo: 'Aldo Sergiacomi'
+    descrizione: 'La biografia, i premi e le mostre.'
+    percorso: /aldo-sergiacomi/
+  - titolo: 'Le opere'
+    descrizione: 'Le schede delle opere, con mappa e linea del tempo.'
+    percorso: /opere/
+  - titolo: 'Archivio'
+    descrizione: 'Lettere, fotografie e articoli.'
+    percorso: /archivio/
+stato: segnaposto
+daConfermare:
+  - campo: voci
+    nota: 'Le voci sono una proposta nostra, da rivedere con la Fondazione'

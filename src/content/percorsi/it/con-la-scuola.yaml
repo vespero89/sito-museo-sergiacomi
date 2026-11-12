@@ -1,0 +1,17 @@
+titolo: 'Con la scuola'
+descrizione: 'Il percorso per gli insegnanti e le classi: didattica, visita al museo e itinerari.'
+intro: 'Per le classi e gli insegnanti: laboratori, visite al museo e itinerari sul territorio.'
+voci:
+  - titolo: 'Didattica'
+    descrizione: 'I progetti svolti e le visite e i laboratori su richiesta.'
+    percorso: /didattica/
+  - titolo: 'Visita il museo'
+    descrizione: 'Come prenotare e come arrivare.'
+    percorso: /visita/
+  - titolo: 'Itinerari'
+    descrizione: 'Quattro itinerari tra le opere dello scultore.'
+    percorso: /itinerari/
+stato: segnaposto
+daConfermare:
+  - campo: voci
+    nota: 'Le voci sono una proposta nostra: la Fondazione dirà cosa serve alle scuole'

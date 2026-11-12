@@ -1,0 +1,17 @@
+titolo: 'In famiglia'
+descrizione: 'Il percorso per chi viene con i bambini: museo, itinerari e iniziative.'
+intro: 'Per chi viene con i bambini: la visita al museo, un itinerario facile e le iniziative.'
+voci:
+  - titolo: 'Il museo'
+    descrizione: 'La casa-bottega e le quattro sale.'
+    percorso: /il-museo/
+  - titolo: 'Itinerari'
+    descrizione: 'Quattro itinerari tra le opere dello scultore.'
+    percorso: /itinerari/
+  - titolo: 'Eventi e iniziative'
+    descrizione: 'Cosa succede al museo.'
+    percorso: /eventi/
+stato: segnaposto
+daConfermare:
+  - campo: voci
+    nota: 'Le voci sono una proposta nostra, da rivedere con la Fondazione'

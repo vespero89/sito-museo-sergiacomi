@@ -244,9 +244,11 @@ export const CONTEGGIO_OPERE_PER_COMUNE: Readonly<Record<string, number>> = {
   Folignano: 1,
 };
 
-/** Prizes, exhibitions and rooms the docx lists (spec 3.3). */
+/** Prizes, exhibitions, rooms, itineraries and paths the docx lists (spec 3.3). */
 export const CONTEGGIO_BIOGRAFIA = { premio: 3, mostra: 8 } as const;
 export const CONTEGGIO_SALE = 4;
+export const CONTEGGIO_ITINERARI = 4;
+export const CONTEGGIO_PERCORSI = 4;
 
 /**
  * Checks that the import has the number of works the docx lists (spec 3.3), in total and for each
@@ -303,6 +305,17 @@ export function controllaConteggi(contenuti: Contenuti): Problema[] {
       file: 'src/content/sale/it',
       messaggio: `expected ${CONTEGGIO_SALE} rooms, found ${contenuti.sale.length}`,
     });
+  }
+  for (const [collezione, attesi, nome] of [
+    ['itinerari', CONTEGGIO_ITINERARI, 'itineraries'],
+    ['percorsi', CONTEGGIO_PERCORSI, 'paths'],
+  ] as const) {
+    if (contenuti[collezione].length !== attesi) {
+      problemi.push({
+        file: `src/content/${collezione}/it`,
+        messaggio: `expected ${attesi} ${nome}, found ${contenuti[collezione].length}`,
+      });
+    }
   }
   return problemi;
 }
