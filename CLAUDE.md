@@ -12,3 +12,5 @@ Static Astro site for the Museo Aldo Sergiacomi. See `README.md` for commands an
 - No inline code in the built pages: no `<style>`, no `style=""`, no inline `<script>` (the CSP forbids
   them). Keep `build.inlineStylesheets: 'never'` and `assetsInlineLimit: 0`.
 - File and folder names for content: ASCII, lowercase, with hyphens.
+- Headers, CSP and redirects live only in `config/hosting.mjs`; `_headers` and `_redirects` are generated
+  into `dist/`, never written by hand. Mode decisions come from `decidiModalita`, not from env variables.

@@ -23,7 +23,8 @@ to turn the pre-commit hook on.
 | Command                    | What it does                                                                                        |
 | -------------------------- | --------------------------------------------------------------------------------------------------- |
 | `npm run dev`              | Development server.                                                                                 |
-| `npm run build`            | Build into `dist/`.                                                                                 |
+| `npm run build`            | Build into `dist/`, then write `dist/_headers` and `dist/_redirects` (see "Hosting").               |
+| `npm run serve`            | Serve `dist/` with the hosting rules applied (`--port`, `--fake-tiles`), for the browser tests.     |
 | `npm run build:production` | Production build. Stops with a list while anything is not confirmed (see "Unconfirmed content").    |
 | `npm test`                 | Vitest: unit tests and tests on the built `dist/` (run `npm run build` first).                      |
 | `npm run content:check`    | Content schemas, references between collections and `src/data/sito.yaml`.                           |
@@ -49,6 +50,37 @@ all of it with the `DaConfermare` label (a listed `sito.yaml` field shows only t
 value). `npm run build:production` stops, with the list, while any of these is open. `ALLOW_OPEN_ITEMS=1`
 lets a production build go on, but only as a private preview: noindex, no sitemap, no `llms.txt`.
 `npm run content:report` is the working list for the content team.
+
+## Hosting
+
+`config/hosting.mjs` is the single source of the security headers, the CSP and the 301 redirects from the
+old `.htm` pages. `scripts/emit-hosting.mjs` turns it into `dist/_headers` and `dist/_redirects` for
+Cloudflare Pages (it runs at the end of `npm run build`), and `scripts/serve-dist.mjs` applies the same
+rules to a local server, so the CSP the tests prove is the one that ships. Do not edit the generated files.
+
+- Which mode the build is in (noindex header, HSTS) comes from `decidiModalita` in `src/lib/modalita.ts`,
+  not from the environment variables. The CSP sources of external services come from `src/data/servizi.ts`.
+- `Cache-Control` is set only on `/_astro/*` (long, immutable) and `/pagefind/*` (always revalidate), never
+  on the general rule: Cloudflare joins the values of a same header from every rule that matches.
+- A configuration for Caddy or nginx is not generated. It is added to `scripts/` when that server is chosen.
+- The www to non-www redirect is done in the DNS or in the hosting service, not in these files.
+- The redirects also list the capitalised spellings of the old addresses (`/Chisiamo.htm`, `/ChiSiamo.htm`),
+  because the old server ignored case and Cloudflare does not. Check them on a real preview, since a
+  server can treat case differently from the local one.
+
+### Private preview
+
+The preview must stay private until Fabio says it is ready. The `noindex` header and meta tag are not
+protection (a crawler can ignore them), so the preview needs an access control **in addition**. This is a
+requirement for whoever configures the hosting: do not publish the preview address without it.
+
+- Cloudflare Pages: put the project (the custom domain and the `*.pages.dev` addresses, preview deployments
+  included) behind Cloudflare Access, with a policy that lets in only the people who review the site. This
+  is set in the Cloudflare dashboard, not in code.
+- Own server: a password on the whole site (for example HTTP basic auth).
+- `_headers` and `_redirects` carry a "PRIVATE PREVIEW" reminder while the mode is preview.
+- Do not add `Disallow` to `robots.txt` in the preview (a page Google cannot read is a page whose
+  `noindex` Google cannot see); the access control is what keeps crawlers out.
 
 ## Git workflow
 
