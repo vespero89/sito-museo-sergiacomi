@@ -1,0 +1,105 @@
+---
+// The two visit actions, "Prenota" and "Orari e come arrivare" (spec 5.8). Two variants of the
+// same links: in the header from 768 px up, in a fixed bar at the bottom below it. They are plain
+// links, so they work without JavaScript.
+import { LINGUA_PREDEFINITA, percorso, t, type Lingua } from '../i18n/index.ts';
+
+interface Props {
+  azioni: { prenota: { titolo: string; href: string }; orari: { titolo: string; href: string } };
+  variante: 'testata' | 'barra';
+  lingua?: Lingua;
+}
+const { azioni, variante, lingua = LINGUA_PREDEFINITA } = Astro.props;
+const voci = [
+  { ...azioni.prenota, primaria: true },
+  { ...azioni.orari, primaria: false },
+];
+---
+
+{variante === 'barra' ? (
+  <nav class="barra" aria-label={t('azioni.etichetta', lingua)}>
+    {voci.map((voce) => (
+      <a class:list={['azione', { primaria: voce.primaria }]} href={percorso(voce.href, lingua)}>
+        {voce.titolo}
+      </a>
+    ))}
+  </nav>
+) : (
+  <ul class="in-testata">
+    {voci.map((voce) => (
+      <li>
+        <a class:list={['azione', { primaria: voce.primaria }]} href={percorso(voce.href, lingua)}>
+          {voce.titolo}
+        </a>
+      </li>
+    ))}
+  </ul>
+)}
+
+<style>
+  .azione {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--bersaglio-min);
+    padding-inline: var(--spazio-4);
+    border: 2px solid var(--colore-accento);
+    border-radius: var(--raggio-pieno);
+    color: var(--colore-accento);
+    background: var(--colore-superficie);
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+  }
+  .azione.primaria {
+    background: var(--colore-accento);
+    color: var(--colore-sull-accento);
+  }
+  .azione:hover {
+    background: var(--colore-superficie-calda);
+    color: var(--colore-accento-scuro);
+  }
+  .azione.primaria:hover {
+    background: var(--colore-accento-scuro);
+    color: var(--colore-sull-accento);
+  }
+
+  /* In the header: only from 768 px up. */
+  .in-testata {
+    display: none;
+    gap: var(--spazio-3);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  @media (min-width: 48em) {
+    .in-testata {
+      display: flex;
+    }
+  }
+
+  /* Fixed bar at the bottom: only below 768 px (56 px high plus the safe area). */
+  .barra {
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 10;
+    display: flex;
+    gap: var(--spazio-2);
+    height: calc(var(--altezza-barra) + var(--area-sicura-sotto));
+    padding: var(--spazio-2) var(--spazio-3) calc(var(--spazio-2) + var(--area-sicura-sotto));
+    background: var(--colore-superficie);
+    border-top: 1px solid var(--colore-bordo);
+    box-shadow: var(--ombra-m);
+  }
+  .barra .azione {
+    flex: 1;
+    padding-inline: var(--spazio-2);
+    font-size: var(--testo-s);
+    line-height: 1.2;
+  }
+  @media (min-width: 48em) {
+    .barra {
+      display: none;
+    }
+  }
+</style>

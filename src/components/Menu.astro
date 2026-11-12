@@ -1,0 +1,125 @@
+---
+// Main menu (spec 4, 5.8). A native popover on small screens (Esc closes it, no JavaScript);
+// an open row of links from 768 px up. The items come from sito.yaml, not from this file.
+import { LINGUA_PREDEFINITA, percorso, t, type Lingua } from '../i18n/index.ts';
+
+interface Props {
+  voci: { titolo: string; href: string }[];
+  /** Address of the current page, to mark the current item. */
+  corrente?: string | undefined;
+  lingua?: Lingua;
+}
+const { voci, corrente, lingua = LINGUA_PREDEFINITA } = Astro.props;
+---
+
+<button class="apri" type="button" popovertarget="menu-principale">
+  {t('menu.apri', lingua)}
+</button>
+
+<nav id="menu-principale" class="menu" popover aria-label={t('menu.etichetta', lingua)}>
+  <button class="chiudi" type="button" popovertarget="menu-principale" popovertargetaction="hide">
+    {t('menu.chiudi', lingua)}
+  </button>
+  <ul>
+    {voci.map((voce) => (
+      <li>
+        <a
+          href={percorso(voce.href, lingua)}
+          aria-current={voce.href === corrente ? 'page' : undefined}
+        >
+          {voce.titolo}
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<style>
+  .apri,
+  .chiudi {
+    min-height: var(--bersaglio-min);
+    padding-inline: var(--spazio-4);
+    border: 2px solid var(--colore-testo);
+    border-radius: var(--raggio-pieno);
+    background: var(--colore-superficie);
+    color: var(--colore-testo);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* Small screens: the popover is a full-page panel. */
+  .menu {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: var(--spazio-4) var(--margine-laterale) var(--spazio-6);
+    border: 0;
+    overflow: auto;
+    background: var(--colore-sfondo);
+    color: var(--colore-testo);
+  }
+  .chiudi {
+    display: block;
+    margin-inline-start: auto;
+  }
+  ul {
+    list-style: none;
+    margin: var(--spazio-5) 0 0;
+    padding: 0;
+  }
+  a {
+    display: flex;
+    align-items: center;
+    min-height: var(--bersaglio-min);
+    padding-block: var(--spazio-2);
+    border-bottom: 1px solid var(--colore-bordo);
+    color: var(--colore-testo);
+    font-family: var(--font-titoli);
+    font-size: var(--testo-xl);
+    text-decoration: none;
+  }
+  a[aria-current='page'] {
+    color: var(--colore-accento);
+    font-weight: 700;
+  }
+
+  /* From 768 px up the menu is always open, as a row under the brand. */
+  @media (min-width: 48em) {
+    .apri,
+    .chiudi {
+      display: none;
+    }
+    .menu {
+      position: static;
+      width: auto;
+      height: auto;
+      padding: 0;
+      overflow: visible;
+      background: transparent;
+      display: block;
+    }
+    ul {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spazio-1) var(--spazio-5);
+      margin: 0;
+    }
+    a {
+      min-height: var(--bersaglio-min);
+      padding-block: 0;
+      border-bottom: 3px solid transparent;
+      font-family: var(--font-testo);
+      font-size: var(--testo-m);
+      font-weight: 600;
+    }
+    a:hover,
+    a[aria-current='page'] {
+      border-bottom-color: var(--colore-accento);
+    }
+  }
+</style>

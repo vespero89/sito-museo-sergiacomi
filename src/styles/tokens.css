@@ -1,0 +1,73 @@
+/* Design tokens (spec 9.1). No raw colour or size outside this file: components use these.
+   Media queries cannot use var(): the breakpoints are written in em in the components
+   (the one that matters is 48em = 768 px: header actions above it, bottom bar below it). */
+:root {
+  color-scheme: light;
+
+  /* Colours */
+  --colore-sfondo: #faf7f2;
+  --colore-superficie: #ffffff;
+  --colore-superficie-calda: #f1e9dc;
+  --colore-testo: #1f1b16;
+  --colore-testo-tenue: #5a5148;
+  --colore-accento: #8a4b1f;
+  --colore-accento-scuro: #6b3814;
+  --colore-sull-accento: #ffffff;
+  --colore-bordo: #d9cfc0;
+  --colore-focus: #0b57d0;
+  --colore-scuro: #2a231c;
+  --colore-sul-scuro: #f3ece1;
+  --colore-sul-scuro-tenue: #cfc3b1;
+  --colore-ombra: rgb(31 27 22 / 0.18);
+
+  /* Typography */
+  --font-testo: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --font-titoli: Georgia, 'Iowan Old Style', 'Palatino Linotype', Palatino, serif;
+  --testo-s: 0.875rem;
+  --testo-m: 1rem;
+  --testo-l: clamp(1.125rem, 1.05rem + 0.4vw, 1.3125rem);
+  --testo-xl: clamp(1.375rem, 1.2rem + 0.9vw, 1.75rem);
+  --testo-2xl: clamp(1.75rem, 1.4rem + 1.8vw, 2.5rem);
+  --testo-3xl: clamp(2.125rem, 1.5rem + 3vw, 3.5rem);
+  --interlinea-testo: 1.6;
+  --interlinea-titoli: 1.2;
+
+  /* Spacing, radii, shadows */
+  --spazio-1: 0.25rem;
+  --spazio-2: 0.5rem;
+  --spazio-3: 0.75rem;
+  --spazio-4: 1rem;
+  --spazio-5: 1.5rem;
+  --spazio-6: 2.5rem;
+  --spazio-7: 4rem;
+  --raggio-s: 0.25rem;
+  --raggio-m: 0.5rem;
+  --raggio-pieno: 999px;
+  --ombra-m: 0 0.5rem 1.5rem var(--colore-ombra);
+
+  /* Widths and fixed sizes */
+  --larghezza-pagina: 72rem;
+  --larghezza-testo: 42rem;
+  --margine-laterale: 1rem;
+  --bersaglio-min: 2.75rem; /* 44 px touch target (spec 5) */
+  --altezza-barra: 3.5rem; /* bottom action bar, 56 px (spec 5.8) */
+  --area-sicura-sotto: env(safe-area-inset-bottom, 0px);
+
+  /* Motion: zero under prefers-reduced-motion (below) */
+  --durata-s: 150ms;
+  --durata-m: 300ms;
+  --curva: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+@media (min-width: 48em) {
+  :root {
+    --margine-laterale: 2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --durata-s: 0ms;
+    --durata-m: 0ms;
+  }
+}

@@ -1,0 +1,77 @@
+---
+// The SEO head of a page (spec 6.1): title, description, canonical, robots, Open Graph, Twitter
+// card, hreflang. Used by the Base layout. It receives ready data and knows no collection.
+import { alternative, LINGUA_PREDEFINITA, percorso, type Lingua } from '../i18n/index.ts';
+import { COLORE_TEMA, titoloPagina, urlAssoluto } from '../lib/seo.ts';
+import { percorsoOg } from '../lib/og.ts';
+
+interface Props {
+  /** Page title without the museum name; leave out for the home page. */
+  titolo?: string | undefined;
+  /** Neutral hand-written description, 70-160 characters (spec 6.1). */
+  descrizione: string;
+  /** Address of the page in the default language, like `/il-museo/`. */
+  indirizzo: string;
+  nome: string;
+  lingua?: Lingua;
+  /** The page must not be indexed (preview mode, error and search pages). */
+  noindex: boolean;
+  /** No canonical link (error page). */
+  senzaCanonical?: boolean;
+  /** No Open Graph and Twitter card (error and search pages). */
+  senzaOg?: boolean;
+  /** Id of the photo (collection `immagini`) for the preview image; the default one otherwise. */
+  immagineOg?: string | undefined;
+  /** Short description of the preview image. */
+  altOg?: string | undefined;
+}
+
+const {
+  titolo,
+  descrizione,
+  indirizzo,
+  nome,
+  lingua = LINGUA_PREDEFINITA,
+  noindex,
+  senzaCanonical = false,
+  senzaOg = false,
+  immagineOg,
+  altOg,
+} = Astro.props;
+
+const origine = Astro.site ?? new URL(Astro.url.origin);
+const titoloCompleto = titoloPagina(titolo, nome);
+const url = urlAssoluto(percorso(indirizzo, lingua), origine);
+const immagine = urlAssoluto(percorsoOg(immagineOg), origine);
+const alternate = alternative(indirizzo).map((a) => ({
+  hreflang: a.hreflang,
+  href: urlAssoluto(a.percorso, origine),
+}));
+---
+
+<title>{titoloCompleto}</title>
+<meta name="description" content={descrizione} />
+<meta name="theme-color" content={COLORE_TEMA} />
+{noindex && <meta name="robots" content="noindex" />}
+{!senzaCanonical && <link rel="canonical" href={url} />}
+{alternate.map((a) => (
+  <link rel="alternate" hreflang={a.hreflang} href={a.href} />
+))}
+{!senzaOg && (
+  <>
+    <meta property="og:site_name" content={nome} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={titoloCompleto} />
+    <meta property="og:description" content={descrizione} />
+    <meta property="og:url" content={url} />
+    <meta property="og:locale" content="it_IT" />
+    <meta property="og:image" content={immagine} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    {altOg && <meta property="og:image:alt" content={altOg} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={titoloCompleto} />
+    <meta name="twitter:description" content={descrizione} />
+    <meta name="twitter:image" content={immagine} />
+  </>
+)}

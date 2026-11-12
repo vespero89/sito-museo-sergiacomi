@@ -1,0 +1,30 @@
+---
+import Base from '../layouts/Base.astro';
+import { t } from '../i18n/index.ts';
+import { leggiSito } from '../lib/sito-dati.ts';
+
+const { navigazione } = leggiSito();
+---
+
+<Base
+  titolo={t('errore.titolo')}
+  descrizione={t('errore.descrizione')}
+  indirizzo="/404.html"
+  tipo="errore"
+>
+  <h1>{t('errore.titolo')}</h1>
+  <p>{t('errore.testo')}</p>
+  <p>
+    <a class="torna" href="/">
+      {t('errore.torna')}
+    </a>
+  </p>
+  <p>{t('errore.oppure')}</p>
+  <ul>
+    {navigazione.principale.map((voce) => (
+      <li>
+        <a href={voce.href}>{voce.titolo}</a>
+      </li>
+    ))}
+  </ul>
+</Base>

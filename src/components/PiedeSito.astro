@@ -1,0 +1,111 @@
+---
+// Site footer: the groups of links from sito.yaml, address and contact of the museum.
+import { LINGUA_PREDEFINITA, percorso, t, type Lingua } from '../i18n/index.ts';
+
+interface Props {
+  nome: string;
+  fondazione: string;
+  indirizzo: { via: string; cap: string; comune: string; provincia: string };
+  email: string;
+  gruppi: { gruppo: string; voci: { titolo: string; href: string }[] }[];
+  lingua?: Lingua;
+}
+const { nome, fondazione, indirizzo, email, gruppi, lingua = LINGUA_PREDEFINITA } = Astro.props;
+---
+
+<footer class="piede">
+  <div class="contenitore griglia">
+    <div class="museo">
+      <p class="nome">{nome}</p>
+      <address>
+        {indirizzo.via}
+        <br />
+        {`${indirizzo.cap} ${indirizzo.comune} (${indirizzo.provincia})`}
+      </address>
+      <p>
+        <a href={`mailto:${email}`}>{email}</a>
+      </p>
+      <p class="fondazione">
+        {t('piede.gestitoDa', lingua)} {fondazione}
+      </p>
+    </div>
+    <nav class="gruppi" aria-label={t('piede.etichetta', lingua)}>
+      {gruppi.map((gruppo) => (
+        <section>
+          <h2>{gruppo.gruppo}</h2>
+          <ul>
+            {gruppo.voci.map((voce) => (
+              <li>
+                <a href={percorso(voce.href, lingua)}>{voce.titolo}</a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </nav>
+  </div>
+</footer>
+
+<style>
+  .piede {
+    margin-block-start: var(--spazio-7);
+    padding-block: var(--spazio-6);
+    background: var(--colore-scuro);
+    color: var(--colore-sul-scuro);
+  }
+  .piede a {
+    color: var(--colore-sul-scuro);
+  }
+  .piede a:hover {
+    color: var(--colore-sul-scuro-tenue);
+  }
+  .griglia {
+    display: grid;
+    gap: var(--spazio-6);
+  }
+  .nome {
+    margin: 0 0 var(--spazio-2);
+    font-family: var(--font-titoli);
+    font-size: var(--testo-xl);
+    font-weight: 700;
+  }
+  address {
+    font-style: normal;
+    margin-block-end: var(--spazio-3);
+  }
+  .fondazione {
+    color: var(--colore-sul-scuro-tenue);
+    font-size: var(--testo-s);
+  }
+  .gruppi {
+    display: grid;
+    gap: var(--spazio-5);
+  }
+  h2 {
+    margin: 0 0 var(--spazio-2);
+    font-family: var(--font-testo);
+    font-size: var(--testo-s);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--colore-sul-scuro-tenue);
+  }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  li a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--bersaglio-min);
+  }
+  @media (min-width: 48em) {
+    .griglia {
+      grid-template-columns: 1fr 2fr;
+    }
+    .gruppi {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>

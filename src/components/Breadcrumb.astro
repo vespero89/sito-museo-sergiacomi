@@ -1,0 +1,45 @@
+---
+// Breadcrumb trail (spec 4). Only pages that exist go in it; the last item is the current page.
+import { t, type Lingua, LINGUA_PREDEFINITA } from '../i18n/index.ts';
+
+interface Props {
+  /** In order, from the home page to the current page. The last one has no `href`. */
+  voci: { titolo: string; href?: string }[];
+  lingua?: Lingua;
+}
+const { voci, lingua = LINGUA_PREDEFINITA } = Astro.props;
+---
+
+<nav class="briciole" aria-label={t('briciole.etichetta', lingua)}>
+  <ol>
+    {voci.map((voce, i) => (
+      <li>
+        {voce.href && i < voci.length - 1 ? (
+          <a href={voce.href}>{voce.titolo}</a>
+        ) : (
+          <span aria-current="page">{voce.titolo}</span>
+        )}
+      </li>
+    ))}
+  </ol>
+</nav>
+
+<style>
+  .briciole {
+    font-size: var(--testo-s);
+    color: var(--colore-testo-tenue);
+    padding-block: var(--spazio-3);
+  }
+  ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spazio-1) var(--spazio-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  li + li::before {
+    content: '/';
+    margin-inline-end: var(--spazio-2);
+  }
+</style>

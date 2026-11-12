@@ -1,18 +1,12 @@
 ---
-const title = 'Museo Aldo Sergiacomi';
+import Base from '../layouts/Base.astro';
+import { t } from '../i18n/index.ts';
+import { leggiSito } from '../lib/sito-dati.ts';
+
+const sito = leggiSito();
 ---
 
-<!doctype html>
-<html lang="it">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title}</title>
-  </head>
-  <body>
-    <main>
-      <h1>{title}</h1>
-      <p>Il sito è in costruzione.</p>
-    </main>
-  </body>
-</html>
+<Base descrizione={t('home.descrizione')} indirizzo="/">
+  <h1>{sito.nome}</h1>
+  <p>{t('home.costruzione')}</p>
+</Base>

@@ -1,0 +1,109 @@
+---
+// Base layout (spec 9.1): head, skip link, header, main, footer, bottom action bar.
+// The content of a page goes in the slot; the data of the site (menu, address) comes from sito.yaml.
+import '../styles/globale.css';
+import BarraAzioni from '../components/BarraAzioni.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+import PiedeSito from '../components/PiedeSito.astro';
+import Seo from '../components/Seo.astro';
+import Testata from '../components/Testata.astro';
+import { LINGUA_PREDEFINITA, t, type Lingua } from '../i18n/index.ts';
+import { decidiModalita } from '../lib/modalita.ts';
+import { leggiSito } from '../lib/sito-dati.ts';
+
+interface Props {
+  /** Page title without the museum name; leave out for the home page. */
+  titolo?: string;
+  /** Neutral description for the meta tag, 70-160 characters. */
+  descrizione: string;
+  /** Address of the page, like `/il-museo/`. */
+  indirizzo: string;
+  /** `errore` (404): no canonical, no Open Graph, noindex. `ricerca`: no Open Graph, noindex. */
+  tipo?: 'normale' | 'errore' | 'ricerca';
+  immagineOg?: string;
+  altOg?: string;
+  /** Breadcrumb trail from the home page, the last item being the current page. */
+  briciole?: { titolo: string; href?: string }[];
+  lingua?: Lingua;
+}
+const {
+  titolo,
+  descrizione,
+  indirizzo,
+  tipo = 'normale',
+  immagineOg,
+  altOg,
+  briciole,
+  lingua = LINGUA_PREDEFINITA,
+} = Astro.props;
+
+const sito = leggiSito();
+const modalita = decidiModalita(process.env);
+---
+
+<!doctype html>
+<html lang={lingua}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <Seo
+      titolo={titolo}
+      descrizione={descrizione}
+      indirizzo={indirizzo}
+      nome={sito.nome}
+      lingua={lingua}
+      noindex={modalita.noindex || tipo !== 'normale'}
+      senzaCanonical={tipo === 'errore'}
+      senzaOg={tipo !== 'normale'}
+      immagineOg={immagineOg}
+      altOg={altOg}
+    />
+  </head>
+  <body>
+    <a class="salta" href="#contenuto">
+      {t('salta', lingua)}
+    </a>
+    <Testata
+      nome={sito.nome}
+      menu={sito.navigazione.principale}
+      azioni={sito.azioni}
+      corrente={indirizzo}
+      lingua={lingua}
+    />
+    <main id="contenuto" tabindex="-1" class="contenitore">
+      {briciole && <Breadcrumb voci={briciole} lingua={lingua} />}
+      <slot />
+    </main>
+    <PiedeSito
+      nome={sito.nome}
+      fondazione={sito.fondazione.denominazione}
+      indirizzo={sito.museo.indirizzo}
+      email={sito.contatti.email}
+      gruppi={sito.navigazione.piede}
+      lingua={lingua}
+    />
+    <BarraAzioni azioni={sito.azioni} variante="barra" lingua={lingua} />
+  </body>
+</html>
+
+<style>
+  .salta {
+    position: absolute;
+    inset-block-start: var(--spazio-2);
+    inset-inline-start: var(--spazio-2);
+    z-index: 20;
+    padding: var(--spazio-3) var(--spazio-4);
+    background: var(--colore-testo);
+    color: var(--colore-sfondo);
+    border-radius: var(--raggio-m);
+    transform: translateY(-200%);
+  }
+  .salta:focus {
+    transform: none;
+  }
+  main {
+    flex: 1;
+    padding-block: var(--spazio-5);
+  }
+</style>

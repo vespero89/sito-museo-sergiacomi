@@ -1,0 +1,67 @@
+---
+// Site header: brand, main menu and, from 768 px up, the two visit actions.
+import { LINGUA_PREDEFINITA, percorso, type Lingua } from '../i18n/index.ts';
+import BarraAzioni from './BarraAzioni.astro';
+import Menu from './Menu.astro';
+
+interface Props {
+  nome: string;
+  menu: { titolo: string; href: string }[];
+  azioni: { prenota: { titolo: string; href: string }; orari: { titolo: string; href: string } };
+  corrente?: string | undefined;
+  lingua?: Lingua;
+}
+const { nome, menu, azioni, corrente, lingua = LINGUA_PREDEFINITA } = Astro.props;
+---
+
+<header class="testata">
+  <div class="contenitore riga">
+    <a class="marchio" href={percorso('/', lingua)}>
+      {nome}
+    </a>
+    <div class="azioni">
+      <BarraAzioni azioni={azioni} variante="testata" lingua={lingua} />
+    </div>
+    <div class="menu-riga">
+      <Menu voci={menu} corrente={corrente} lingua={lingua} />
+    </div>
+  </div>
+</header>
+
+<style>
+  .testata {
+    background: var(--colore-superficie);
+    border-bottom: 1px solid var(--colore-bordo);
+  }
+  .riga {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spazio-2) var(--spazio-5);
+    padding-block: var(--spazio-3);
+  }
+  .marchio {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--bersaglio-min);
+    font-family: var(--font-titoli);
+    font-size: var(--testo-xl);
+    font-weight: 700;
+    color: var(--colore-testo);
+    text-decoration: none;
+  }
+  /* Small screens: brand on the left, the menu button on the right. */
+  .menu-riga {
+    margin-inline-start: auto;
+  }
+  /* From 768 px up: row 1 brand and actions, row 2 the menu across the full width. */
+  @media (min-width: 48em) {
+    .azioni {
+      margin-inline-start: auto;
+    }
+    .menu-riga {
+      flex-basis: 100%;
+      margin-inline-start: 0;
+    }
+  }
+</style>
