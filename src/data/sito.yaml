@@ -1,0 +1,81 @@
+# Data of the museum and the Foundation: the one place (spec 3.2).
+# A field listed in daConfermare is not shown in the preview, only its "da confermare" label.
+daConfermare:
+  - campo: orari
+    nota: Gli orari non sono nei materiali ricevuti.
+  - campo: contatti.telefono
+    nota: Telefono del museo non ancora indicato dalla Fondazione.
+  - campo: social
+    nota: Profili social non ancora raccolti.
+  - campo: sostegno.iban
+    nota: IBAN della Fondazione da riprendere dal vecchio sito e confermare.
+  - campo: sostegno.intestatario
+    nota: Intestatario da confermare insieme all'IBAN.
+  - campo: sostegno.causale
+    nota: Causale da concordare con la Fondazione.
+
+nome: Museo Aldo Sergiacomi
+nomeEsteso: Laboratori Didattici Museo Aldo Sergiacomi (LaDiMAS)
+
+museo:
+  indirizzo: &indirizzo
+    via: via Ischia 24
+    cap: '63073' # confermato da Fabio il 12/11/2026
+    comune: Offida
+    provincia: AP
+    regione: Marche
+    paese: IT
+
+orari:
+  testo: ''
+
+contatti:
+  email: info@lavoroperlapersona.it
+  telefono: ''
+
+social: []
+
+fondazione:
+  denominazione: Fondazione Lavoroperlapersona
+  sede: *indirizzo
+
+artista:
+  nome: Aldo Sergiacomi
+  wikidata: Q105686429
+
+azioni:
+  prenota:
+    titolo: Prenota
+    href: /visita/#prenota
+  orari:
+    titolo: Orari e come arrivare
+    href: /visita/#orari
+
+navigazione:
+  principale:
+    - { titolo: Aldo Sergiacomi, href: /aldo-sergiacomi/ }
+    - { titolo: Il Museo, href: /il-museo/ }
+    - { titolo: Opere e itinerari, href: /opere/ }
+    - { titolo: Didattica, href: /didattica/ }
+    - { titolo: Eventi, href: /eventi/ }
+    - { titolo: Archivio, href: /archivio/ }
+    - { titolo: Chi siamo, href: /chi-siamo/ }
+  piede:
+    - gruppo: Il museo
+      voci:
+        - { titolo: Visita, href: /visita/ }
+        - { titolo: Contatti, href: /contatti/ }
+        - { titolo: Pubblicazioni, href: /pubblicazioni/ }
+        - { titolo: Sostieni il museo, href: /sostieni/ }
+        - { titolo: Cerca nel sito, href: /ricerca/ }
+    - gruppo: Note
+      voci:
+        - { titolo: Privacy, href: /privacy/ }
+        - { titolo: Cookie, href: /cookie/ }
+        - { titolo: Note legali, href: /note-legali/ }
+        - { titolo: Accessibilità, href: /accessibilita/ }
+
+sostegno:
+  iban: ''
+  intestatario: ''
+  causale: ''
