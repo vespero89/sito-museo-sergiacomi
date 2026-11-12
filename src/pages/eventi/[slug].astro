@@ -2,6 +2,7 @@
 // An event or an initiative (task 14). Only a dated event has an Event JSON-LD (spec 6.2).
 import { getCollection, render } from 'astro:content';
 import Dubbi from '../../components/Dubbi.astro';
+import Continua from '../../components/Continua.astro';
 import Foto from '../../components/Foto.astro';
 import { t } from '../../i18n/index.ts';
 import Base from '../../layouts/Base.astro';
@@ -100,6 +101,7 @@ const dataSicura = daConfermare.some((d) => d.campo === 'data') ? undefined : da
         <Foto id={immagine.id} sizes="(min-width: 56em) 50rem, 100vw" />
       </figure>
     )}
+    <Continua pagina={{ tipo: 'manuale', continua: voce.data.continua }} href={indirizzo} />
   </article>
 </Base>
 

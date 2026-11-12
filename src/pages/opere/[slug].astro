@@ -4,6 +4,7 @@
 import { getImage } from 'astro:assets';
 import { getEntry, render } from 'astro:content';
 import CartaOpera from '../../components/CartaOpera.astro';
+import Continua from '../../components/Continua.astro';
 import Dubbi from '../../components/Dubbi.astro';
 import FotoOpera from '../../components/FotoOpera.astro';
 import Galleria from '../../components/Galleria.astro';
@@ -120,6 +121,7 @@ const datiJsonLd = {
         ))}
       </ul>
     </section>
+    <Continua pagina={{ tipo: 'opera', id: opera.slug }} href={indirizzo} />
   </article>
 </Base>
 

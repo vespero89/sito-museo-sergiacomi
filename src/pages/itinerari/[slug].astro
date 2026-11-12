@@ -3,6 +3,7 @@
 // Google Maps link of each group and a print version (the stops only, numbered).
 import { render } from 'astro:content';
 import Dubbi from '../../components/Dubbi.astro';
+import Continua from '../../components/Continua.astro';
 import { t, type ChiaveUi } from '../../i18n/index.ts';
 import Base from '../../layouts/Base.astro';
 import { briciole as briciolaJsonLd, itinerario as itinerarioJsonLd } from '../../lib/jsonld.ts';
@@ -109,6 +110,7 @@ const dati = [
         </ul>
       </section>
     )}
+    <Continua pagina={{ tipo: 'itinerario', id: itinerario.slug }} href={indirizzo} />
   </article>
 </Base>
 

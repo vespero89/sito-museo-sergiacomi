@@ -1,0 +1,51 @@
+---
+// "Continua il percorso" (spec 5.4): two or three cards at the end of a content page. No script.
+import { t } from '../i18n/index.ts';
+import { leggiContinua, type PaginaContinua } from '../lib/continua-dati.ts';
+import CartaVoce from './CartaVoce.astro';
+
+interface Props {
+  pagina: PaginaContinua;
+  /** Address of the page that shows the block: it never proposes itself. */
+  href: string;
+}
+const { pagina, href } = Astro.props;
+const schede = await leggiContinua(pagina, href);
+---
+
+<section class="continua" aria-labelledby="continua-titolo">
+  <h2 id="continua-titolo">{t('continua.titolo')}</h2>
+  <ul class="schede">
+    {schede.map((s) => (
+      <li>
+        <CartaVoce titolo={s.titolo} href={s.href} dati={t(`continua.tipo.${s.tipo}`)} />
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .continua {
+    padding-block: var(--spazio-6) var(--spazio-6);
+    border-block-start: 1px solid var(--colore-bordo);
+    margin-block-start: var(--spazio-6);
+  }
+  h2 {
+    margin-block: 0 var(--spazio-4);
+    font-size: var(--testo-2xl);
+    color: var(--colore-accento-scuro);
+  }
+  .schede {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    gap: var(--spazio-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media print {
+    .continua {
+      display: none;
+    }
+  }
+</style>

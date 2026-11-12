@@ -4,6 +4,7 @@
 // the entry. The labels of an entry that is not confirmed show under the title (spec 3.5).
 import { render, type CollectionEntry } from 'astro:content';
 import Dubbi from '../components/Dubbi.astro';
+import Continua from '../components/Continua.astro';
 import { t } from '../i18n/index.ts';
 import { briciole as briciolaJsonLd, type NodoJsonLd } from '../lib/jsonld.ts';
 import Base from './Base.astro';
@@ -43,6 +44,7 @@ const briciole = [{ titolo: t('briciole.home'), href: '/' }, ...(padre ? [padre]
       <Content />
     </div>
     <slot />
+    <Continua pagina={{ tipo: 'voce', voce }} href={indirizzo} />
   </article>
 </Base>
 

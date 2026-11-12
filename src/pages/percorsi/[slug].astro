@@ -3,6 +3,7 @@
 // breadcrumb is Home and the title: /percorsi/ is not a page (spec 4).
 import { getCollection } from 'astro:content';
 import CartaVoce from '../../components/CartaVoce.astro';
+import Continua from '../../components/Continua.astro';
 import Dubbi from '../../components/Dubbi.astro';
 import { t } from '../../i18n/index.ts';
 import Base from '../../layouts/Base.astro';
@@ -41,6 +42,7 @@ const briciole = [{ titolo: t('briciole.home'), href: '/' }, { titolo }];
         </li>
       ))}
     </ul>
+    <Continua pagina={{ tipo: 'manuale' }} href={indirizzo} />
   </div>
 </Base>
 
