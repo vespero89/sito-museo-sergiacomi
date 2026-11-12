@@ -58,6 +58,14 @@ one per page at most). Never put a photo in `public/`. Open Graph images (1200x6
 `dist/og/` for every photo, plus `/og/predefinita.jpg`. Encoder quality is set in `astro.config.mjs`; Astro
 caches the transformed images by name and size only, so after changing it delete `node_modules/.astro/assets`.
 
+The museum has four environments (rooms 1-3, the workshop, the cloister, the Foundation's spaces for the
+workshops), each a page under `/il-museo/` built from `src/pages/il-museo/[ambiente].astro` and a `pagine`
+entry named `ambiente-<name>.md`. The address of each page is the `slug` of its entry; the name and address
+of the fourth are provisional and live only in `ambiente-spazi-fondazione.md`. `PiantaSale.astro` draws the
+plan with one link per environment; `Galleria.astro` shows two or more photos as links to the image files,
+and as a modal `<dialog>` when JavaScript runs (the script returns the focus to the thumbnail).
+Browser tests: `npm run test:e2e`.
+
 ## Unconfirmed content
 
 Every entry has a `stato` (`confermato`, `da-confermare`, `segnaposto`) and a `daConfermare` list of
