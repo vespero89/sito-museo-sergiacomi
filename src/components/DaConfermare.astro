@@ -1,0 +1,29 @@
+---
+// Label for content that is not confirmed (spec 3.5). Shown in the preview next to a doubtful
+// text or in place of a doubtful value. A production build cannot contain one: the build stops
+// first. Claude Design may restyle it but not remove it.
+interface Props {
+  /** `segnaposto` for provisional or invented content, `da-confermare` for a doubt. */
+  tipo?: 'da-confermare' | 'segnaposto';
+  /** What is doubtful, in the museum's Italian. */
+  motivo?: string;
+}
+const { tipo = 'da-confermare', motivo } = Astro.props;
+const testo =
+  tipo === 'segnaposto' ? 'Segnaposto' : motivo ? `Da confermare: ${motivo}` : 'Da confermare';
+---
+
+<span class="da-confermare" data-tipo={tipo}>
+  {testo}
+</span>
+
+<style>
+  .da-confermare {
+    display: inline-block;
+    padding: 0.1em 0.5em;
+    border: 1px dashed currentColor;
+    border-radius: 0.25em;
+    font-size: 0.85em;
+    font-style: normal;
+  }
+</style>

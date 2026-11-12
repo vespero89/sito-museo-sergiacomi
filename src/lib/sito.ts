@@ -55,6 +55,26 @@ export function campoPresente(dati: unknown, percorso: string): boolean {
   return true;
 }
 
+/**
+ * The value of a field of sito.yaml, or just the label when the field is listed in `daConfermare`
+ * (spec 3.5): a doubtful value is never shown, the IBAN included. A listed field also hides what
+ * is inside it (`social` hides `social.0.url`).
+ */
+export function campoSito(
+  sito: Sito,
+  percorso: string,
+): { visibile: true; valore: unknown } | { visibile: false; nota: string } {
+  const dubbio = sito.daConfermare.find(
+    (d) => d.campo === percorso || percorso.startsWith(`${d.campo}.`),
+  );
+  if (dubbio) return { visibile: false, nota: dubbio.nota };
+  let valore: unknown = sito;
+  for (const parte of percorso.split('.')) {
+    valore = (valore as Record<string, unknown> | undefined)?.[parte];
+  }
+  return { visibile: true, valore };
+}
+
 export const sitoSchema = struttura.superRefine((v, ctx) => {
   // A listed field is hidden in the preview (spec 3.5): a path that does not exist would
   // silently leave the doubtful value on show.

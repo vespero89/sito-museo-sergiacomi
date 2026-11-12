@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { campoPresente, sitoSchema } from '../../src/lib/sito.ts';
+import { campoPresente, campoSito, sitoSchema } from '../../src/lib/sito.ts';
 import { parseYaml } from '../../src/lib/yaml.ts';
 
 const FILE = join(import.meta.dirname, '..', '..', 'src', 'data', 'sito.yaml');
@@ -144,5 +144,40 @@ describe('campoPresente', () => {
   it('does not walk into inherited properties', () => {
     expect(campoPresente(dati, 'toString')).toBe(false);
     expect(campoPresente(dati, 'a.constructor')).toBe(false);
+  });
+});
+
+describe('campoSito', () => {
+  it('shows only the label, not the value, for a field listed in daConfermare', () => {
+    const dati = reale();
+    (dati.sostegno as Record<string, unknown>).iban = 'IT60X0542811101000000123456';
+    dati.daConfermare = [{ campo: 'sostegno.iban', nota: 'Da confermare con la Fondazione' }];
+    const r = campoSito(dati as never, 'sostegno.iban');
+    expect(r).toEqual({ visibile: false, nota: 'Da confermare con la Fondazione' });
+    expect(JSON.stringify(r)).not.toContain('IT60');
+  });
+
+  it('hides everything under a listed parent field', () => {
+    const dati = reale();
+    dati.social = [{ nome: 'Facebook', url: 'https://example.org/museo' }];
+    dati.daConfermare = [{ campo: 'social', nota: 'Profili da verificare' }];
+    expect(campoSito(dati as never, 'social.0.url')).toEqual({
+      visibile: false,
+      nota: 'Profili da verificare',
+    });
+  });
+
+  it('returns the value of a field that is not listed', () => {
+    const dati = reale();
+    expect(campoSito(dati as never, 'contatti.email')).toEqual({
+      visibile: true,
+      valore: 'info@lavoroperlapersona.it',
+    });
+  });
+
+  it('does not hide a field only because a sibling is listed', () => {
+    const dati = reale();
+    dati.daConfermare = [{ campo: 'sostegno.iban', nota: 'x' }];
+    expect(campoSito(dati as never, 'sostegno.intestatario').visibile).toBe(true);
   });
 });
