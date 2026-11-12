@@ -231,6 +231,21 @@ describe('the photos of the works', () => {
     expect(delSoggetto).toHaveLength(11);
   });
 
+  it('credits the cover photo of the Merlettaie to the Foundation and says what it is', () => {
+    const copertina = immagini.find((i) => i.id === 'le-merlettaie-copertina-1') as Immagine & {
+      origine: string;
+      credito?: string;
+      alt: string;
+      didascalia?: string;
+    };
+    expect(copertina.origine).toBe('fondazione');
+    expect(copertina.credito).toBe('Fondazione Lavoroperlapersona');
+    for (const testo of [copertina.alt, copertina.didascalia ?? '']) {
+      expect(testo).toMatch(/prima realizzazione/i);
+      expect(testo).toMatch(/chiostro/i);
+    }
+  });
+
   it('links to a work only the Via crucis formella that carries the inscription of 1952', () => {
     const crucis = immagini.filter((i) => i.id.startsWith('via-crucis-'));
     expect(crucis).toHaveLength(5);
