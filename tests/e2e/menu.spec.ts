@@ -103,7 +103,7 @@ test.describe('wide screen', () => {
     expect(
       await tabFinoA(page, () => primaVoce.evaluate((el) => el === document.activeElement)),
     ).toBe(true);
-    // The header actions are links too.
-    await expect(page.locator('ul.in-testata').getByRole('link')).toHaveCount(2);
+    // The booking button of the header is a link too.
+    await expect(page.locator('a.in-testata')).toHaveCount(1);
   });
 });
