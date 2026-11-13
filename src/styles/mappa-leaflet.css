@@ -60,16 +60,33 @@
 .mappa .leaflet-control-attribution {
   font-size: var(--testo-s);
 }
-/* The gesture plugin: its message, with our font and colours, and no fade with reduced motion. */
-.mappa.leaflet-gesture-handling::after {
+/* One finger scrolls the page: the browser keeps the pan, Leaflet's script keeps the two-finger gestures. */
+.mappa.leaflet-container {
+  touch-action: pan-x pan-y;
+}
+/* The hint of the gestures (src/scripts/mappa-gesti.ts): over the map, never in the way of a click. */
+.mappa .mappa-gesti {
+  position: absolute;
+  inset: 0;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spazio-3);
   font-family: var(--font-testo);
   font-size: var(--testo-l);
   color: var(--colore-sul-scuro);
   background: rgb(42 35 28 / 0.72);
-  transition-duration: 0.3s;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+.mappa .mappa-gesti--visibile {
+  opacity: 1;
 }
 @media (prefers-reduced-motion: reduce) {
-  .mappa.leaflet-gesture-handling::after {
+  .mappa .mappa-gesti {
     transition-duration: 0s;
   }
 }

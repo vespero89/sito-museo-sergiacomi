@@ -289,8 +289,8 @@ test.describe('the map with reduced motion', () => {
     await expect(page.getByRole('button', { name: 'Riproduci' })).toBeHidden();
     await expect(page.getByRole('slider')).toBeVisible();
     const durata = await page
-      .locator('.leaflet-gesture-handling')
-      .evaluate((e) => getComputedStyle(e, '::after').transitionDuration);
+      .locator('.mappa-gesti')
+      .evaluate((e) => getComputedStyle(e).transitionDuration);
     expect(durata).toBe('0s');
   });
 });
@@ -342,11 +342,10 @@ test.describe('gestures on a touch device', () => {
     await tocca('touchStart', [{ x: cx, y: cy }]);
     await tocca('touchMove', [{ x: cx + 40, y: cy + 5 }]);
     await tocca('touchMove', [{ x: cx + 80, y: cy + 10 }]);
-    await expect(page.locator('.leaflet-gesture-handling-touch')).toHaveCount(1);
-    const messaggio = await page
-      .locator('[data-mappa]')
-      .evaluate((e) => getComputedStyle(e, '::after').content);
-    expect(messaggio).toContain('Usa due dita per spostare la mappa');
+    const messaggio = page.locator('[data-mappa] .mappa-gesti');
+    await expect(messaggio).toHaveClass(/mappa-gesti--visibile/);
+    await expect(messaggio).toHaveText('Usa due dita per spostare la mappa');
+    await expect(messaggio).toHaveAttribute('role', 'status');
     await tocca('touchEnd', []);
     expect(await posizione(page)).toEqual(prima);
 
@@ -362,6 +361,78 @@ test.describe('gestures on a touch device', () => {
     }
     await tocca('touchEnd', []);
     expect(await posizione(page)).not.toEqual(prima);
+    await expect(page.locator('[data-mappa] .mappa-gesti')).not.toHaveClass(
+      /mappa-gesti--visibile/,
+    );
+  });
+
+  test('a second finger that arrives late turns the drag into a two-finger move', async ({
+    page,
+  }) => {
+    await apri(page);
+    const tocca = toccare(await page.context().newCDPSession(page));
+    const mappa = page.locator('[data-mappa]');
+    await mappa.scrollIntoViewIfNeeded();
+    const riquadro = (await mappa.boundingBox())!;
+    const cx = riquadro.x + riquadro.width / 2;
+    const cy = riquadro.y + riquadro.height / 2;
+    const prima = await posizione(page);
+    await tocca('touchStart', [{ x: cx - 30, y: cy }]);
+    await tocca('touchStart', [
+      { x: cx - 30, y: cy },
+      { x: cx + 30, y: cy },
+    ]);
+    for (const passo of [20, 40, 60]) {
+      await tocca('touchMove', [
+        { x: cx - 30 + passo, y: cy },
+        { x: cx + 30 + passo, y: cy },
+      ]);
+    }
+    await tocca('touchEnd', []);
+    expect(await posizione(page)).not.toEqual(prima);
+  });
+});
+
+test.describe('the wheel on the map', () => {
+  test.use({ viewport: LARGO, reducedMotion: 'no-preference' });
+  // The distance between the first two markers changes with the zoom, not with a pan.
+  const livelloZoom = (page: Page) =>
+    page.locator(MARCATORI).evaluateAll((el) => {
+      const [a, b] = el.map((e) => e.getBoundingClientRect()) as [DOMRect, DOMRect];
+      return Math.round(Math.hypot(a.x - b.x, a.y - b.y));
+    });
+
+  test('without Ctrl the wheel does not zoom and shows the message, which goes away alone', async ({
+    page,
+  }) => {
+    await apri(page);
+    const mappa = page.locator('[data-mappa]');
+    await mappa.scrollIntoViewIfNeeded();
+    const riquadro = (await mappa.boundingBox())!;
+    await page.mouse.move(riquadro.x + riquadro.width / 2, riquadro.y + riquadro.height / 2);
+    const prima = await livelloZoom(page);
+    await page.mouse.wheel(0, -300);
+    const messaggio = mappa.locator('.mappa-gesti');
+    await expect(messaggio).toHaveClass(/mappa-gesti--visibile/);
+    await expect(messaggio).toHaveText(/Ctrl|Cmd/);
+    expect(await livelloZoom(page)).toBe(prima);
+    // It does not catch clicks.
+    expect(await messaggio.evaluate((e) => getComputedStyle(e).pointerEvents)).toBe('none');
+    await expect(messaggio).not.toHaveClass(/mappa-gesti--visibile/, { timeout: 3000 });
+  });
+
+  test('with Ctrl the wheel zooms the map and shows no message', async ({ page }) => {
+    await apri(page);
+    const mappa = page.locator('[data-mappa]');
+    await mappa.scrollIntoViewIfNeeded();
+    const riquadro = (await mappa.boundingBox())!;
+    await page.mouse.move(riquadro.x + riquadro.width / 2, riquadro.y + riquadro.height / 2);
+    const prima = await livelloZoom(page);
+    await page.keyboard.down('Control');
+    await page.mouse.wheel(0, -400);
+    await page.keyboard.up('Control');
+    await expect.poll(() => livelloZoom(page)).not.toBe(prima);
+    await expect(mappa.locator('.mappa-gesti')).not.toHaveClass(/mappa-gesti--visibile/);
   });
 });
 

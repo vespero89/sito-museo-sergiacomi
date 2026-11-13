@@ -1,9 +1,10 @@
 // Browser code of the map of the works (spec 5.3, task 17). The first part is the reusable base
-// (load Leaflet and the gesture plugin, make a map, our own zoom buttons, the markers): the maps on
+// (load Leaflet, make a map, our own zoom buttons, the markers): the maps on
 // the work pages and on the itineraries (task 18) import `caricaLeaflet`, `creaMappa`,
 // `controlloZoom` and `creaMarcatore`. The second part, `avviaMappaOpere`, wires the page of the works:
 // slider, "Riproduci", filters, the address, "near me". The rules are in src/lib/mappa.ts.
 import type * as Leaflet from 'leaflet';
+import { gestiMappa } from './mappa-gesti.ts';
 import {
   DURATA_FERMATA,
   conta,
@@ -56,16 +57,10 @@ export interface TestiMappa {
   saltoAnni: string;
 }
 
-/**
- * Leaflet, then the gesture plugin, one after the other. The plugin reads `window.L` and is
- * imported by its package root (never `dist/`, which breaks inside a module).
- */
+/** Leaflet, loaded when a map is needed. */
 export async function caricaLeaflet(): Promise<L> {
   const modulo = await import('leaflet');
   const leaflet = ((modulo as unknown as { default?: L }).default ?? modulo) as L;
-  const finestra = window as unknown as { L?: L };
-  finestra.L ??= leaflet;
-  await import('@raruto/leaflet-gesture-handling');
   return leaflet;
 }
 
@@ -79,11 +74,10 @@ interface OpzioniMappa {
   ridotto: boolean;
 }
 
-/** A map with tiles, the attribution, the gesture handling and our zoom buttons. */
+/** A map with tiles, the attribution, our gestures and our zoom buttons. */
 export function creaMappa(L: L, contenitore: HTMLElement, { tile, testi, ridotto }: OpzioniMappa) {
   const mac = /mac/i.test(navigator.platform);
   const animazioni = !ridotto;
-  // The plugin shows `text.scroll` as it is when the text is complete: we choose it for the platform.
   const opzioni = {
     zoomControl: false,
     attributionControl: false,
@@ -91,17 +85,9 @@ export function creaMappa(L: L, contenitore: HTMLElement, { tile, testi, ridotto
     fadeAnimation: animazioni,
     markerZoomAnimation: animazioni,
     inertia: animazioni,
-    gestureHandling: true,
-    gestureHandlingOptions: {
-      text: {
-        touch: testi.gestoTocco,
-        scroll: mac ? testi.gestoCmd : testi.gestoCtrl,
-        scrollMac: testi.gestoCmd,
-      },
-      duration: 1700,
-    },
   };
   const mappa = L.map(contenitore, opzioni);
+  gestiMappa(mappa, contenitore, testi, mac);
   // Leaflet listens for Esc only when the map itself has the focus, not a marker inside it.
   contenitore.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') mappa.closePopup();

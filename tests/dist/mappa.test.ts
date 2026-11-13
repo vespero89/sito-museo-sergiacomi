@@ -55,13 +55,7 @@ describe('/opere/ with the map', () => {
     expect(radice.getAttribute('data-testi')).toContain('OpenStreetMap contributors');
   });
 
-  it('does not ship the 356 language files of the gesture plugin nor its compiled file', () => {
-    const file = walk(DIST).map((f) => f.replace(DIST, ''));
-    expect(file.filter((f) => /locales/i.test(f))).toEqual([]);
-    expect(file.filter((f) => /leaflet-gesture-handling\.min/.test(f))).toEqual([]);
-  });
-
-  it('weighs 80 KB or less of compressed JavaScript, Leaflet and the plugin included', () => {
+  it('weighs 80 KB or less of compressed JavaScript, Leaflet and our gestures included', () => {
     const grafico = graficoScript();
     expect(grafico.some((f) => /leaflet/.test(f))).toBe(true);
     const peso = grafico.reduce((somma, f) => somma + gzipSync(readFileSync(f)).length, 0);
@@ -75,7 +69,7 @@ describe('/opere/ with the map', () => {
       .map((f) => readFileSync(f, 'utf8'))
       .join('\n');
     expect(css).toContain('.leaflet-container');
-    expect(css).toContain('.leaflet-gesture-handling');
+    expect(css).toContain('.mappa-gesti');
   });
 });
 

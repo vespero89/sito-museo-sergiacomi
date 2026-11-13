@@ -4,7 +4,6 @@
 import type * as Leaflet from 'leaflet';
 import type { PuntoPercorso } from '../lib/itinerari.ts';
 import leafletCss from 'leaflet/dist/leaflet.css?url';
-import gestiCss from '@raruto/leaflet-gesture-handling/src/index.css?url';
 import mappaCss from '../styles/mappa-leaflet.css?url';
 import { caricaLeaflet, creaMappa, movimentoRidotto, type TestiMappa } from './mappa-opere.ts';
 
@@ -75,7 +74,7 @@ function creaMarcatoreTappe(L: L, punto: PuntoPercorso, testi: TestiMappa): Leaf
 /** Adds the stylesheets of the map to the page and waits until they are loaded. */
 function caricaStili(): Promise<unknown> {
   return Promise.all(
-    [leafletCss, gestiCss, mappaCss].map(
+    [leafletCss, mappaCss].map(
       (href) =>
         new Promise((risolvi) => {
           const link = document.createElement('link');
