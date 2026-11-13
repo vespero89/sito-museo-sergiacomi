@@ -1,8 +1,6 @@
 # Data of the museum and the Foundation: the one place (spec 3.2).
 # A field listed in daConfermare is not shown in the preview, only its "da confermare" label.
 daConfermare:
-  - campo: orari
-    nota: Gli orari non sono nei materiali ricevuti.
   - campo: contatti.telefono
     nota: Telefono del museo non ancora indicato dalla Fondazione.
   - campo: social
@@ -31,7 +29,7 @@ museo:
     paese: IT
 
 orari:
-  testo: ''
+  testo: Solo su prenotazione # decided by Fabio on 13/11/2026, until the Foundation gives fixed hours
 
 contatti:
   email: info@lavoroperlapersona.it

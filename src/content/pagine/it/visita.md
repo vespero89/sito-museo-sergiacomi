@@ -7,11 +7,11 @@ stato: da-confermare
 
 ## Prenota
 
-Per prenotare la visita scrivete ai social della Fondazione Lavoroperlapersona oppure all'indirizzo info@lavoroperlapersona.it.
+Il museo si visita solo su prenotazione. Per prenotare scrivete a info@lavoroperlapersona.it.
 
 ## Orari
 
-[[DA CONFERMARE: gli orari di apertura non sono nei materiali ricevuti]]
+Il museo apre solo su prenotazione. Scrivete a info@lavoroperlapersona.it per concordare il giorno e l'ora della visita.
 
 ## Come arrivare
 
