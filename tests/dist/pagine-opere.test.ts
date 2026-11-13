@@ -32,12 +32,12 @@ describe('/opere/', () => {
     expect(grafo(d).find((n) => n['@type'] === 'BreadcrumbList')!.itemListElement).toHaveLength(2);
   });
 
-  it('lists the 27 works once each, in sections by town, with no map', () => {
+  it('lists the 27 works once each, in sections by town, with the map block', () => {
     const link = [...d.querySelectorAll('.schede h3 a')].map((a) => a.getAttribute('href'));
     expect(slugs).toHaveLength(27);
     expect([...link].sort()).toEqual(slugs.map((s) => `/opere/${s}/`).sort());
     expect(d.querySelectorAll('section.comune').length).toBeGreaterThan(5);
-    expect(d.querySelector('#mappa, [data-mappa]')).toBeNull();
+    expect(d.querySelector('[data-mappa]')).not.toBeNull();
   });
 
   it('keeps the works with no certain year in the list, with a label', () => {

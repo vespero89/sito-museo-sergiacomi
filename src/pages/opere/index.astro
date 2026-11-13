@@ -1,11 +1,16 @@
 ---
-// The list of the works (spec 12): every work, grouped by town. No map and no filters yet.
-// A work with no certain year (Stemmi, Tomba Palmucci) is in the list like the others, with a label.
+// The list of the works (spec 12) with the map, the year slider and the filters (spec 5.3, task 17).
+// The list is the real page: every work, grouped by town, with data-attributes the map script reads.
+// A work with no certain year (Stemmi, Tomba Palmucci) is in the list like the others, with a label,
+// and the slider never hides it.
+import { getCollection } from 'astro:content';
 import CartaOpera from '../../components/CartaOpera.astro';
 import { t } from '../../i18n/index.ts';
 import Base from '../../layouts/Base.astro';
 import { briciole as briciolaJsonLd } from '../../lib/jsonld.ts';
-import { leggiOpere, type OperaCompleta } from '../../lib/opere-dati.ts';
+import MappaOpere from '../../components/MappaOpere.astro';
+import { limitiAnni, slugComune, type OperaMappa } from '../../lib/mappa.ts';
+import { indirizzoOpera, leggiOpere, type OperaCompleta } from '../../lib/opere-dati.ts';
 
 const opere = await leggiOpere();
 
@@ -18,16 +23,50 @@ const comuni = [...perComune.entries()]
   .sort(([a], [b]) => a.localeCompare(b, 'it'))
   .map(([comune, lista]) => ({
     comune,
-    id: `comune-${comune
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9]+/g, '-')}`,
+    slug: slugComune(comune),
+    id: `comune-${slugComune(comune)}`,
     lista: [...lista].sort(
       (a, b) =>
         (a.voce.data.anno ?? 9999) - (b.voce.data.anno ?? 9999) || a.slug.localeCompare(b.slug),
     ),
   }));
+
+// What the map script needs about each work, written as data-attributes of its list item.
+const dati = new Map<string, OperaMappa>(
+  opere.map((o) => {
+    const { anno, nellElenco, materiali, daConfermare } = o.voce.data;
+    const certa = nellElenco && anno !== undefined && !daConfermare.some((d) => d.campo === 'anno');
+    return [
+      o.slug,
+      {
+        id: o.slug,
+        titolo: o.voce.data.titolo,
+        href: indirizzoOpera(o.slug),
+        anno: certa ? anno : undefined,
+        certa,
+        comune: slugComune(o.luogo.comune),
+        materiali,
+        luogoId: o.voce.data.luogo.id,
+        luogoNome: o.luogo.nome,
+        indicativa: o.luogo.precisione !== 'punto',
+        lat: o.luogo.lat,
+        lon: o.luogo.lon,
+      },
+    ];
+  }),
+);
+const limiti = limitiAnni([...dati.values()]);
+const materialiUsati = [...new Set(opere.flatMap((o) => o.voce.data.materiali))].sort((a, b) =>
+  a.localeCompare(b, 'it'),
+);
+const segni = [
+  ...new Map(
+    (await getCollection('biografia'))
+      .filter((v) => v.data.anno >= limiti.min && v.data.anno <= limiti.max)
+      .sort((a, b) => a.data.anno - b.data.anno)
+      .map((v) => [v.data.anno, { anno: v.data.anno, titolo: v.data.titolo }] as const),
+  ).values(),
+];
 
 const titolo = t('opere.titolo');
 const briciole = [{ titolo: t('briciole.home'), href: '/' }, { titolo }];
@@ -45,24 +84,57 @@ const quante = (n: number) => (n === 1 ? t('opere.una') : t('opere.piu').replace
   <div class="intestazione">
     <h1>{titolo}</h1>
     <p class="intro">{t('opere.intro')}</p>
+    <p class="intro">{t('mappa.intro')}</p>
     <p class="intro">
       <a href="/itinerari/">{t('opere.versoItinerari')}</a>.
     </p>
   </div>
-  {comuni.map(({ comune, id, lista }) => (
-    <section class="comune" aria-labelledby={id}>
-      <h2 id={id}>
-        {comune} <span class="numero">{quante(lista.length)}</span>
-      </h2>
-      <ul class="schede">
-        {lista.map((opera) => (
-          <li>
-            <CartaOpera opera={opera} transizione />
-          </li>
-        ))}
-      </ul>
-    </section>
-  ))}
+  <MappaOpere
+    limiti={limiti}
+    comuni={comuni.map((c) => ({ id: c.slug, nome: c.comune }))}
+    materiali={materialiUsati}
+    segni={segni}
+    idElenco="elenco-opere"
+  />
+  <div id="elenco-opere" tabindex="-1">
+    <h2 class="solo-lettori">{t('mappa.sezioneElenco')}</h2>
+    <p class="nessuna" data-nessuna hidden>
+      {t('mappa.nessuna')}
+    </p>
+    {comuni.map(({ comune, id, lista }) => (
+      <section class="comune" aria-labelledby={id} data-comune-sezione>
+        <h2 id={id}>
+          {comune}{' '}
+          <span class="numero" data-numero>
+            {quante(lista.length)}
+          </span>
+        </h2>
+        <ul class="schede">
+          {lista.map((opera) => {
+            const d = dati.get(opera.slug)!;
+            return (
+              <li
+                data-voce={d.id}
+                data-titolo={d.titolo}
+                data-href={d.href}
+                data-anno={d.anno}
+                data-certa={d.certa ? '1' : '0'}
+                data-comune={d.comune}
+                data-materiali={d.materiali.join(' ')}
+                data-luogo={d.luogoId}
+                data-luogo-nome={d.luogoNome}
+                data-indicativa={d.indicativa ? '1' : '0'}
+                data-lat={d.lat}
+                data-lon={d.lon}
+              >
+                <CartaOpera opera={opera} transizione />
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+    ))}
+  </div>
 </Base>
 
 <style>

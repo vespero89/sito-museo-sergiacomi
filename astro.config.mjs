@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'astro/config';
 import { bloccoProduzione } from './src/lib/blocco-produzione.ts';
 import { ORIGINE_PREDEFINITA } from './src/lib/seo.ts';
@@ -30,6 +31,21 @@ export default defineConfig({
     inlineStylesheets: 'never',
   },
   vite: {
+    resolve: {
+      alias: [
+        // The package points `browser` at its compiled file, which reads `document.currentScript`
+        // and fails inside a module. The source entry (its `module` field) uses `import.meta.url`.
+        {
+          find: /^@raruto\/leaflet-gesture-handling$/,
+          replacement: fileURLToPath(
+            new URL(
+              './node_modules/@raruto/leaflet-gesture-handling/src/index.js',
+              import.meta.url,
+            ),
+          ),
+        },
+      ],
+    },
     build: {
       // Never inline assets as data: URIs.
       assetsInlineLimit: 0,

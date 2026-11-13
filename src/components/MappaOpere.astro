@@ -1,0 +1,301 @@
+---
+// The map of the works with the year slider, the filters and "near me" (spec 5.3, task 17). The page
+// that uses it also writes the list of the works (the real page): each item has `data-opera` and
+// the other data-attributes read by src/scripts/mappa-opere.ts. Without JavaScript only the
+// paragraph that explains it is shown; the controls and the map appear when the script starts.
+import { t } from '../i18n/index.ts';
+import { MATERIALE_NON_INDICATO, tileMappa, type LimitiAnni } from '../lib/mappa.ts';
+import 'leaflet/dist/leaflet.css';
+import '@raruto/leaflet-gesture-handling/src/index.css';
+
+interface Props {
+  limiti: LimitiAnni;
+  comuni: { id: string; nome: string }[];
+  materiali: string[];
+  /** Years of the biography inside the limits, for the marks of the slider. */
+  segni: { anno: number; titolo: string }[];
+  /** Id of the list of the works: where "Salta la mappa" goes. */
+  idElenco: string;
+}
+const { limiti, comuni, materiali, segni, idElenco } = Astro.props;
+const tile = tileMappa(import.meta.env.PUBLIC_TILE_URL);
+const testi = {
+  conteggio: t('mappa.conteggio'),
+  una: t('opere.una'),
+  piu: t('opere.piu'),
+  indicativa: t('mappa.indicativa'),
+  nessuna: t('mappa.nessuna'),
+  zoomPiu: t('mappa.zoomPiu'),
+  zoomMeno: t('mappa.zoomMeno'),
+  chiudi: t('mappa.chiudi'),
+  vicinoNegato: t('mappa.vicinoNegato'),
+  vicinoNonDisponibile: t('mappa.vicinoNonDisponibile'),
+  vicinoScaduto: t('mappa.vicinoScaduto'),
+  gestoTocco: t('mappa.gestoTocco'),
+  gestoCtrl: t('mappa.gestoCtrl'),
+  gestoCmd: t('mappa.gestoCmd'),
+  attribuzione: `<a href="${tile.attribuzioneUrl}">${tile.attribuzione}</a>`,
+};
+---
+
+<div
+  class="mappa-opere"
+  data-mappa-opere
+  data-min={limiti.min}
+  data-max={limiti.max}
+  data-tile={tile.urlTemplate}
+  data-testi={JSON.stringify(testi)}
+>
+  <p class="senza-js" data-senza-js>
+    {t('mappa.richiedeJs')}
+  </p>
+  <div class="controlli" data-controlli hidden>
+    <a class="salta-mappa" href={`#${idElenco}`}>
+      {t('mappa.saltaMappa')}
+    </a>
+    <div class="filtri" role="group" aria-label={t('mappa.controlli')}>
+      <div class="campo anni">
+        <label for="mappa-fino">{t('mappa.anno')}</label>
+        <input
+          id="mappa-fino"
+          name="fino"
+          type="range"
+          min={limiti.min}
+          max={limiti.max}
+          step="1"
+          value={limiti.max}
+          list="mappa-segni"
+        />
+        <datalist id="mappa-segni">
+          {segni.map((s) => (
+            <option value={s.anno} label={String(s.anno)} title={s.titolo} />
+          ))}
+        </datalist>
+      </div>
+      <div class="riproduzione" data-riproduzione hidden>
+        <button type="button" data-riproduci>
+          {t('mappa.riproduci')}
+        </button>
+        <button type="button" data-pausa disabled>
+          {t('mappa.pausa')}
+        </button>
+      </div>
+      <div class="campo">
+        <label for="mappa-comune">{t('mappa.comune')}</label>
+        <select id="mappa-comune" name="comune">
+          <option value="">{t('mappa.tuttiComuni')}</option>
+          {comuni.map((c) => (
+            <option value={c.id}>{c.nome}</option>
+          ))}
+        </select>
+      </div>
+      <div class="campo">
+        <label for="mappa-materiale">{t('mappa.materiale')}</label>
+        <select id="mappa-materiale" name="materiale">
+          <option value="">{t('mappa.tuttiMateriali')}</option>
+          {materiali.map((m) => (
+            <option value={m}>{m[0]!.toUpperCase() + m.slice(1)}</option>
+          ))}
+          <option value={MATERIALE_NON_INDICATO}>{t('mappa.nonIndicato')}</option>
+        </select>
+      </div>
+    </div>
+    <p class="conteggio" data-conteggio></p>
+    <p class="solo-lettori" aria-live="polite" data-annuncio></p>
+  </div>
+  <div class="riquadro" data-riquadro role="region" aria-label={t('mappa.etichetta')} hidden>
+    <div class="mappa" data-mappa></div>
+  </div>
+  <div class="vicino" data-vicino hidden>
+    <button type="button" data-vicino-pulsante>
+      {t('mappa.vicino')}
+    </button>
+    <p class="nota">{t('mappa.vicinoNote')}</p>
+    <p class="messaggio" role="status" data-vicino-messaggio></p>
+    <div data-vicino-risultato hidden>
+      <h2>{t('mappa.vicinoTitolo')}</h2>
+      <ol data-vicino-elenco></ol>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { avviaMappaOpere } from '../scripts/mappa-opere.ts';
+  document.querySelectorAll<HTMLElement>('[data-mappa-opere]').forEach(avviaMappaOpere);
+</script>
+
+<style>
+  .mappa-opere {
+    margin-block-end: var(--spazio-6);
+  }
+  .senza-js {
+    padding: var(--spazio-4);
+    background: var(--colore-superficie-calda);
+    border-radius: var(--raggio-m);
+  }
+  .salta-mappa {
+    display: inline-block;
+    margin-block-end: var(--spazio-3);
+  }
+  .filtri {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: var(--spazio-4) var(--spazio-5);
+  }
+  .campo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spazio-1);
+  }
+  .anni {
+    flex: 1 1 18rem;
+  }
+  .anni input {
+    width: 100%;
+    min-height: var(--bersaglio-min);
+    accent-color: var(--colore-accento);
+  }
+  label {
+    font-weight: 600;
+  }
+  select,
+  button {
+    min-height: var(--bersaglio-min);
+    padding-inline: var(--spazio-4);
+    font: inherit;
+    color: var(--colore-testo);
+    background: var(--colore-superficie);
+    border: 1px solid var(--colore-bordo);
+    border-radius: var(--raggio-m);
+  }
+  button {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: default;
+    color: var(--colore-testo-tenue);
+  }
+  .riproduzione {
+    display: flex;
+    gap: var(--spazio-2);
+  }
+  .riproduzione[hidden] {
+    display: none;
+  }
+  .conteggio {
+    margin-block: var(--spazio-3);
+    font-size: var(--testo-l);
+    color: var(--colore-accento-scuro);
+  }
+  .riquadro {
+    position: relative;
+    height: var(--mappa-altezza);
+    border: 1px solid var(--colore-bordo);
+    border-radius: var(--raggio-m);
+    overflow: hidden;
+    background: var(--colore-superficie-calda);
+  }
+  .mappa {
+    width: 100%;
+    height: 100%;
+  }
+  .vicino {
+    margin-block-start: var(--spazio-4);
+  }
+  .nota,
+  .messaggio {
+    margin-block: var(--spazio-2) 0;
+    font-size: var(--testo-s);
+    color: var(--colore-testo-tenue);
+  }
+  .vicino h2 {
+    margin-block: var(--spazio-4) var(--spazio-2);
+    font-size: var(--testo-xl);
+  }
+  .vicino ol {
+    margin: 0;
+    padding-inline-start: var(--spazio-5);
+  }
+  @media (min-width: 48em) {
+    .riquadro {
+      height: calc(var(--mappa-altezza) * 1.4);
+    }
+  }
+
+  /* Leaflet markup is made by the script, so these rules must be global. */
+  .mappa :global(.leaflet-tile-pane) {
+    filter: var(--mappa-filtro-tile);
+  }
+  .mappa:global(.leaflet-container) {
+    font-family: var(--font-testo);
+    background: var(--colore-superficie-calda);
+  }
+  .mappa :global(.marcatore) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    font: 700 var(--testo-s) var(--font-testo);
+    color: var(--colore-sull-accento);
+    background: var(--colore-accento);
+    border: 2px solid var(--colore-superficie);
+    border-radius: var(--raggio-pieno);
+    box-shadow: var(--ombra-m);
+  }
+  .mappa :global(.marcatore.indicativo) {
+    background: var(--colore-superficie);
+    color: var(--colore-accento-scuro);
+    border: 2px dashed var(--colore-accento);
+  }
+  .mappa :global(.leaflet-marker-icon:focus-visible) {
+    outline: 3px solid var(--colore-focus);
+    outline-offset: 2px;
+    border-radius: var(--raggio-pieno);
+  }
+  .mappa :global(.zoom-nostro) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spazio-1);
+  }
+  .mappa :global(.zoom-nostro button) {
+    min-width: var(--bersaglio-min);
+    padding-inline: 0;
+    font-size: var(--testo-xl);
+    line-height: 1;
+  }
+  .mappa :global(.leaflet-popup-content) {
+    margin: var(--spazio-3);
+    font-size: var(--testo-m);
+    color: var(--colore-testo);
+  }
+  .mappa :global(.leaflet-popup-content h3) {
+    margin: 0 0 var(--spazio-2);
+    font-size: var(--testo-l);
+  }
+  .mappa :global(.leaflet-popup-content ul) {
+    margin: 0;
+    padding-inline-start: var(--spazio-4);
+  }
+  .mappa :global(.leaflet-popup-content .indicativa) {
+    margin: var(--spazio-2) 0 0;
+    font-size: var(--testo-s);
+    color: var(--colore-testo-tenue);
+  }
+  .mappa :global(.leaflet-control-attribution) {
+    font-size: var(--testo-s);
+  }
+  /* The gesture plugin: its message, with our font and colours, and no fade with reduced motion. */
+  .mappa:global(.leaflet-gesture-handling)::after {
+    font-family: var(--font-testo);
+    font-size: var(--testo-l);
+    color: var(--colore-sul-scuro);
+    background: rgb(42 35 28 / 0.72);
+    transition-duration: 0.3s;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .mappa:global(.leaflet-gesture-handling)::after {
+      transition-duration: 0s;
+    }
+  }
+</style>

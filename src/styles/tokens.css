@@ -44,6 +44,9 @@
   --raggio-m: 0.5rem;
   --raggio-pieno: 999px;
   --ombra-m: 0 0.5rem 1.5rem var(--colore-ombra);
+  /* The map tiles are toned to the palette with a CSS filter (spec 5.3) */
+  --mappa-filtro-tile: sepia(0.3) saturate(0.75) hue-rotate(-8deg) brightness(1.03);
+  --mappa-altezza: 26rem;
 
   /* Widths and fixed sizes */
   --larghezza-pagina: 72rem;
