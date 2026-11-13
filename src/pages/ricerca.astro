@@ -1,0 +1,128 @@
+---
+// Search page (task 20). Pagefind builds the index after the build (`pagefind --site dist`); the
+// script loads it on the same domain. Without JavaScript, or without the index, the page explains
+// and lists the sections. The page is kept out of the index and of the search engines (tipo ricerca).
+import { t } from '../i18n/index.ts';
+import Base from '../layouts/Base.astro';
+import { briciole as briciolaJsonLd } from '../lib/jsonld.ts';
+import { leggiSito } from '../lib/sito-dati.ts';
+
+const sezioni = leggiSito().navigazione.principale;
+const indirizzo = '/ricerca/';
+const briciole = [{ titolo: t('briciole.home'), href: '/' }, { titolo: t('ricerca.titolo') }];
+const testi = JSON.stringify({
+  nonDisponibile: t('ricerca.nonDisponibile'),
+  caricamento: t('ricerca.caricamento'),
+  una: t('ricerca.risultatoUno'),
+  piu: t('ricerca.risultatoPiu'),
+  nessuno: t('ricerca.nessuno'),
+});
+---
+
+<Base
+  titolo={t('ricerca.titolo')}
+  descrizione={t('ricerca.descrizione')}
+  indirizzo={indirizzo}
+  tipo="ricerca"
+  briciole={briciole}
+  jsonld={[briciolaJsonLd(briciole, indirizzo, Astro.site!)]}
+>
+  <div class="pagina" data-ricerca data-testi={testi}>
+    <h1>{t('ricerca.titolo')}</h1>
+    <p class="senza-js" data-senza-js>
+      {t('ricerca.senzaJs')}
+    </p>
+    <form class="modulo" role="search" data-modulo hidden>
+      <label for="ricerca-q">{t('ricerca.etichetta')}</label>
+      <div class="riga">
+        <input id="ricerca-q" name="q" type="search" autocomplete="off" />
+        <button type="submit">{t('ricerca.invia')}</button>
+      </div>
+    </form>
+    <p class="stato" role="status" aria-live="polite" data-stato></p>
+    <ol class="risultati" data-risultati></ol>
+    <section class="sezioni" data-sezioni aria-labelledby="sezioni-titolo">
+      <h2 id="sezioni-titolo">{t('ricerca.sezioni')}</h2>
+      <ul>
+        {sezioni.map((s) => (
+          <li>
+            <a href={s.href}>{s.titolo}</a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  </div>
+</Base>
+
+<script>
+  import { avviaRicerca } from '../scripts/ricerca.ts';
+  document.querySelectorAll<HTMLElement>('[data-ricerca]').forEach(avviaRicerca);
+</script>
+
+<style>
+  .pagina {
+    padding-block: var(--spazio-5) var(--spazio-6);
+  }
+  h1 {
+    font-size: var(--testo-3xl);
+    margin-block-end: var(--spazio-4);
+  }
+  .senza-js {
+    padding: var(--spazio-4);
+    background: var(--colore-superficie-calda);
+    border-radius: var(--raggio-m);
+  }
+  .modulo[hidden] {
+    display: none;
+  }
+  label {
+    font-weight: 600;
+  }
+  .riga {
+    display: flex;
+    gap: var(--spazio-2);
+    margin-block-start: var(--spazio-1);
+  }
+  input {
+    flex: 1;
+    min-width: 0;
+  }
+  input,
+  button {
+    min-height: var(--bersaglio-min);
+    padding-inline: var(--spazio-4);
+    font: inherit;
+    color: var(--colore-testo);
+    background: var(--colore-superficie);
+    border: 1px solid var(--colore-bordo);
+    border-radius: var(--raggio-m);
+  }
+  button {
+    cursor: pointer;
+  }
+  .stato {
+    margin-block: var(--spazio-4);
+    font-size: var(--testo-l);
+    color: var(--colore-accento-scuro);
+  }
+  .risultati {
+    display: grid;
+    gap: var(--spazio-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .risultati :global(a) {
+    font-size: var(--testo-l);
+    font-weight: 600;
+  }
+  .risultati :global(p) {
+    margin: var(--spazio-1) 0 0;
+  }
+  .sezioni {
+    margin-block-start: var(--spazio-6);
+  }
+  .sezioni[hidden] {
+    display: none;
+  }
+</style>

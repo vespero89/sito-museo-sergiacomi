@@ -10,7 +10,7 @@ interface Props {
 const { voci, lingua = LINGUA_PREDEFINITA } = Astro.props;
 ---
 
-<nav class="briciole" aria-label={t('briciole.etichetta', lingua)}>
+<nav class="briciole" data-pagefind-ignore aria-label={t('briciole.etichetta', lingua)}>
   <ol>
     {voci.map((voce, i) => (
       <li>

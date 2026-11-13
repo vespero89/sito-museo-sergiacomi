@@ -11,8 +11,8 @@
   "scripts": {
     "prepare": "git config core.hooksPath .githooks",
     "dev": "astro dev",
-    "build": "astro build && node scripts/emit-hosting.mjs",
-    "build:production": "export SITE_ENV=production && astro build && node scripts/emit-hosting.mjs",
+    "build": "astro build && pagefind --site dist && node scripts/emit-hosting.mjs",
+    "build:production": "export SITE_ENV=production && astro build && pagefind --site dist && node scripts/emit-hosting.mjs",
     "typecheck": "astro check",
     "lint": "eslint .",
     "format": "prettier --write .",
@@ -44,6 +44,7 @@
     "eslint-plugin-astro": "3.2.1",
     "eslint-plugin-jsx-a11y-x": "0.2.0",
     "linkedom": "0.18.14",
+    "pagefind": "1.5.2",
     "playwright-core": "1.64.1",
     "prettier": "3.9.10",
     "prettier-plugin-astro": "1.1.2",

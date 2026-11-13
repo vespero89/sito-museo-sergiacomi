@@ -167,7 +167,7 @@ describe('the built pages', () => {
     (path, document) => {
       const indirizzo = indirizzoDi(path);
       expect(
-        problemiPagina(document, { indirizzo, origine: ORIGINE, errore: path === '404.html', noindex }),
+        problemiPagina(document, { indirizzo, origine: ORIGINE, errore: path === '404.html', ricerca: path === join('ricerca', 'index.html'), noindex }),
       ).toEqual([]);
     },
   );

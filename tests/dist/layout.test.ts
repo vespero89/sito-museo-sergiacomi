@@ -23,9 +23,9 @@ describe('layout of every built page', () => {
     expect(menu?.hasAttribute('popover')).toBe(true);
     // A JSON-LD script is data, not code. The only code is the own files of the gallery, the phases and the comparison, on pages that have one.
     const codice = document.querySelectorAll('script:not([type="application/ld+json"])');
-    const attesi = ['[data-galleria]', '[data-fasi]', '[data-confronto]', '[data-mappa-opere]', '[data-mappa-piccola]'].filter((s) => document.querySelector(s));
+    const attesi = ['[data-galleria]', '[data-fasi]', '[data-confronto]', '[data-mappa-opere]', '[data-mappa-piccola]', '[data-archivio-filtri]', '[data-ricerca]'].filter((s) => document.querySelector(s));
     expect(codice).toHaveLength(attesi.length);
-    for (const script of codice) expect(script.getAttribute('src')).toMatch(/^\/_astro\/(Galleria|Fasi|Confronto|MappaOpere|MappaPiccola)/);
+    for (const script of codice) expect(script.getAttribute('src')).toMatch(/^\/_astro\/(Galleria|Fasi|Confronto|MappaOpere|MappaPiccola|index\.astro_astro_type_script|ricerca\.astro_astro_type_script)/);
   });
 
   it.each(pagine)('%s: the menu items come from sito.yaml', (_path, document) => {

@@ -80,7 +80,12 @@ const modalita = decidiModalita(process.env);
       corrente={indirizzo}
       lingua={lingua}
     />
-    <main id="contenuto" tabindex="-1" class:list={['contenitore', { larga }]}>
+    <main
+      id="contenuto"
+      tabindex="-1"
+      class:list={['contenitore', { larga }]}
+      data-pagefind-body={tipo === 'normale' ? '' : undefined}
+    >
       {briciole && <Breadcrumb voci={briciole} lingua={lingua} />}
       <slot />
     </main>

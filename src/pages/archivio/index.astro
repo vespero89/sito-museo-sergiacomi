@@ -1,10 +1,12 @@
 ---
-// The archive (task 14): static list by type. Filters come with task 20.
+// The archive (task 14, filters task 20): every item is in the HTML, grouped by type. The script of
+// the filters (src/scripts/archivio-filtri.ts) hides the ones that do not match; without it all show.
 import { getCollection } from 'astro:content';
 import CartaVoce from '../../components/CartaVoce.astro';
 import { t, type ChiaveUi } from '../../i18n/index.ts';
 import Base from '../../layouts/Base.astro';
 import { briciole as briciolaJsonLd } from '../../lib/jsonld.ts';
+import { decennio, decenniPresenti, normalizza } from '../../lib/archivio.ts';
 import { TIPI_ARCHIVIO } from '../../lib/schemi.ts';
 
 const voci = (await getCollection('archivio')).sort((a, b) =>
@@ -14,6 +16,12 @@ const gruppi = TIPI_ARCHIVIO.map((tipo) => ({
   tipo,
   voci: voci.filter((v) => v.data.tipo === tipo),
 })).filter((g) => g.voci.length > 0);
+const decenni = decenniPresenti(voci.map((v) => ({ decennio: decennio(v.data.data) })));
+const testi = JSON.stringify({
+  una: t('archivio.conteggioUno'),
+  piu: t('archivio.conteggioPiu'),
+  nessuna: t('archivio.conteggioNessuno'),
+});
 const indirizzo = '/archivio/';
 const briciole = [{ titolo: t('briciole.home'), href: '/' }, { titolo: t('archivio.titolo') }];
 ---
@@ -30,12 +38,54 @@ const briciole = [{ titolo: t('briciole.home'), href: '/' }, { titolo: t('archiv
       <h1>{t('archivio.titolo')}</h1>
       <p class="intro">{t('archivio.intro')}</p>
     </div>
+    <div
+      class="filtri"
+      data-archivio-filtri
+      data-testi={testi}
+      role="search"
+      aria-label={t('archivio.filtri')}
+      hidden
+    >
+      <div class="campo">
+        <label for="archivio-tipo">{t('archivio.filtroTipo')}</label>
+        <select id="archivio-tipo" name="tipo">
+          <option value="">{t('archivio.tutti')}</option>
+          {TIPI_ARCHIVIO.map((tipo) => (
+            <option value={tipo}>{t(`archivio.tipo.${tipo}` as ChiaveUi)}</option>
+          ))}
+        </select>
+      </div>
+      <div class="campo">
+        <label for="archivio-decennio">{t('archivio.filtroDecennio')}</label>
+        <select id="archivio-decennio" name="decennio">
+          <option value="">{t('archivio.tuttiDecenni')}</option>
+          {decenni.map((d) => (
+            <option value={d}>{`Anni ${d}`}</option>
+          ))}
+        </select>
+      </div>
+      <div class="campo campo-testo">
+        <label for="archivio-q">{t('archivio.cerca')}</label>
+        <input id="archivio-q" name="q" type="search" autocomplete="off" />
+      </div>
+      <button type="button" data-azzera>
+        {t('archivio.azzera')}
+      </button>
+      <p class="conteggio" role="status" aria-live="polite" data-conteggio></p>
+      <p class="tutto-il-sito">
+        <a href="/ricerca/">{t('archivio.cercaTutto')}</a>
+      </p>
+    </div>
     {gruppi.map((gruppo) => (
-      <section class="gruppo">
+      <section class="gruppo" data-gruppo>
         <h2>{t(`archivio.tipo.${gruppo.tipo}` as ChiaveUi)}</h2>
         <ul class="schede">
           {gruppo.voci.map((v) => (
-            <li>
+            <li
+              data-tipo={v.data.tipo}
+              data-decennio={decennio(v.data.data)}
+              data-testo={normalizza(`${v.data.titolo} ${v.data.descrizione}`)}
+            >
               <CartaVoce
                 titolo={v.data.titolo}
                 href={`/archivio/${v.id}/`}
@@ -53,6 +103,11 @@ const briciole = [{ titolo: t('briciole.home'), href: '/' }, { titolo: t('archiv
   </div>
 </Base>
 
+<script>
+  import { avviaFiltriArchivio } from '../../scripts/archivio-filtri.ts';
+  document.querySelectorAll<HTMLElement>('[data-archivio-filtri]').forEach(avviaFiltriArchivio);
+</script>
+
 <style>
   .pagina {
     padding-block-end: var(--spazio-6);
@@ -69,6 +124,53 @@ const briciole = [{ titolo: t('briciole.home'), href: '/' }, { titolo: t('archiv
     margin: 0;
     font-size: var(--testo-l);
     color: var(--colore-testo-tenue);
+  }
+  .filtri {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: var(--spazio-4) var(--spazio-5);
+    padding: var(--spazio-4);
+    background: var(--colore-superficie-calda);
+    border-radius: var(--raggio-m);
+  }
+  .filtri[hidden] {
+    display: none;
+  }
+  .campo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spazio-1);
+  }
+  .campo-testo {
+    flex: 1 1 16rem;
+  }
+  label {
+    font-weight: 600;
+  }
+  select,
+  input,
+  button {
+    min-height: var(--bersaglio-min);
+    padding-inline: var(--spazio-4);
+    font: inherit;
+    color: var(--colore-testo);
+    background: var(--colore-superficie);
+    border: 1px solid var(--colore-bordo);
+    border-radius: var(--raggio-m);
+  }
+  button {
+    cursor: pointer;
+  }
+  .conteggio {
+    flex-basis: 100%;
+    margin: 0;
+    font-size: var(--testo-l);
+    color: var(--colore-accento-scuro);
+  }
+  .tutto-il-sito {
+    flex-basis: 100%;
+    margin: 0;
   }
   .gruppo {
     margin-block-start: var(--spazio-6);

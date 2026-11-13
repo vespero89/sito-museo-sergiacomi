@@ -10,6 +10,8 @@ export interface ContestoPagina {
   origine: string;
   /** The error page: no canonical, no Open Graph, always noindex. */
   errore: boolean;
+  /** The search page: canonical but no Open Graph, always noindex. */
+  ricerca?: boolean;
   /** Does the build mode ask for `noindex` on every page? */
   noindex: boolean;
 }
@@ -56,28 +58,32 @@ export function problemiPagina(document: Document, contesto: ContestoPagina): st
 
   // Canonical and social cards.
   const canonical = [...document.querySelectorAll('link[rel="canonical"]')];
-  if (contesto.errore) {
-    if (canonical.length > 0) problemi.push('the error page must have no canonical');
+  const senzaOg = contesto.errore || contesto.ricerca === true;
+  if (senzaOg) {
+    if (contesto.errore && canonical.length > 0) problemi.push('the error page must have no canonical');
     for (const chiave of [...OG, ...TWITTER]) {
-      if (meta(document, chiave).length > 0) problemi.push(`the error page must have no ${chiave}`);
+      if (meta(document, chiave).length > 0) problemi.push(`this page must have no ${chiave}`);
     }
-  } else {
+  }
+  if (!contesto.errore) {
     const atteso = new URL(contesto.indirizzo, contesto.origine).href;
     if (canonical.length !== 1) problemi.push(`${canonical.length} canonical links, wanted one`);
     else if (canonical[0]!.getAttribute('href') !== atteso) {
       problemi.push(`canonical is ${canonical[0]!.getAttribute('href')}, wanted ${atteso}`);
     }
-    for (const chiave of [...OG, ...TWITTER]) {
-      if (!meta(document, chiave)[0]?.getAttribute('content')) problemi.push(`${chiave} missing`);
-    }
-    if (meta(document, 'og:url')[0]?.getAttribute('content') !== atteso) {
-      problemi.push('og:url differs from the canonical address');
+    if (!senzaOg) {
+      for (const chiave of [...OG, ...TWITTER]) {
+        if (!meta(document, chiave)[0]?.getAttribute('content')) problemi.push(`${chiave} missing`);
+      }
+      if (meta(document, 'og:url')[0]?.getAttribute('content') !== atteso) {
+        problemi.push('og:url differs from the canonical address');
+      }
     }
   }
 
   // Robots follows the build mode; the error page is always noindex.
   const noindex = meta(document, 'robots').some((m) => /noindex/.test(m.getAttribute('content') ?? ''));
-  if (noindex !== (contesto.noindex || contesto.errore)) {
+  if (noindex !== (contesto.noindex || contesto.errore || contesto.ricerca === true)) {
     problemi.push(noindex ? 'noindex on an indexable build' : 'noindex missing');
   }
 
