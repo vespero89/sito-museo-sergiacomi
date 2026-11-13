@@ -98,8 +98,40 @@ Open choices left to you:
 
 - "Chi siamo" may stay in the main menu or sit in the footer only. Move it by editing `sito.yaml`
   (`principale` or `piede`); its address `/chi-siamo/` does not change.
-- The menu label "Didattica" or "Scuole e laboratori", and whether the public sees the name "LaDiMAS".
-  Both are waiting for Fabio; do not decide them in code without asking.
+- The menu label "Didattica" or "Scuole e laboratori" is waiting for Fabio; do not decide it in code
+  without asking. "LaDiMAS" stays: it is the brand agreed with the Foundation (decided 13/11/2026). Our
+  advice: not a menu entry, but a small subtitle under the museum name, in the footer and in "Chi siamo".
+
+### Hints from the project review (13/11/2026)
+
+Each point says what to design and why. They are suggestions, not constraints.
+
+1. **Top of the home: one sentence and one button.** A sentence that says what the museum is, and a large
+   "Prenota la visita" button. The box with address and hours must look fine when the hours say only
+   "Solo su prenotazione" (today it is a single line and looks like a gap).
+2. **A "Prenota" box.** Not a paragraph: a box people notice, with the email address, two words on what
+   to write in the mail and how soon they get an answer. The same box goes in the home, in Visita and in
+   the schools page. Booking is by email only (there is no phone or form, and no museum social accounts).
+3. **Works without a photo.** Today 19 of 27 works share the same beige "Foto in arrivo" panel. Replace
+   it with a simple drawing that changes with the type of work (outline of a monument, a portal, an
+   altar), so it looks intentional. It is needed only until the photos arrive.
+4. **A small mark for "drawing, plaster, bronze".** The three steps from sketch to statue are the theme of
+   the site. Design a small mark that recalls them (three shapes, three colours, or an icon) for section
+   titles, for the phases of a work and for the single-work marker on the map.
+5. **A box for practical data.** For schools: age of the children, duration, cost, how to book. For
+   itineraries: duration, walking length, difficulty. Same design, different data.
+6. **Colours from the workshop.** Plaster white, bronze green or brown, wood and iron of the tools. The
+   photos of the tools exist already (collection `strumenti`) and can serve as backgrounds or details.
+7. **A place for a quote.** In the home and in the schools page, a slot for a sentence from a teacher or a
+   visitor. If the Foundation has none yet, the slot stays empty without harm.
+8. **The header without a logo.** The logo is not chosen yet: the header must work with the name alone,
+   "Museo Aldo Sergiacomi", and a small "LaDiMAS" under it. Leave room for an "English" button, which
+   comes later.
+9. **The tinted map.** If the map tiles take the colours of the site, check that town names stay
+   readable and that the markers stand out, both the numbered ones (groups) and the icon ones (single
+   work).
+10. **Photos of children in the workshops.** They may never exist (parents' consent). The cards of the
+    school projects must look good with photos of hands, materials and works, with no faces.
 
 ## 4. Visual quality matters (request of the owner)
 
@@ -125,7 +157,7 @@ The prototype has the hooks; the look is for you:
 - Some photos are small (the Merlettaie "monument" is 1186 x 749 px): they are never upscaled, so design
   for a maximum size per photo. Room 1 is dark (phone photo); it may stay out.
 - 19 of the 27 works have no photo yet. The "Foto in arrivo" panel must look intentional. The Foundation
-  has not said whether the photos will arrive; if they do not, the sortable table becomes the main view.
+  is preparing the photos (decided 13/11/2026); until they arrive, design for both cases.
 - The phases sketch, foundry, monument are a theme in themselves (Merlettaie: 10 photos; Sogno del
   pescatore: 5). Use them.
 - Budgets (enforced by tests on `dist/`): no served image over 400 KB, `dist/` under 25 MB (temporarily
