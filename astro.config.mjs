@@ -33,9 +33,6 @@ export default defineConfig({
     build: {
       // Never inline assets as data: URIs.
       assetsInlineLimit: 0,
-      // Source maps ship with the public bundle: this is how the GPL-3.0 front-end code
-      // is made available (see README.md).
-      sourcemap: true,
     },
   },
 });

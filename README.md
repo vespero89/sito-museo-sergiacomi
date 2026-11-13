@@ -178,7 +178,6 @@ run it; the others are tools used only while developing and testing.
 | --------------------------------------------------------------------------------------------------------------------------------------- | --------------- | ------------------------------------------------------------------- |
 | `astro`                                                                                                                                 | MIT             | Site generator                                                      |
 | `leaflet`                                                                                                                               | BSD-2-Clause    | Map (in the public JavaScript)                                      |
-| `@raruto/leaflet-gesture-handling`                                                                                                      | **GPL-3.0**     | Two-finger map gestures (in the public JavaScript)                  |
 | `sharp`                                                                                                                                 | Apache-2.0      | Image processing at build time                                      |
 | `typescript`, `@astrojs/check`                                                                                                          | Apache-2.0, MIT | Types                                                               |
 | `pagefind` (dev)                                                                                                                        | MIT             | Search index, and the search script it writes into `dist/pagefind/` |
@@ -187,17 +186,12 @@ run it; the others are tools used only while developing and testing.
 | `eslint`, `typescript-eslint`, `eslint-plugin-astro`, `eslint-plugin-jsx-a11y-x`, `prettier`, `prettier-plugin-astro`, `@types/*` (dev) | MIT             | Lint and format                                                     |
 | `linkedom`, `yaml` (dev)                                                                                                                | ISC             | Test and content tooling                                            |
 
-What the GPL-3.0 plugin means, briefly: it is bundled into the JavaScript that visitors download, so that
-JavaScript is a combined work and the front-end code of the site must be offered under the GPL-3.0 with its
-source. This is why the build ships source maps (`vite.build.sourcemap: true`), why the repository itself is
-`GPL-3.0-or-later`, and why the legal notes page should say that the full source can be asked of the Foundation (that line is not written yet: it is an open item for the legal text). The
-rest of the project (the content, the photos and the texts) is not code and is not covered by that licence;
-their rights belong to the Foundation and to the third parties credited on the pages. Fabio accepted the
-GPL-3.0 on 12 November 2026. If that changes, the plugin is the only package to replace. This list is not
-legal advice: a lawyer should read it with the legal pages.
+The code of the site is MIT. Leaflet (BSD-2-Clause) is the only library bundled into the JavaScript that
+visitors download, and its licence is permissive. The content, the photos and the texts are not code and are
+not covered by the MIT licence; their rights belong to the Foundation and to the third parties credited on the
+pages. This list is not legal advice: a lawyer should read it with the legal pages.
 
 ## License
 
-The front-end code of the site is distributed under the GPL-3.0 terms, because the map gesture plugin
-(`@raruto/leaflet-gesture-handling`, GPL-3.0) is bundled into the public JavaScript. The source is made
-available through the source maps that ship with the build (`vite.build.sourcemap: true`).
+The code of the site is released under the MIT licence (see `LICENSE`). Leaflet is BSD-2-Clause; the other
+dependencies keep their own licences, listed above. Content, photos and texts are not covered by the MIT licence.

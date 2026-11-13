@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "description": "Website of the Museo Aldo Sergiacomi (LaDiMAS), prototype.",
-  "license": "GPL-3.0-or-later",
+  "license": "MIT",
   "engines": {
     "node": ">=22.23.4"
   },

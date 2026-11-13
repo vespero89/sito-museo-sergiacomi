@@ -193,7 +193,7 @@ unless you have a reason you can state.
 8. **View transitions.** The names `opera-<slug>` come from `/assets/vt-opere.css` (linked only from
    `/opere/` and the work pages) and must be unique on a page; the rule `@view-transition` is in
    `src/styles/globale.css`. Do not give a second element the same name.
-9. **Map.** Leaflet 1.9.4 with the gesture plugin, loaded only on the pages that have a map, with local
+9. **Map.** Leaflet 1.9.4 with our own gesture code (`src/scripts/mappa-gesti.ts`), loaded only on the pages that have a map, with local
    tiles in the tests (`--fake-tiles`); no cookie and no request to any host other than OpenStreetMap
    tiles. Marker drawing is in `src/scripts/mappa-opere.ts` (`creaMarcatore`).
 10. **Semantics and head.** Titles, descriptions, canonical, Open Graph and JSON-LD come from `Seo.astro`
