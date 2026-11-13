@@ -1,7 +1,10 @@
 import { fileURLToPath } from 'node:url';
+import { satteri } from '@astrojs/markdown-satteri';
 import { defineConfig } from 'astro/config';
 import { bloccoProduzione } from './src/lib/blocco-produzione.ts';
 import { ORIGINE_PREDEFINITA } from './src/lib/seo.ts';
+import { mostraAperti } from './src/lib/aperti-visibili.ts';
+import { mdastTogliMarcatori } from './src/lib/mdast-togli-marcatori.ts';
 import { potaOriginaliFoto } from './src/lib/pota-originali.ts';
 
 // Static output. Security headers and redirects live in config/hosting.mjs (later task),
@@ -13,6 +16,9 @@ export default defineConfig({
   output: 'static',
   integrations: [bloccoProduzione(), potaOriginaliFoto()],
   trailingSlash: 'always',
+  // In production the `[[DA CONFERMARE: ...]]` markers do not reach the public (spec 3.5).
+  // (the default Markdown processor is kept in the preview, which shows them)
+  markdown: mostraAperti() ? {} : { processor: satteri({ mdastPlugins: [mdastTogliMarcatori] }) },
   image: {
     service: {
       entrypoint: 'astro/assets/services/sharp',

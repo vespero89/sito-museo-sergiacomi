@@ -104,6 +104,18 @@ production build go on, but only as a private preview: noindex, no sitemap, no `
 `npm run content:report` is the working list for the content team: blocking items first (with the
 number of `segnaposto` to approve), then the not blocking ones, each with its total.
 
+In production (`mostraAperti` false) what is still open is not blocking, and it is hidden, so the public
+never sees an internal note (`src/lib/aperti-visibili.ts`): no `DaConfermare` label and no box
+(`Dubbi`); the `[[DA CONFERMARE: ...]]` markers are removed from the body text (Markdown plugin
+`src/lib/mdast-togli-marcatori.ts`, set in `astro.config.mjs`) and from the strings of the frontmatter
+and of `sito.yaml` (`src/content.config.ts`, `sito-dati.ts`); a non-blocking `sito.yaml` field with a
+`daConfermare` item, or with no value, is left out together with its row (`sitoDaMostrare`), so the
+social block stays out while it has no links. The preview, and a build with `ALLOW_OPEN_ITEMS=1`, show
+everything. `tests/build/produzione.test.ts` builds a throw-away copy of the project in production, with
+the blocking items resolved, and checks that `dist/` has no marker and no label. The Markdown plugin
+needs `@astrojs/markdown-satteri` and `satteri` as direct dependencies (the same versions Astro already
+installs).
+
 ## Layout, menu and addresses
 
 `src/layouts/Base.astro` gives every page the head (`Seo.astro`), skip link, header, footer and, below

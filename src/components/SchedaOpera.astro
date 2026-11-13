@@ -4,6 +4,7 @@
 // shows as a label (spec 3.5); what is missing and not asked for is left out.
 import { getEntry } from 'astro:content';
 import { t, type ChiaveUi } from '../i18n/index.ts';
+import { mostraAperti } from '../lib/aperti-visibili.ts';
 import { indirizzoSala } from '../lib/ambienti.ts';
 import { elencoItaliano } from '../lib/frase-opera.ts';
 import type { OperaCompleta } from '../lib/opere-dati.ts';
@@ -29,15 +30,17 @@ const indicazioni = `https://www.google.com/maps/dir/?api=1&destination=${encode
 <section class="fatti" aria-labelledby="fatti-titolo">
   <h2 id="fatti-titolo">{t('opera.fatti')}</h2>
   <dl>
-    <div>
-      <dt>{t('opera.anno')}</dt>
-      <dd>{anno ?? <DaConfermare motivo={nota('anno') ?? 'anno'} />}</dd>
-    </div>
+    {(anno !== undefined || mostraAperti()) && (
+      <div>
+        <dt>{t('opera.anno')}</dt>
+        <dd>{anno ?? <DaConfermare motivo={nota('anno') ?? 'anno'} />}</dd>
+      </div>
+    )}
     <div>
       <dt>{t('opera.tipo')}</dt>
       <dd>{t(`opera.categoria.${categoria}` as ChiaveUi)}</dd>
     </div>
-    {(materiali.length > 0 || nota('materiali')) && (
+    {(materiali.length > 0 || (mostraAperti() && nota('materiali'))) && (
       <div>
         <dt>{t('opera.materiale')}</dt>
         <dd>
