@@ -154,7 +154,13 @@ describe('trovaMarcatori', () => {
 describe('formattaAperti', () => {
   it('prints one line per open item, with file and reason', () => {
     const testo = formattaAperti([
-      { collezione: 'opere', file: 'a.md', causa: 'dubbio', dettaglio: 'anno: x' },
+      {
+        collezione: 'opere',
+        file: 'a.md',
+        causa: 'dubbio',
+        dettaglio: 'anno: x',
+        bloccante: false,
+      },
     ]);
     expect(testo).toContain('a.md');
     expect(testo).toContain('anno: x');
@@ -246,7 +252,7 @@ describe('production block on a repository on disk', () => {
 });
 
 describe('build:production on the real content', () => {
-  it('fails with the list of open items', () => {
+  it('fails with the list of blocking items only', () => {
     const r = spawnSync('npm', ['run', 'build:production'], {
       cwd: RADICE,
       encoding: 'utf8',
@@ -255,5 +261,7 @@ describe('build:production on the real content', () => {
     expect(r.status).not.toBe(0);
     expect(r.stderr).toContain('sostegno.iban');
     expect(r.stderr).toContain('src/data/sito.yaml');
+    expect(r.stderr).toMatch(/\d+ blocking item\(s\)/);
+    expect(r.stderr).not.toContain('coordinate:');
   }, 60_000);
 });

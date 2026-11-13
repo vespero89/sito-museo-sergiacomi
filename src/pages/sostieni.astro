@@ -3,28 +3,34 @@ import { getEntry } from 'astro:content';
 import DatoSito from '../components/DatoSito.astro';
 import { t } from '../i18n/index.ts';
 import PaginaTesto from '../layouts/PaginaTesto.astro';
+import { sitoDaMostrare } from '../lib/aperti-visibili.ts';
+import { leggiSito } from '../lib/sito-dati.ts';
 
 const voce = (await getEntry('pagine', 'sostieni'))!;
+const sito = leggiSito();
+const righe = [
+  { percorso: 'sostegno.intestatario', titolo: t('sostieni.intestatario') },
+  { percorso: 'sostegno.iban', titolo: t('sostieni.iban') },
+  { percorso: 'sostegno.causale', titolo: t('sostieni.causale') },
+].filter((riga) => sitoDaMostrare(sito, riga.percorso));
 ---
 
 <PaginaTesto voce={voce}>
-  <section class="bonifico" aria-labelledby="bonifico">
-    <h2 id="bonifico">{t('sostieni.dati')}</h2>
-    <dl>
-      <dt>{t('sostieni.intestatario')}</dt>
-      <dd>
-        <DatoSito percorso="sostegno.intestatario" />
-      </dd>
-      <dt>{t('sostieni.iban')}</dt>
-      <dd>
-        <DatoSito percorso="sostegno.iban" />
-      </dd>
-      <dt>{t('sostieni.causale')}</dt>
-      <dd>
-        <DatoSito percorso="sostegno.causale" />
-      </dd>
-    </dl>
-  </section>
+  {righe.length > 0 && (
+    <section class="bonifico" aria-labelledby="bonifico">
+      <h2 id="bonifico">{t('sostieni.dati')}</h2>
+      <dl>
+        {righe.map((riga) => (
+          <>
+            <dt>{riga.titolo}</dt>
+            <dd>
+              <DatoSito percorso={riga.percorso} />
+            </dd>
+          </>
+        ))}
+      </dl>
+    </section>
+  )}
 </PaginaTesto>
 
 <style>

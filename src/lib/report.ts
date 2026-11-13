@@ -13,21 +13,37 @@ const CAUSE: [Causa, string][] = [
   ['alt', 'alt'],
 ];
 
-export function creaReport(aperti: Aperto[]): string {
-  if (aperti.length === 0) return 'Nothing to confirm: every entry is confirmed.\n';
-
-  const righe = [`${aperti.length} open items\n`];
+function gruppo(titolo: string, aperti: Aperto[], righe: string[]): void {
+  righe.push(`${titolo} (${aperti.length})`);
   for (const collezione of [...COLLEZIONI, 'sito'] as const) {
     const suoi = aperti.filter((a) => a.collezione === collezione);
     if (suoi.length === 0) continue;
     righe.push(`${collezione} (${suoi.length})`);
-    for (const [causa, titolo] of CAUSE) {
-      const gruppo = suoi.filter((a) => a.causa === causa);
-      if (gruppo.length === 0) continue;
-      righe.push(`  ${titolo} (${gruppo.length})`);
-      for (const a of gruppo) righe.push(`    ${a.file}: ${a.dettaglio}`);
+    for (const [causa, nome] of CAUSE) {
+      const perCausa = suoi.filter((a) => a.causa === causa);
+      if (perCausa.length === 0) continue;
+      righe.push(`  ${nome} (${perCausa.length})`);
+      for (const a of perCausa) righe.push(`    ${a.file}: ${a.dettaglio}`);
     }
     righe.push('');
   }
+}
+
+export function creaReport(aperti: Aperto[]): string {
+  if (aperti.length === 0) return 'Nothing to confirm: every entry is confirmed.\n';
+
+  const bloccanti = aperti.filter((a) => a.bloccante);
+  const altri = aperti.filter((a) => !a.bloccante);
+  const righe = [
+    `${aperti.length} open items: ${bloccanti.length} blocking, ${altri.length} not blocking\n`,
+  ];
+  if (bloccanti.length === 0) {
+    righe.push('Nothing blocks the production build.\n');
+  } else {
+    const generati = bloccanti.filter((a) => a.causa === 'segnaposto').length;
+    gruppo('BLOCKING', bloccanti, righe);
+    righe.push(`of which generated text still to approve (segnaposto): ${generati}\n`);
+  }
+  if (altri.length > 0) gruppo('NOT BLOCKING', altri, righe);
   return righe.join('\n');
 }

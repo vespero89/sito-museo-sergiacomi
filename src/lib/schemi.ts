@@ -129,7 +129,7 @@ const dataGiorno = z
   );
 const anno = z.number().int().min(1900).max(2100);
 
-const dubbio = z.strictObject({ campo: testo, nota: testo });
+const dubbio = z.strictObject({ campo: testo, nota: testo, bloccante: z.boolean().optional() });
 export type Dubbio = z.infer<typeof dubbio>;
 
 export const stato = z.enum(STATI);

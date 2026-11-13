@@ -22,15 +22,18 @@ export function bloccoProduzione(): AstroIntegration {
           return;
         }
         const { aperti, problemi } = apertiDelRepo(fileURLToPath(config.root));
-        if (aperti.length === 0 && problemi.length === 0) return;
+        const bloccanti = aperti.filter((a) => a.bloccante);
+        if (bloccanti.length === 0 && problemi.length === 0) return;
+        const altri = aperti.length - bloccanti.length;
         const elenco = [
           ...problemi.map((p) => `  ${p.file}\n    could not read: ${p.messaggio}`),
-          formattaAperti(aperti),
+          formattaAperti(bloccanti),
         ]
           .filter(Boolean)
           .join('\n');
         throw new Error(
-          `Production build stopped: ${aperti.length} open item(s) are not confirmed.\n${elenco}\n` +
+          `Production build stopped: ${bloccanti.length} blocking item(s) are not confirmed` +
+            ` (${altri} more open item(s) do not block).\n${elenco}\n` +
             'Confirm them (see "npm run content:report"), or set ALLOW_OPEN_ITEMS=1 to build a private preview.',
         );
       },

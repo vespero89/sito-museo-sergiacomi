@@ -11,6 +11,7 @@ import { t } from '../i18n/index.ts';
 import Base from '../layouts/Base.astro';
 import { leggiEventi } from '../lib/eventi-dati.ts';
 import { museo, sitoWeb } from '../lib/jsonld.ts';
+import { sitoDaMostrare } from '../lib/aperti-visibili.ts';
 import { leggiSito } from '../lib/sito-dati.ts';
 
 const sito = leggiSito();
@@ -85,12 +86,14 @@ const fasi = ['bozzetto', 'fonderia', 'monumento']
               {sito.museo.indirizzo.via}, {sito.museo.indirizzo.comune}
             </dd>
           </div>
-          <div>
-            <dt>{t('home.quando')}</dt>
-            <dd>
-              <DatoSito percorso="orari.testo" />
-            </dd>
-          </div>
+          {sitoDaMostrare(sito, 'orari.testo') && (
+            <div>
+              <dt>{t('home.quando')}</dt>
+              <dd>
+                <DatoSito percorso="orari.testo" />
+              </dd>
+            </div>
+          )}
         </dl>
         <ul class="azioni">
           <li>

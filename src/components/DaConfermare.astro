@@ -1,7 +1,10 @@
 ---
 // Label for content that is not confirmed (spec 3.5). Shown in the preview next to a doubtful
-// text or in place of a doubtful value. A production build cannot contain one: the build stops
-// first. Claude Design may restyle it but not remove it.
+// text or in place of a doubtful value. In production it writes nothing: a blocking item stops the
+// build, and a non-blocking one is an internal note. Claude Design may restyle it but not remove it.
+import { t } from '../i18n/index.ts';
+import { mostraAperti } from '../lib/aperti-visibili.ts';
+
 interface Props {
   /** `segnaposto` for provisional or invented content, `da-confermare` for a doubt. */
   tipo?: 'da-confermare' | 'segnaposto';
@@ -10,12 +13,19 @@ interface Props {
 }
 const { tipo = 'da-confermare', motivo } = Astro.props;
 const testo =
-  tipo === 'segnaposto' ? 'Segnaposto' : motivo ? `Da confermare: ${motivo}` : 'Da confermare';
+  tipo === 'segnaposto'
+    ? t('daConfermare.segnaposto')
+    : motivo
+      ? `Da confermare: ${motivo}`
+      : 'Da confermare';
+const mostra = mostraAperti();
 ---
 
-<span class="da-confermare" data-tipo={tipo}>
-  {testo}
-</span>
+{mostra && (
+  <span class="da-confermare" data-tipo={tipo}>
+    {testo}
+  </span>
+)}
 
 <style>
   .da-confermare {

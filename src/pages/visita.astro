@@ -4,6 +4,7 @@ import DaConfermare from '../components/DaConfermare.astro';
 import DatoSito from '../components/DatoSito.astro';
 import { t } from '../i18n/index.ts';
 import PaginaTesto from '../layouts/PaginaTesto.astro';
+import { sitoDaMostrare } from '../lib/aperti-visibili.ts';
 import { museo } from '../lib/jsonld.ts';
 import { campoSito } from '../lib/sito.ts';
 import { leggiSito } from '../lib/sito-dati.ts';
@@ -12,38 +13,51 @@ const voce = (await getEntry('pagine', 'visita'))!;
 const sito = leggiSito();
 const { via, cap, comune, provincia } = sito.museo.indirizzo;
 const social = campoSito(sito, 'social');
+const mostra = (percorso: string) => sitoDaMostrare(sito, percorso);
 ---
 
 <PaginaTesto voce={voce} jsonld={[museo(sito, Astro.site!)]}>
   <section id="contatti" class="recapiti" aria-labelledby="recapiti">
     <h2 id="recapiti">{t('contatti.titolo')}</h2>
     <dl>
-      <dt>{t('contatti.email')}</dt>
-      <dd>
-        <DatoSito percorso="contatti.email" email />
-      </dd>
-      <dt>{t('contatti.telefono')}</dt>
-      <dd>
-        <DatoSito percorso="contatti.telefono" />
-      </dd>
+      {mostra('contatti.email') && (
+        <>
+          <dt>{t('contatti.email')}</dt>
+          <dd>
+            <DatoSito percorso="contatti.email" email />
+          </dd>
+        </>
+      )}
+      {mostra('contatti.telefono') && (
+        <>
+          <dt>{t('contatti.telefono')}</dt>
+          <dd>
+            <DatoSito percorso="contatti.telefono" />
+          </dd>
+        </>
+      )}
       <dt>{t('contatti.indirizzo')}</dt>
       <dd>{`${via}, ${cap} ${comune} (${provincia})`}</dd>
-      <dt>{t('contatti.social')}</dt>
-      <dd>
-        {!social.visibile ? (
-          <DaConfermare motivo={social.nota} />
-        ) : sito.social.length === 0 ? (
-          <DaConfermare tipo="segnaposto" />
-        ) : (
-          <ul>
-            {sito.social.map((s) => (
-              <li>
-                <a href={s.url}>{s.nome}</a>
-              </li>
-            ))}
-          </ul>
-        )}
-      </dd>
+      {mostra('social') && (
+        <>
+          <dt>{t('contatti.social')}</dt>
+          <dd>
+            {!social.visibile ? (
+              <DaConfermare motivo={social.nota} />
+            ) : sito.social.length === 0 ? (
+              <DaConfermare tipo="segnaposto" />
+            ) : (
+              <ul>
+                {sito.social.map((s) => (
+                  <li>
+                    <a href={s.url}>{s.nome}</a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </dd>
+        </>
+      )}
     </dl>
   </section>
 </PaginaTesto>

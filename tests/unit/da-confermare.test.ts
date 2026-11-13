@@ -19,7 +19,7 @@ describe('DaConfermare', () => {
     expect(await etichetta({})).toBe('Da confermare');
   });
 
-  it('shows "Segnaposto" for a placeholder', async () => {
-    expect(await etichetta({ tipo: 'segnaposto' })).toBe('Segnaposto');
+  it('shows the generated-text label for a placeholder', async () => {
+    expect(await etichetta({ tipo: 'segnaposto' })).toBe('Testo generato, da approvare');
   });
 });

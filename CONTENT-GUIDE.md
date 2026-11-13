@@ -167,6 +167,15 @@ Foundation; then:
 | `altVerificato: false`                      | a photo in `immagini.yaml`          | after someone reads the `alt` against the photo, set `true`                                 |
 | `daConfermare` list in `src/data/sito.yaml` | museum data (hours, contacts, IBAN) | confirm the value, then delete its line                                                     |
 
+What happens to an item that is still open when the site goes online: a blocking one stops the
+production build (a `segnaposto` entry, anything in the legal pages, `daConfermare` with
+`bloccante: true`, a `[[BLOCCANTE: reason]]` marker, a doubt on opening hours, contacts, support data,
+the artist's dates or the address). A non-blocking one does not stop it, and the public sees nothing of
+it: no label, no box, the `[[DA CONFERMARE: ...]]` marker is cut out of the sentence (the rest of the
+sentence stays, so write it so that it reads well without the marker), and a `sito.yaml` field with a
+doubt is left out. Only the preview shows them. To make an open item stop the production build, write
+`bloccante: true` in its `daConfermare` item, or `[[BLOCCANTE: reason]]` in the text.
+
 Change a doubt only when the fact is confirmed. A listed `sito.yaml` field shows only the label, never
 the value, in the preview, so a wrong IBAN or phone number never goes out by accident.
 
