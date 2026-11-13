@@ -14,6 +14,7 @@ import {
   creaSchemi,
   type Collezione,
 } from './schemi.ts';
+import { PAGINE_BLOCCANTI } from './bloccanti.ts';
 import { sitoSchema } from './sito.ts';
 import { parseYaml } from './yaml.ts';
 
@@ -325,6 +326,15 @@ interface OpzioniRepo {
   conteggi?: boolean;
 }
 
+/** Every page of PAGINE_BLOCCANTI must exist, or the rule would silently protect nothing. */
+export function controllaPagineBloccanti(contenuti: Contenuti): Problema[] {
+  const esistenti = new Set(contenuti.pagine.map((p) => p.id));
+  return PAGINE_BLOCCANTI.filter((id) => !esistenti.has(id)).map((id) => ({
+    file: 'src/lib/bloccanti.ts',
+    messaggio: `PAGINE_BLOCCANTI lists "${id}", which is not a page`,
+  }));
+}
+
 /** Runs every check on the repository at `radice`. */
 export function controllaRepo(
   radice: string,
@@ -339,7 +349,10 @@ export function controllaRepo(
       fotoPresenti: elencaFoto(radice),
     }),
   );
-  if (conteggi) problemi.push(...controllaConteggi(contenuti));
+  if (conteggi) {
+    problemi.push(...controllaConteggi(contenuti));
+    problemi.push(...controllaPagineBloccanti(contenuti));
+  }
 
   const fileSito = 'src/data/sito.yaml';
   try {

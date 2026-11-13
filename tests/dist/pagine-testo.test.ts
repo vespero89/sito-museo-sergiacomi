@@ -102,8 +102,8 @@ describe('content that is not confirmed', () => {
     [...documento(indirizzo).querySelectorAll('.da-confermare')].map((e) => e.textContent!.trim());
 
   it('shows the placeholder label on /pubblicazioni/ and /sostieni/', () => {
-    expect(etichette('/pubblicazioni/')).toContain('Segnaposto');
-    expect(etichette('/sostieni/')).toContain('Segnaposto');
+    expect(etichette('/pubblicazioni/')).toContain('Testo generato, da approvare');
+    expect(etichette('/sostieni/')).toContain('Testo generato, da approvare');
   });
 
   it('shows only the label of the IBAN, and the IBAN is nowhere in dist', () => {

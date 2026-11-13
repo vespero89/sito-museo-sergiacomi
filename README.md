@@ -85,9 +85,24 @@ Every entry has a `stato` (`confermato`, `da-confermare`, `segnaposto`) and a `d
 single doubts; inside a text a doubt is marked `[[DA CONFERMARE: reason]]`. Places have `verificato`,
 images have `altVerificato`, and `src/data/sito.yaml` has its own `daConfermare` list. The preview shows
 all of it with the `DaConfermare` label (a listed `sito.yaml` field shows only the label, never the
-value). `npm run build:production` stops, with the list, while any of these is open. `ALLOW_OPEN_ITEMS=1`
-lets a production build go on, but only as a private preview: noindex, no sitemap, no `llms.txt`.
-`npm run content:report` is the working list for the content team.
+value). A `segnaposto` entry is labelled "Testo generato, da approvare": generated text that Fabio has
+not approved yet.
+
+Not every open item stops the production build. `src/lib/bloccanti.ts` holds the rule (`eBloccante`):
+
+- Blocking: every `segnaposto` entry; a `daConfermare` item with `bloccante: true`; a doubt about a
+  `sito.yaml` field of `CAMPI_BLOCCANTI` (opening hours, contacts, support data, the artist's dates,
+  the address); anything open in the legal pages of `PAGINE_BLOCCANTI` (`privacy`, `note-legali`,
+  `cookie`, `accessibilita`); a `[[BLOCCANTE: reason]]` marker in a text; a `[[...]]` marker that is not
+  closed.
+- Not blocking: the other `da-confermare` entries and doubts, the other `[[DA CONFERMARE: reason]]`
+  markers, places with `verificato: false`, images with `altVerificato: false`.
+
+`npm run build:production` stops, with the list of the blocking items only (and how many others stay
+open). `decidiModalita` also gives `mostraAperti`, true only in a preview. `ALLOW_OPEN_ITEMS=1` lets a
+production build go on, but only as a private preview: noindex, no sitemap, no `llms.txt`.
+`npm run content:report` is the working list for the content team: blocking items first (with the
+number of `segnaposto` to approve), then the not blocking ones, each with its total.
 
 ## Layout, menu and addresses
 

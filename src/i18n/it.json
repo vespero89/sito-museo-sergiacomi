@@ -232,5 +232,6 @@
   "ricerca.caricamento": "Cerco...",
   "ricerca.risultatoUno": "1 risultato per «{q}»",
   "ricerca.risultatoPiu": "{n} risultati per «{q}»",
+  "daConfermare.segnaposto": "Testo generato, da approvare",
   "ricerca.nessuno": "Nessun risultato per «{q}». Prova con una parola più semplice."
 }

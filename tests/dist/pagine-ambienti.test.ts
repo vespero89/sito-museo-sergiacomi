@@ -65,7 +65,7 @@ describe('the page of the cloister', () => {
   const d = documento('/il-museo/il-chiostro/');
 
   it('is marked as a placeholder and shows the photos of the Merlettaie', () => {
-    expect(etichette('/il-museo/il-chiostro/')).toContain('Segnaposto');
+    expect(etichette('/il-museo/il-chiostro/')).toContain('Testo generato, da approvare');
     expect(d.querySelectorAll('[data-galleria] a.apri').length).toBeGreaterThanOrEqual(2);
   });
 
@@ -81,7 +81,7 @@ describe('the Foundation spaces and Didattica', () => {
 
   it('is marked as provisional, with the name and the address to confirm', () => {
     const testi = etichette(indirizzo);
-    expect(testi).toContain('Segnaposto');
+    expect(testi).toContain('Testo generato, da approvare');
     expect(testi.some((e) => e.startsWith('Da confermare: Nome provvisorio'))).toBe(true);
     expect(testi.some((e) => e.startsWith('Da confermare: Indirizzo provvisorio'))).toBe(true);
   });
@@ -118,6 +118,6 @@ describe('the plan on /il-museo/', () => {
   });
 
   it('is marked as a placeholder', () => {
-    expect(etichette('/il-museo/')).toContain('Segnaposto');
+    expect(etichette('/il-museo/')).toContain('Testo generato, da approvare');
   });
 });

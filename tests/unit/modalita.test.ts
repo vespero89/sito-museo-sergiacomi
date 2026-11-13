@@ -7,6 +7,7 @@ const ANTEPRIMA = {
   sitemap: false,
   llmsTxt: false,
   bloccaAperti: false,
+  mostraAperti: true,
 };
 
 describe('decidiModalita', () => {
@@ -26,6 +27,7 @@ describe('decidiModalita', () => {
       sitemap: true,
       llmsTxt: true,
       bloccaAperti: true,
+      mostraAperti: false,
     });
   });
 

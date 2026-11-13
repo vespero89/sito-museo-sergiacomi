@@ -170,6 +170,7 @@ describe('modes: the decisions come from decidiModalita', () => {
       sitemap: false,
       llmsTxt: false,
       bloccaAperti: false,
+      mostraAperti: true,
     };
     const h = intestazioniPer(creaIntestazioni(finta, { https: true }), '/');
     expect(h['X-Robots-Tag']).toBe('noindex');

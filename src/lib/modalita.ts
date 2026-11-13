@@ -13,8 +13,10 @@ export interface Modalita {
   noindex: boolean;
   sitemap: boolean;
   llmsTxt: boolean;
-  /** The build stops when something is not confirmed (spec 3.5). */
+  /** The build stops when a blocking item is not confirmed (spec 3.5, bloccanti.ts). */
   bloccaAperti: boolean;
+  /** Markers, labels and "da confermare" boxes are shown: only in a preview. */
+  mostraAperti: boolean;
 }
 
 interface Ambiente {
@@ -39,5 +41,6 @@ export function decidiModalita(env: Ambiente): Modalita {
     sitemap: !anteprima,
     llmsTxt: !anteprima,
     bloccaAperti: !anteprima,
+    mostraAperti: anteprima,
   };
 }
