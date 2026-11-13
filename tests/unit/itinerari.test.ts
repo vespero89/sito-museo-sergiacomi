@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { linkGoogleMaps, raggruppaTappe } from '../../src/lib/itinerari.ts';
+import { linkGoogleMaps, puntiPercorso, raggruppaTappe } from '../../src/lib/itinerari.ts';
 
 describe('raggruppaTappe', () => {
   it('numbers the stops across groups', () => {
@@ -52,5 +52,53 @@ describe('linkGoogleMaps', () => {
   it('encodes special characters and refuses an empty list', () => {
     expect(linkGoogleMaps('a&b', ['c d'])).toContain('origin=a%26b');
     expect(() => linkGoogleMaps('x', [])).toThrow();
+  });
+});
+
+describe('puntiPercorso', () => {
+  const stop = (luogoId: string, lat: number, titolo: string, gruppo?: string) => ({
+    query: titolo,
+    gruppo,
+    luogoId,
+    luogoNome: luogoId,
+    lat,
+    lon: 13,
+    indicativa: false,
+    titolo,
+    href: undefined,
+  });
+
+  it('gives one point per place with the numbers of its stops, in order', () => {
+    const { punti } = puntiPercorso(
+      raggruppaTappe([stop('a', 1, 'Uno'), stop('b', 2, 'Due'), stop('a', 1, 'Tre')]),
+    );
+    expect(punti.map((p) => p.luogoId)).toEqual(['a', 'b']);
+    expect(punti[0]!.tappe.map((t) => t.numero)).toEqual([1, 3]);
+  });
+
+  it('draws one line per group, in stop order, skipping a place repeated in a row', () => {
+    const { percorsi } = puntiPercorso(
+      raggruppaTappe([
+        stop('a', 1, 'Uno', 'Marche'),
+        stop('a', 1, 'Due', 'Marche'),
+        stop('b', 2, 'Tre', 'Marche'),
+        stop('c', 3, 'Quattro', 'Abruzzo'),
+        stop('d', 4, 'Cinque', 'Abruzzo'),
+      ]),
+    );
+    expect(percorsi).toEqual([
+      [
+        [1, 13],
+        [2, 13],
+      ],
+      [
+        [3, 13],
+        [4, 13],
+      ],
+    ]);
+  });
+
+  it('draws no line for a single place', () => {
+    expect(puntiPercorso(raggruppaTappe([stop('a', 1, 'Uno')])).percorsi).toEqual([]);
   });
 });

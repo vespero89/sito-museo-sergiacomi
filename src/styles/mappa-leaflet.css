@@ -1,0 +1,81 @@
+/* Leaflet markup made by the script (maps of the works, the work pages and the itineraries). */
+.mappa .leaflet-tile-pane {
+  filter: var(--mappa-filtro-tile);
+}
+.mappa.leaflet-container {
+  font-family: var(--font-testo);
+  background: var(--colore-superficie-calda);
+}
+.mappa .marcatore {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  font: 700 var(--testo-s) var(--font-testo);
+  color: var(--colore-sull-accento);
+  background: var(--colore-accento);
+  border: 2px solid var(--colore-superficie);
+  border-radius: var(--raggio-pieno);
+  box-shadow: var(--ombra-m);
+}
+.mappa .marcatore.indicativo {
+  background: var(--colore-superficie);
+  color: var(--colore-accento-scuro);
+  border: 2px dashed var(--colore-accento);
+}
+.mappa .leaflet-marker-icon:focus-visible {
+  outline: 3px solid var(--colore-focus);
+  outline-offset: 2px;
+  border-radius: var(--raggio-pieno);
+}
+.mappa .zoom-nostro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spazio-1);
+}
+.mappa .zoom-nostro button {
+  min-width: var(--bersaglio-min);
+  padding-inline: 0;
+  font-size: var(--testo-xl);
+  line-height: 1;
+}
+.mappa .leaflet-popup-content {
+  margin: var(--spazio-3);
+  font-size: var(--testo-m);
+  color: var(--colore-testo);
+}
+.mappa .leaflet-popup-content h3 {
+  margin: 0 0 var(--spazio-2);
+  font-size: var(--testo-l);
+}
+.mappa .leaflet-popup-content ul {
+  margin: 0;
+  padding-inline-start: var(--spazio-4);
+}
+.mappa .leaflet-popup-content .indicativa {
+  margin: var(--spazio-2) 0 0;
+  font-size: var(--testo-s);
+  color: var(--colore-testo-tenue);
+}
+.mappa .leaflet-control-attribution {
+  font-size: var(--testo-s);
+}
+/* The gesture plugin: its message, with our font and colours, and no fade with reduced motion. */
+.mappa.leaflet-gesture-handling::after {
+  font-family: var(--font-testo);
+  font-size: var(--testo-l);
+  color: var(--colore-sul-scuro);
+  background: rgb(42 35 28 / 0.72);
+  transition-duration: 0.3s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mappa.leaflet-gesture-handling::after {
+    transition-duration: 0s;
+  }
+}
+.mappa .percorso {
+  stroke: var(--colore-accento-scuro);
+  stroke-width: 3;
+  stroke-dasharray: 8 6;
+  fill: none;
+}

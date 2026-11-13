@@ -263,3 +263,66 @@ test.describe('gestures on a touch device', () => {
     expect(await posizione(page)).not.toEqual(prima);
   });
 });
+
+test.describe('the small maps (task 18)', () => {
+  test.use({ viewport: LARGO, reducedMotion: 'no-preference' });
+
+  test('a work page has the map of its place, loaded when it comes near, with the address without JS', async ({
+    page,
+    browser,
+  }) => {
+    const richieste: string[] = [];
+    page.on('request', (r) => richieste.push(r.url()));
+    await page.goto('/opere/le-merlettaie/');
+    const radice = page.locator('[data-mappa-piccola]');
+    await radice.scrollIntoViewIfNeeded();
+    await expect(radice.locator('.leaflet-marker-icon')).toHaveCount(1);
+    await expect(radice.locator('[data-senza-js]')).toBeHidden();
+    expect(richieste.filter((u) => /marker-icon|marker-shadow|locales/.test(u))).toEqual([]);
+    expect(await scorrimentoOrizzontale(page)).toBe(false);
+    // Only the map: the work page has its own contrast question on a photo caption, not part of this task.
+    const sulleMappe = (await violazioniAxe(page)).filter((v) =>
+      v.elementi.some((e) => /leaflet|mappa|marcatore/.test(e)),
+    );
+    expect(sulleMappe).toEqual([]);
+
+    const senza = await browser.newContext({ javaScriptEnabled: false });
+    const p2 = await senza.newPage();
+    await p2.goto(new URL('/opere/le-merlettaie/', page.url()).href);
+    await expect(p2.locator('[data-mappa-piccola] [data-senza-js]')).toBeVisible();
+    await senza.close();
+  });
+
+  test('the marker of a work page opens from the keyboard', async ({ page }) => {
+    await page.goto('/opere/le-merlettaie/');
+    await page.locator('[data-mappa-piccola]').scrollIntoViewIfNeeded();
+    const marcatore = page.locator('[data-mappa-piccola] .leaflet-marker-icon');
+    await marcatore.focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('[data-mappa-piccola] .leaflet-popup h3')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('[data-mappa-piccola] .leaflet-popup')).toHaveCount(0);
+    await expect(marcatore).toBeFocused();
+  });
+
+  test('an itinerary has numbered stops in order and a line between them', async ({ page }) => {
+    await page.goto('/itinerari/i-portali-del-sergiacomi/');
+    const radice = page.locator('[data-mappa-piccola]');
+    await radice.scrollIntoViewIfNeeded();
+    const marcatori = radice.locator('.leaflet-marker-icon');
+    await expect(marcatori.first()).toBeVisible();
+    const voci = await page.locator('ol.tappe li').count();
+    const numeri = (await marcatori.evaluateAll((els) => els.map((e) => e.textContent ?? '')))
+      .join(',')
+      .split(/,\s*/)
+      .map(Number)
+      .sort((a, b) => a - b);
+    expect(numeri).toEqual(Array.from({ length: voci }, (_, i) => i + 1));
+    await expect(radice.locator('path.percorso').first()).toBeAttached();
+    // The first marker is reached with Tab and opens with Enter.
+    await marcatori.first().focus();
+    await page.keyboard.press('Enter');
+    await expect(radice.locator('.leaflet-popup li').first()).toBeVisible();
+    expect(await violazioniAxe(page)).toEqual([]);
+  });
+});

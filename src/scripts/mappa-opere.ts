@@ -35,6 +35,8 @@ export interface TestiMappa {
   gestoCtrl: string;
   gestoCmd: string;
   attribuzione: string;
+  /** Label of a stop on an itinerary, with `{n}`. */
+  tappa: string;
 }
 
 /**

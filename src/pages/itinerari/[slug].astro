@@ -3,11 +3,12 @@
 // Google Maps link of each group and a print version (the stops only, numbered).
 import { render } from 'astro:content';
 import Dubbi from '../../components/Dubbi.astro';
+import MappaPiccola from '../../components/MappaPiccola.astro';
 import Continua from '../../components/Continua.astro';
 import { t, type ChiaveUi } from '../../i18n/index.ts';
 import Base from '../../layouts/Base.astro';
 import { briciole as briciolaJsonLd, itinerario as itinerarioJsonLd } from '../../lib/jsonld.ts';
-import { raggruppaTappe } from '../../lib/itinerari.ts';
+import { puntiPercorso, raggruppaTappe } from '../../lib/itinerari.ts';
 import { indirizzoItinerario, leggiItinerari, mappaTappe } from '../../lib/itinerari-dati.ts';
 
 export async function getStaticPaths() {
@@ -20,6 +21,7 @@ const { titolo, descrizione, modo, durataMinuti, stato, daConfermare } = itinera
 const { Content } = await render(itinerario.voce);
 const meta = descrizione ?? t('itinerario.descrizioneBase');
 const gruppi = raggruppaTappe(itinerario.tappe);
+const { punti, percorsi } = puntiPercorso(gruppi);
 const altri = tutti.filter((i) => i.slug !== itinerario.slug);
 
 const indirizzo = indirizzoItinerario(itinerario.slug);
@@ -65,6 +67,12 @@ const dati = [
 
     <section aria-labelledby="tappe-titolo">
       <h2 id="tappe-titolo">{t('itinerario.tappe')}</h2>
+      <MappaPiccola
+        punti={punti}
+        percorsi={percorsi}
+        etichetta={t('mappa.itinerarioEtichetta')}
+        nota={percorsi.length > 0 ? t('mappa.percorsoNota') : undefined}
+      />
       {gruppi.map((gruppo) => (
         <div class="gruppo">
           {gruppo.gruppo && <h3>{gruppo.gruppo}</h3>}

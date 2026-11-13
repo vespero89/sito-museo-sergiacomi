@@ -5,8 +5,10 @@
 // paragraph that explains it is shown; the controls and the map appear when the script starts.
 import { t } from '../i18n/index.ts';
 import { MATERIALE_NON_INDICATO, tileMappa, type LimitiAnni } from '../lib/mappa.ts';
+import { testiMappa } from '../lib/mappa-testi.ts';
 import 'leaflet/dist/leaflet.css';
 import '@raruto/leaflet-gesture-handling/src/index.css';
+import '../styles/mappa-leaflet.css';
 
 interface Props {
   limiti: LimitiAnni;
@@ -19,23 +21,7 @@ interface Props {
 }
 const { limiti, comuni, materiali, segni, idElenco } = Astro.props;
 const tile = tileMappa(import.meta.env.PUBLIC_TILE_URL);
-const testi = {
-  conteggio: t('mappa.conteggio'),
-  una: t('opere.una'),
-  piu: t('opere.piu'),
-  indicativa: t('mappa.indicativa'),
-  nessuna: t('mappa.nessuna'),
-  zoomPiu: t('mappa.zoomPiu'),
-  zoomMeno: t('mappa.zoomMeno'),
-  chiudi: t('mappa.chiudi'),
-  vicinoNegato: t('mappa.vicinoNegato'),
-  vicinoNonDisponibile: t('mappa.vicinoNonDisponibile'),
-  vicinoScaduto: t('mappa.vicinoScaduto'),
-  gestoTocco: t('mappa.gestoTocco'),
-  gestoCtrl: t('mappa.gestoCtrl'),
-  gestoCmd: t('mappa.gestoCmd'),
-  attribuzione: `<a href="${tile.attribuzioneUrl}">${tile.attribuzione}</a>`,
-};
+const testi = testiMappa(tile);
 ---
 
 <div
@@ -220,82 +206,6 @@ const testi = {
   @media (min-width: 48em) {
     .riquadro {
       height: calc(var(--mappa-altezza) * 1.4);
-    }
-  }
-
-  /* Leaflet markup is made by the script, so these rules must be global. */
-  .mappa :global(.leaflet-tile-pane) {
-    filter: var(--mappa-filtro-tile);
-  }
-  .mappa:global(.leaflet-container) {
-    font-family: var(--font-testo);
-    background: var(--colore-superficie-calda);
-  }
-  .mappa :global(.marcatore) {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-    font: 700 var(--testo-s) var(--font-testo);
-    color: var(--colore-sull-accento);
-    background: var(--colore-accento);
-    border: 2px solid var(--colore-superficie);
-    border-radius: var(--raggio-pieno);
-    box-shadow: var(--ombra-m);
-  }
-  .mappa :global(.marcatore.indicativo) {
-    background: var(--colore-superficie);
-    color: var(--colore-accento-scuro);
-    border: 2px dashed var(--colore-accento);
-  }
-  .mappa :global(.leaflet-marker-icon:focus-visible) {
-    outline: 3px solid var(--colore-focus);
-    outline-offset: 2px;
-    border-radius: var(--raggio-pieno);
-  }
-  .mappa :global(.zoom-nostro) {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spazio-1);
-  }
-  .mappa :global(.zoom-nostro button) {
-    min-width: var(--bersaglio-min);
-    padding-inline: 0;
-    font-size: var(--testo-xl);
-    line-height: 1;
-  }
-  .mappa :global(.leaflet-popup-content) {
-    margin: var(--spazio-3);
-    font-size: var(--testo-m);
-    color: var(--colore-testo);
-  }
-  .mappa :global(.leaflet-popup-content h3) {
-    margin: 0 0 var(--spazio-2);
-    font-size: var(--testo-l);
-  }
-  .mappa :global(.leaflet-popup-content ul) {
-    margin: 0;
-    padding-inline-start: var(--spazio-4);
-  }
-  .mappa :global(.leaflet-popup-content .indicativa) {
-    margin: var(--spazio-2) 0 0;
-    font-size: var(--testo-s);
-    color: var(--colore-testo-tenue);
-  }
-  .mappa :global(.leaflet-control-attribution) {
-    font-size: var(--testo-s);
-  }
-  /* The gesture plugin: its message, with our font and colours, and no fade with reduced motion. */
-  .mappa:global(.leaflet-gesture-handling)::after {
-    font-family: var(--font-testo);
-    font-size: var(--testo-l);
-    color: var(--colore-sul-scuro);
-    background: rgb(42 35 28 / 0.72);
-    transition-duration: 0.3s;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .mappa:global(.leaflet-gesture-handling)::after {
-      transition-duration: 0s;
     }
   }
 </style>

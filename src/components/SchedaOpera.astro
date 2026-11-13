@@ -8,6 +8,7 @@ import { indirizzoSala } from '../lib/ambienti.ts';
 import { elencoItaliano } from '../lib/frase-opera.ts';
 import type { OperaCompleta } from '../lib/opere-dati.ts';
 import DaConfermare from './DaConfermare.astro';
+import MappaPiccola from './MappaPiccola.astro';
 
 interface Props {
   opera: OperaCompleta;
@@ -83,6 +84,20 @@ const indicazioni = `https://www.google.com/maps/dir/?api=1&destination=${encode
       </div>
     )}
   </dl>
+  <MappaPiccola
+    punti={[
+      {
+        luogoId: opera.voce.data.luogo.id,
+        luogoNome: luogo.nome,
+        lat: luogo.lat,
+        lon: luogo.lon,
+        indicativa: luogo.precisione !== 'punto',
+        tappe: [],
+      },
+    ]}
+    etichetta={t('mappa.luogoEtichetta')}
+    senzaJs={t('mappa.luogoIndirizzo').replace('{luogo}', `${luogo.nome}, ${posto}`)}
+  />
   <p class="indicazioni">
     <a class="pulsante" href={indicazioni} rel="noopener">
       {t('opera.indicazioni')}

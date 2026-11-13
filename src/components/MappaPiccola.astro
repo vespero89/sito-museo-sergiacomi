@@ -1,0 +1,77 @@
+---
+// A small map (spec 5.3, task 18): the place of a work on its page, or the numbered stops of an
+// itinerary with the route. The text next to it is the real content (the address, the numbered
+// list of the page); the map is an improvement and loads when it comes near the screen. It is left
+// out of the print. Its stylesheets load with the map (script), not with the page: the page renders
+// first and the map costs nothing until it comes near.
+import type { PuntoPercorso } from '../lib/itinerari.ts';
+import { tileMappa } from '../lib/mappa.ts';
+import { testiMappa } from '../lib/mappa-testi.ts';
+
+interface Props {
+  punti: PuntoPercorso[];
+  /** One line per group, as lists of [lat, lon]. */
+  percorsi?: [number, number][][];
+  etichetta: string;
+  /** Shown without JavaScript instead of the map (the address). */
+  senzaJs?: string;
+  /** A line under the map. */
+  nota?: string | undefined;
+}
+const { punti, percorsi = [], etichetta, senzaJs, nota } = Astro.props;
+const tile = tileMappa(import.meta.env.PUBLIC_TILE_URL);
+---
+
+<div
+  class="mappa-piccola no-stampa"
+  data-mappa-piccola
+  data-tile={tile.urlTemplate}
+  data-testi={JSON.stringify(testiMappa(tile))}
+  data-punti={JSON.stringify(punti)}
+  data-percorsi={JSON.stringify(percorsi)}
+>
+  {senzaJs && (
+    <p class="senza-js" data-senza-js>
+      {senzaJs}
+    </p>
+  )}
+  <div class="riquadro" data-riquadro-mappa role="region" aria-label={etichetta} hidden>
+    <div class="mappa" data-mappa></div>
+  </div>
+  {nota && <p class="nota">{nota}</p>}
+</div>
+
+<script>
+  import { avviaMappaPiccola } from '../scripts/mappa-piccola.ts';
+  document.querySelectorAll<HTMLElement>('[data-mappa-piccola]').forEach(avviaMappaPiccola);
+</script>
+
+<style>
+  .mappa-piccola {
+    margin-block: var(--spazio-4);
+  }
+  .senza-js {
+    margin: 0;
+  }
+  .riquadro {
+    height: calc(var(--mappa-altezza) * 0.75);
+    border: 1px solid var(--colore-bordo);
+    border-radius: var(--raggio-m);
+    overflow: hidden;
+    background: var(--colore-superficie-calda);
+  }
+  .mappa {
+    width: 100%;
+    height: 100%;
+  }
+  .nota {
+    margin: var(--spazio-2) 0 0;
+    font-size: var(--testo-s);
+    color: var(--colore-testo-tenue);
+  }
+  @media (min-width: 48em) {
+    .riquadro {
+      height: var(--mappa-altezza);
+    }
+  }
+</style>

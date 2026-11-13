@@ -1,14 +1,11 @@
 // The itineraries as the pages read them (the astro:content side of itinerari.ts): each stop with
 // its title, its page and the text Google Maps searches for.
 import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
-import { linkGoogleMaps, type Tappa } from './itinerari.ts';
+import { linkGoogleMaps, type TappaPosizionata } from './itinerari.ts';
 import { leggiSito } from './sito-dati.ts';
 
-export interface TappaCompleta extends Tappa {
-  titolo: string;
+export interface TappaCompleta extends TappaPosizionata {
   comune: string;
-  /** Page of the stop, if it has one. */
-  href: string | undefined;
   nota: string | undefined;
 }
 
@@ -35,11 +32,17 @@ export async function leggiItinerari(): Promise<ItinerarioCompleto[]> {
       const tappe = await Promise.all(
         voce.data.tappe.map(async (tappa): Promise<TappaCompleta> => {
           const opera = tappa.tipo === 'opera' ? await getEntry('opere', tappa.id) : undefined;
-          const luogo = luoghi.get(opera ? opera.data.luogo.id : tappa.id);
+          const luogoId = opera ? opera.data.luogo.id : tappa.id;
+          const luogo = luoghi.get(luogoId);
           if (!luogo) throw new Error(`the stop "${tappa.id}" of "${voce.id}" has no place`);
           return {
             titolo: opera ? opera.data.titolo : luogo.nome,
             comune: luogo.comune,
+            luogoId,
+            luogoNome: luogo.nome,
+            lat: luogo.lat,
+            lon: luogo.lon,
+            indicativa: luogo.precisione !== 'punto',
             href: opera ? `/opere/${opera.id}/` : undefined,
             nota: tappa.nota,
             gruppo: tappa.gruppo,
@@ -56,7 +59,7 @@ export async function leggiItinerari(): Promise<ItinerarioCompleto[]> {
 
 /** The Google Maps link of some stops, from the museum. */
 export const mappaTappe = (
-  tappe: readonly Tappa[],
+  tappe: readonly { query: string }[],
   modo: CollectionEntry<'itinerari'>['data']['modo'],
 ): string =>
   linkGoogleMaps(

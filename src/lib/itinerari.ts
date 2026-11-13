@@ -52,3 +52,53 @@ export function linkGoogleMaps(
   if (viaggio) parametri.set('travelmode', viaggio);
   return `https://www.google.com/maps/dir/?${parametri.toString().replace(/\+/g, '%20')}`;
 }
+
+/** A stop that knows where it is, for the map. */
+export interface TappaPosizionata extends Tappa {
+  luogoId: string;
+  luogoNome: string;
+  lat: number;
+  lon: number;
+  /** The position is the centre of the town or an approximation. */
+  indicativa: boolean;
+  titolo: string;
+  /** Page of the stop, if it has one. */
+  href: string | undefined;
+}
+
+/** A place on the map of an itinerary, with the numbers of the stops that are there. */
+export interface PuntoPercorso {
+  luogoId: string;
+  luogoNome: string;
+  lat: number;
+  lon: number;
+  indicativa: boolean;
+  tappe: { numero: number; titolo: string; href: string | undefined }[];
+}
+
+/**
+ * What the map of an itinerary draws: one point per place (two stops in the same church share it)
+ * and one line per group through its places in stop order. A place repeated in a row adds no
+ * segment; a group with a single place has no line.
+ */
+export function puntiPercorso(gruppi: readonly GruppoTappe<TappaPosizionata>[]): {
+  punti: PuntoPercorso[];
+  percorsi: [number, number][][];
+} {
+  const punti = new Map<string, PuntoPercorso>();
+  const percorsi: [number, number][][] = [];
+  for (const gruppo of gruppi) {
+    const linea: [number, number][] = [];
+    let ultimo: string | undefined;
+    for (const { numero, tappa } of gruppo.tappe) {
+      const { luogoId, luogoNome, lat, lon, indicativa, titolo, href } = tappa;
+      const punto = punti.get(luogoId) ?? { luogoId, luogoNome, lat, lon, indicativa, tappe: [] };
+      punto.tappe.push({ numero, titolo, href });
+      punti.set(luogoId, punto);
+      if (luogoId !== ultimo) linea.push([lat, lon]);
+      ultimo = luogoId;
+    }
+    if (linea.length > 1) percorsi.push(linea);
+  }
+  return { punti: [...punti.values()], percorsi };
+}

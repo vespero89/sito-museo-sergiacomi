@@ -78,3 +78,45 @@ describe('/opere/ with the map', () => {
     expect(css).toContain('.leaflet-gesture-handling');
   });
 });
+
+// The small maps (task 18): the place on every work page, the stops on every itinerary.
+describe('the small maps', () => {
+  const documento = (file: string) =>
+    parseHTML(readFileSync(join(DIST, file, 'index.html'), 'utf8')).document;
+  const cartelle = (sotto: string) =>
+    walk(join(DIST, sotto))
+      .filter((f) => f.endsWith('index.html') && f !== join(DIST, sotto, 'index.html'))
+      .map((f) => f.slice(DIST.length + 1, -'/index.html'.length));
+
+  it('puts a map and, for no JavaScript, the address on every work page', () => {
+    const schede = cartelle('opere');
+    expect(schede).toHaveLength(27);
+    for (const scheda of schede) {
+      const radice = documento(scheda).querySelector<HTMLElement>('[data-mappa-piccola]');
+      expect(radice, scheda).not.toBeNull();
+      const punti = JSON.parse(radice!.getAttribute('data-punti')!);
+      expect(punti, scheda).toHaveLength(1);
+      expect(radice!.querySelector('[data-senza-js]')!.textContent, scheda).toContain(
+        punti[0].luogoNome,
+      );
+    }
+  });
+
+  it('draws on every itinerary the stops in the order of the numbered list', () => {
+    const itinerari = cartelle('itinerari');
+    expect(itinerari).toHaveLength(4);
+    for (const itinerario of itinerari) {
+      const d = documento(itinerario);
+      const radice = d.querySelector<HTMLElement>('[data-mappa-piccola]')!;
+      const punti = JSON.parse(radice.getAttribute('data-punti')!) as {
+        tappe: { numero: number; titolo: string }[];
+      }[];
+      const sulla = punti.flatMap((p) => p.tappe).sort((a, b) => a.numero - b.numero);
+      const elenco = [...d.querySelectorAll('ol.tappe li')].map(
+        (li) => (li.querySelector('a, span')!.textContent ?? '').trim(),
+      );
+      expect(sulla.map((t) => t.numero), itinerario).toEqual(elenco.map((_, i) => i + 1));
+      expect(sulla.map((t) => t.titolo), itinerario).toEqual(elenco);
+    }
+  });
+});

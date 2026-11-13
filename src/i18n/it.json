@@ -196,5 +196,10 @@
   "mappa.gestoTocco": "Usa due dita per spostare la mappa",
   "mappa.gestoCtrl": "Usa Ctrl e la rotella per ingrandire la mappa",
   "mappa.gestoCmd": "Usa Cmd e la rotella per ingrandire la mappa",
-  "mappa.chiudi": "Chiudi"
+  "mappa.chiudi": "Chiudi",
+  "mappa.luogoEtichetta": "Mappa del luogo dell'opera",
+  "mappa.luogoIndirizzo": "Dove si trova: {luogo}.",
+  "mappa.itinerarioEtichetta": "Mappa delle tappe dell'itinerario",
+  "mappa.percorsoNota": "Le linee uniscono le tappe in ordine, in linea retta: non sono il tragitto su strada.",
+  "mappa.tappa": "tappa {n}"
 }
