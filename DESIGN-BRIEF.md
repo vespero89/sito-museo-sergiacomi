@@ -90,7 +90,7 @@ Open UX points, offered as suggestions (the structure may change if the addresse
   overlap; the museum is not a stop. Suggestion: photo of the first stop on the card, duration and
   length, the museum as stop 0 where it makes sense, initial zoom fitted to the stops.
 - **A9, one style for placeholders.** Today there is a "Da confermare" badge, the text
-  `[[DA CONFERMARE: ...]]` and a "Segnaposto" label. On `/visita/` the square brackets look like an
+  `[[DA CONFERMARE: ...]]` and a "Testo generato, da approvare" label. On `/visita/` the square brackets look like an
   error. Suggestion: one component for all of them.
 - **A10, dates in one format.** In the archive "1983" and "1992-07-27" both appear. Suggestion: "27 luglio 1992".
 
@@ -186,9 +186,11 @@ unless you have a reason you can state.
    (a native `popover`) have an HTML base. The map is never the only way to reach a work.
 6. **Reduced motion.** With `prefers-reduced-motion: reduce`: no page transition, no map animation, no
    fades, no "Play" button.
-7. **Content gate and modes.** Every entry can be `confermato`, `da-confermare` or `segnaposto`. The
-   preview shows open items with the `DaConfermare` label; `npm run build:production` stops while any is
-   open. Keep the label (restyle it, do not remove it). Which mode the build is in comes from
+7. **Content gate and modes.** Every entry can be `confermato`, `da-confermare` or `segnaposto`
+   (`segnaposto` means generated text not yet approved by Fabio). The preview shows every open item with
+   the `DaConfermare` label ("Da confermare", or "Testo generato, da approvare"); `npm run build:production`
+   stops while a blocking item is open and hides the non-blocking ones (`src/lib/bloccanti.ts`). Keep the
+   labels (restyle them, do not remove them). Which mode the build is in comes from
    `decidiModalita` (`src/lib/modalita.ts`), never from an environment variable in a component.
 8. **View transitions.** The names `opera-<slug>` come from `/assets/vt-opere.css` (linked only from
    `/opere/` and the work pages) and must be unique on a page; the rule `@view-transition` is in
