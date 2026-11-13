@@ -30,7 +30,7 @@ For the browser tests, download the browser once with `npx playwright install ch
 | `npm run build:production` | Production build. Stops with a list while anything is not confirmed (see "Unconfirmed content").                                            |
 | `npm test`                 | Vitest: unit tests and tests on the built `dist/` (run `npm run build` first).                                                              |
 | `npm run test:e2e`         | Build, then Playwright (Chromium) on `dist/`: axe, keyboard, no JS, no outside request, CSP (`tests/e2e/`).                                 |
-| `npm run test:lh`          | Build, then Lighthouse CI on the home page (`lighthouserc.json`). Needs Google Chrome.                                                      |
+| `npm run test:lh`          | Build, then Lighthouse CI on the home page and a work page (`lighthouserc.json`). Needs Google Chrome.                                      |
 | `npm run content:check`    | Content schemas, references, import counts (25 works) and `src/data/sito.yaml`.                                                             |
 | `npm run content:report`   | What is not confirmed yet, by collection and type.                                                                                          |
 | `npm run images`           | Rebuild the master photos in `src/assets/foto/` from `materiali/` (see "Photos").                                                           |
@@ -146,6 +146,55 @@ requirement for whoever configures the hosting: do not publish the preview addre
 Current versions of Chrome, Edge, Firefox and Safari (desktop and mobile). Newer features (`popover`,
 `<dialog>`, `@view-transition`) degrade gracefully: every function has a plain HTML base, so older browsers
 get a usable site without the extras.
+
+## Handoff to the designer
+
+`DESIGN-BRIEF.md` explains what the visual redesign may change and what must keep working;
+`CONTENT-GUIDE.md` explains how the content is edited, including clearing unconfirmed items.
+
+## Postponed
+
+Three tasks of the prototype plan are deliberately left until after the graphic redesign and the content
+review, because they would be done twice (or on content that will change):
+
+- Task 21, SEO files: `sitemap.xml`, `robots.txt`, `llms.txt`. They depend on the final addresses and on the
+  content being confirmed (they are never produced while items are open).
+- Task 23, the full browser test run (every sample page with every interaction). The tests that exist today
+  (`npm run test:e2e`) cover the pages and interactions built so far; the full set is written against the
+  final design.
+- Task 24, Lighthouse and the weight budgets. `npm run test:lh` runs on the home page and one work page
+  today; the scores and thresholds for every sample page (above all `/opere/` with the map) are set once the
+  design is final.
+
+Task 22 (legal pages) was done in a reduced form: privacy, cookie, legal notes and accessibility are
+placeholders, marked to be confirmed, and need a lawyer's reading.
+
+## Licences of the dependencies
+
+Direct dependencies, as declared in each package (`license` field). Runtime packages end up in the build or
+run it; the others are tools used only while developing and testing.
+
+| Package                                                                                                                                 | Licence         | Use                                                                 |
+| --------------------------------------------------------------------------------------------------------------------------------------- | --------------- | ------------------------------------------------------------------- |
+| `astro`                                                                                                                                 | MIT             | Site generator                                                      |
+| `leaflet`                                                                                                                               | BSD-2-Clause    | Map (in the public JavaScript)                                      |
+| `@raruto/leaflet-gesture-handling`                                                                                                      | **GPL-3.0**     | Two-finger map gestures (in the public JavaScript)                  |
+| `sharp`                                                                                                                                 | Apache-2.0      | Image processing at build time                                      |
+| `typescript`, `@astrojs/check`                                                                                                          | Apache-2.0, MIT | Types                                                               |
+| `pagefind` (dev)                                                                                                                        | MIT             | Search index, and the search script it writes into `dist/pagefind/` |
+| `vitest`, `@playwright/test`, `playwright-core`, `@lhci/cli` (dev)                                                                      | MIT, Apache-2.0 | Tests                                                               |
+| `@axe-core/playwright` (dev)                                                                                                            | MPL-2.0         | Accessibility tests                                                 |
+| `eslint`, `typescript-eslint`, `eslint-plugin-astro`, `eslint-plugin-jsx-a11y-x`, `prettier`, `prettier-plugin-astro`, `@types/*` (dev) | MIT             | Lint and format                                                     |
+| `linkedom`, `yaml` (dev)                                                                                                                | ISC             | Test and content tooling                                            |
+
+What the GPL-3.0 plugin means, briefly: it is bundled into the JavaScript that visitors download, so that
+JavaScript is a combined work and the front-end code of the site must be offered under the GPL-3.0 with its
+source. This is why the build ships source maps (`vite.build.sourcemap: true`), why the repository itself is
+`GPL-3.0-or-later`, and why the legal notes page should say that the full source can be asked of the Foundation (that line is not written yet: it is an open item for the legal text). The
+rest of the project (the content, the photos and the texts) is not code and is not covered by that licence;
+their rights belong to the Foundation and to the third parties credited on the pages. Fabio accepted the
+GPL-3.0 on 12 November 2026. If that changes, the plugin is the only package to replace. This list is not
+legal advice: a lawyer should read it with the legal pages.
 
 ## License
 
