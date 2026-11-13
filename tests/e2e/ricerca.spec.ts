@@ -26,7 +26,7 @@ test.describe('search page', () => {
     const indirizzi = await risultati.evaluateAll((a) => a.map((x) => x.getAttribute('href')));
     expect(indirizzi).toContain('/opere/le-merlettaie/');
     // The menu and the footer are not in the index: a word only they contain finds nothing.
-    await page.getByLabel('Cosa cerchi?').fill('Cookie');
+    await page.getByLabel('Cosa cerchi?').fill('Xylofono');
     await page.getByRole('button', { name: 'Cerca' }).click();
     await expect(page.locator('[data-stato]')).toContainText('Nessun risultato');
     violazioni.push(

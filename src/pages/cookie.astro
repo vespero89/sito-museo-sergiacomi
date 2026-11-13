@@ -1,0 +1,32 @@
+---
+import { getEntry } from 'astro:content';
+import PaginaTesto from '../layouts/PaginaTesto.astro';
+import { serviziAttivi } from '../data/servizi.ts';
+
+const voce = (await getEntry('pagine', 'cookie'))!;
+const servizi = serviziAttivi();
+---
+
+<PaginaTesto voce={voce} senzaContinua>
+  <section class="servizi" aria-labelledby="servizi">
+    <h2 id="servizi">Servizi esterni attivi</h2>
+    <ul>
+      {servizi.map((s) => (
+        <li data-servizio={s.id}>
+          <strong>{s.nome}</strong> ({s.fornitore}): {s.finalita}
+        </li>
+      ))}
+    </ul>
+  </section>
+</PaginaTesto>
+
+<style>
+  .servizi {
+    max-width: var(--larghezza-testo);
+    margin-block-start: var(--spazio-6);
+  }
+  h2 {
+    margin-block: 0 var(--spazio-3);
+    font-size: var(--testo-xl);
+  }
+</style>

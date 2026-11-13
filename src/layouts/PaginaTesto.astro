@@ -15,8 +15,10 @@ interface Props {
   jsonld?: NodoJsonLd[];
   /** The page above this one, when the address is under another page (for example `/il-museo/`). */
   padre?: { titolo: string; href: string };
+  /** The legal pages do not end with the "Continua il percorso" block (spec 5.4). */
+  senzaContinua?: boolean;
 }
-const { voce, jsonld = [], padre } = Astro.props;
+const { voce, jsonld = [], padre, senzaContinua = false } = Astro.props;
 const { titolo, descrizione, slug, stato, daConfermare } = voce.data;
 const indirizzo = `${padre?.href ?? '/'}${slug}/`;
 const { Content } = await render(voce);
@@ -44,7 +46,7 @@ const briciole = [{ titolo: t('briciole.home'), href: '/' }, ...(padre ? [padre]
       <Content />
     </div>
     <slot />
-    <Continua pagina={{ tipo: 'voce', voce }} href={indirizzo} />
+    {!senzaContinua && <Continua pagina={{ tipo: 'voce', voce }} href={indirizzo} />}
   </article>
 </Base>
 

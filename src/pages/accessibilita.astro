@@ -1,0 +1,8 @@
+---
+import { getEntry } from 'astro:content';
+import PaginaTesto from '../layouts/PaginaTesto.astro';
+
+const voce = (await getEntry('pagine', 'accessibilita'))!;
+---
+
+<PaginaTesto voce={voce} senzaContinua />
