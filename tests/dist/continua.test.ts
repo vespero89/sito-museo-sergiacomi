@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { builtPages } from './helpers';
 
-// "Continua il percorso" (task 15): every content page ends with 2 or 3 valid links, never to the
+// "Vedi anche" (task 15): every content page ends with 2 or 3 valid links, never to the
 // page itself, no repeats. Lists, the home, the 404, search and the legal pages have no block.
 const pagine = builtPages();
 const indirizzo = (path: string) => `/${path.replace(/index\.html$/, '')}`;
 const esistono = new Set(pagine.map((p) => indirizzo(p.path)));
 
-const DETTAGLIO = /^\/(opere|itinerari|eventi|archivio|percorsi)\/[^/]+\/$/;
+const DETTAGLIO = /^\/(opere|itinerari|eventi|archivio)\/[^/]+\/$/;
 const TESTO = [
   '/aldo-sergiacomi/',
   '/il-museo/',
@@ -18,7 +18,6 @@ const TESTO = [
   '/didattica/',
   '/chi-siamo/',
   '/visita/',
-  '/contatti/',
   '/sostieni/',
   '/pubblicazioni/',
 ];
@@ -29,15 +28,15 @@ const contenuto = pagine.filter((p) => {
 const link = (document: Document) =>
   [...document.querySelectorAll('.continua h3 a')].map((a) => a.getAttribute('href')!);
 
-describe('Continua il percorso', () => {
+describe('Vedi anche', () => {
   it('covers every kind of content page', () => {
-    expect(contenuto.length).toBeGreaterThanOrEqual(27 + 4 + 4 + 4 + 2 + 12);
+    expect(contenuto.length).toBeGreaterThanOrEqual(27 + 4 + 4 + 2 + 11);
   });
 
   it.each(contenuto.map((p) => [indirizzo(p.path), p] as const))('%s', (a, p) => {
     const sezione = p.document.querySelectorAll('.continua');
     expect(sezione).toHaveLength(1);
-    expect(sezione[0]!.querySelector('h2')!.textContent!.trim()).toBe('Continua il percorso');
+    expect(sezione[0]!.querySelector('h2')!.textContent!.trim()).toBe('Vedi anche');
     const href = link(p.document);
     expect(href.length).toBeGreaterThanOrEqual(2);
     expect(href.length).toBeLessThanOrEqual(3);

@@ -39,9 +39,9 @@ describe('the pages', () => {
     expect(problemi).toEqual([]);
   });
 
-  it('has the five pages of the menu, each with a neutral description', () => {
+  it('has the pages of the menu and the footer, each with a neutral description', () => {
     const slug = contenuti.pagine.map((p) => dati(p).slug).sort();
-    for (const atteso of ['chi-siamo', 'contatti', 'il-museo', 'sostieni', 'visita']) {
+    for (const atteso of ['chi-siamo', 'il-museo', 'sostieni', 'visita']) {
       expect(slug).toContain(atteso);
     }
     for (const p of contenuti.pagine) expect(dati(p).descrizione.length).toBeGreaterThan(20);

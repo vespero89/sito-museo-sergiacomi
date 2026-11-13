@@ -44,16 +44,15 @@ describe('src/data/sito.yaml', () => {
     expect(errori(() => {})).toEqual([]);
   });
 
-  it('has the 7 main menu entries of the spec, in order', () => {
+  it('has the 6 main menu entries of the review, in order', () => {
     const titoli = sitoSchema.parse(reale()).navigazione.principale.map((v) => v.titolo);
     expect(titoli).toEqual([
       'Aldo Sergiacomi',
-      'Il Museo',
-      'Opere e itinerari',
+      'Il museo',
+      'Opere',
+      'Itinerari',
       'Didattica',
-      'Eventi',
-      'Archivio',
-      'Chi siamo',
+      'Visita',
     ]);
   });
 

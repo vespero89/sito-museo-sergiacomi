@@ -1,6 +1,7 @@
 ---
-// The two visit actions, "Prenota" and "Orari e come arrivare" (spec 5.8). Two variants of the
-// same links: in the header from 768 px up, in a fixed bar at the bottom below it. They are plain
+// The visit actions (spec 5.8). Two variants of the same links: in the header from 768 px up only
+// the button "Prenota la visita", in a fixed bar at the bottom below it with "Orari e come arrivare"
+// too. They are plain
 // links, so they work without JavaScript.
 import { LINGUA_PREDEFINITA, percorso, t, type Lingua } from '../i18n/index.ts';
 
@@ -25,15 +26,9 @@ const voci = [
     ))}
   </nav>
 ) : (
-  <ul class="in-testata">
-    {voci.map((voce) => (
-      <li>
-        <a class:list={['azione', { primaria: voce.primaria }]} href={percorso(voce.href, lingua)}>
-          {voce.titolo}
-        </a>
-      </li>
-    ))}
-  </ul>
+  <a class="azione primaria in-testata" href={percorso(azioni.prenota.href, lingua)}>
+    {azioni.prenota.titolo}
+  </a>
 )}
 
 <style>
@@ -67,14 +62,10 @@ const voci = [
   /* In the header: only from 768 px up. */
   .in-testata {
     display: none;
-    gap: var(--spazio-3);
-    list-style: none;
-    margin: 0;
-    padding: 0;
   }
   @media (min-width: 48em) {
     .in-testata {
-      display: flex;
+      display: inline-flex;
     }
   }
 

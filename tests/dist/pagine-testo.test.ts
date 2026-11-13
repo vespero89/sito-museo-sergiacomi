@@ -9,7 +9,6 @@ import { DIST, builtPages, walk } from './helpers';
 const PAGINE = [
   '/aldo-sergiacomi/',
   '/chi-siamo/',
-  '/contatti/',
   '/didattica/',
   '/il-museo/',
   '/pubblicazioni/',
@@ -43,7 +42,6 @@ describe('JSON-LD of the text pages', () => {
   it.each([
     ['/aldo-sergiacomi/', ['Person', 'BreadcrumbList']],
     ['/chi-siamo/', ['Organization', 'BreadcrumbList']],
-    ['/contatti/', ['Organization', 'BreadcrumbList']],
     ['/visita/', ['Museum', 'BreadcrumbList']],
     ['/il-museo/', ['BreadcrumbList']],
     ['/didattica/', ['BreadcrumbList']],

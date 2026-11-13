@@ -30,18 +30,18 @@ describe('layout of every built page', () => {
 
   it.each(pagine)('%s: the menu items come from sito.yaml', (_path, document) => {
     const menu = document.querySelector('nav[popover]')!;
-    const voci = [...menu.querySelectorAll('ul a')].map((a) => [
+    const voci = [...menu.querySelectorAll('li:not(.solo-telefono) a')].map((a) => [
       a.textContent?.trim(),
       a.getAttribute('href'),
     ]);
     expect(voci).toEqual(sito.navigazione.principale.map((v) => [v.titolo, v.href]));
   });
 
-  it.each(pagine)('%s: both actions are plain links in the header and in the bar', (_path, document) => {
+  it.each(pagine)('%s: the bar has both actions and the header the booking button, all plain links', (_path, document) => {
     const attese = [sito.azioni.prenota, sito.azioni.orari].map((a) => [a.titolo, a.href]);
     const leggi = (selettore: string) =>
       [...document.querySelectorAll(selettore)].map((a) => [a.textContent?.trim(), a.getAttribute('href')]);
-    expect(leggi('header ul a.azione')).toEqual(attese);
+    expect(leggi('header a.azione')).toEqual(attese.slice(0, 1));
     expect(leggi('nav[aria-label="Azioni di visita"] a.azione')).toEqual(attese);
   });
 });

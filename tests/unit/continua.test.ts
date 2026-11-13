@@ -114,11 +114,11 @@ describe('continua: rooms, itineraries, archive', () => {
     const h = href(continua({ tipo: 'sale', ids: ['sala-4'] }, '/il-museo/il-laboratorio/', cat));
     expect(h).toEqual(['/il-museo/', '/opere/', '/visita/']);
   });
-  it('an itinerary: the neighbours in the list (wrapping), then the visit', () => {
+  it('an itinerary: the visit and the museum, never the other itineraries (the page lists them)', () => {
     expect(href(continua({ tipo: 'itinerario', id: 'i1' }, '/itinerari/i1/', cat))).toEqual([
-      '/itinerari/i3/',
-      '/itinerari/i2/',
       '/visita/',
+      '/il-museo/',
+      '/opere/',
     ]);
   });
   it('a document: its works, its room, documents of the same decade', () => {

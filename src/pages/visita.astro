@@ -1,10 +1,86 @@
 ---
 import { getEntry } from 'astro:content';
+import DaConfermare from '../components/DaConfermare.astro';
+import DatoSito from '../components/DatoSito.astro';
+import { t } from '../i18n/index.ts';
 import PaginaTesto from '../layouts/PaginaTesto.astro';
 import { museo } from '../lib/jsonld.ts';
+import { campoSito } from '../lib/sito.ts';
 import { leggiSito } from '../lib/sito-dati.ts';
 
 const voce = (await getEntry('pagine', 'visita'))!;
+const sito = leggiSito();
+const { via, cap, comune, provincia } = sito.museo.indirizzo;
+const social = campoSito(sito, 'social');
 ---
 
-<PaginaTesto voce={voce} jsonld={[museo(leggiSito(), Astro.site!)]} />
+<PaginaTesto voce={voce} jsonld={[museo(sito, Astro.site!)]}>
+  <section id="contatti" class="recapiti" aria-labelledby="recapiti">
+    <h2 id="recapiti">{t('contatti.titolo')}</h2>
+    <dl>
+      <dt>{t('contatti.email')}</dt>
+      <dd>
+        <DatoSito percorso="contatti.email" email />
+      </dd>
+      <dt>{t('contatti.telefono')}</dt>
+      <dd>
+        <DatoSito percorso="contatti.telefono" />
+      </dd>
+      <dt>{t('contatti.indirizzo')}</dt>
+      <dd>{`${via}, ${cap} ${comune} (${provincia})`}</dd>
+      <dt>{t('contatti.social')}</dt>
+      <dd>
+        {!social.visibile ? (
+          <DaConfermare motivo={social.nota} />
+        ) : sito.social.length === 0 ? (
+          <DaConfermare tipo="segnaposto" />
+        ) : (
+          <ul>
+            {sito.social.map((s) => (
+              <li>
+                <a href={s.url}>{s.nome}</a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </dd>
+    </dl>
+  </section>
+</PaginaTesto>
+
+<style>
+  .recapiti {
+    max-width: var(--larghezza-testo);
+    margin-block-start: var(--spazio-6);
+    padding: var(--spazio-5);
+    background: var(--colore-superficie-calda);
+    border-radius: var(--raggio-m);
+  }
+  h2 {
+    margin-block: 0 var(--spazio-4);
+    font-size: var(--testo-xl);
+  }
+  dl {
+    display: grid;
+    gap: var(--spazio-1) var(--spazio-5);
+    margin: 0;
+  }
+  dt {
+    font-weight: 600;
+  }
+  dd {
+    margin: 0 0 var(--spazio-3);
+  }
+  ul {
+    margin: 0;
+    padding-inline-start: var(--spazio-5);
+  }
+  @media (min-width: 48em) {
+    dl {
+      grid-template-columns: 8rem 1fr;
+    }
+    dd {
+      margin: 0;
+    }
+  }
+</style>

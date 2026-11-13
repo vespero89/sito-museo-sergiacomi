@@ -50,8 +50,21 @@ const VECCHIE_PAGINE = [
   ['/immaginimuseo.htm', '/il-museo/'],
   ['/iniziative.htm', '/eventi/'],
   ['/dovesiamo.htm', '/visita/'],
-  ['/contatti.htm', '/contatti/'],
+  ['/contatti.htm', '/visita/#contatti'],
   ['/centenario_aldo_sergiacomi.htm', '/eventi/centenario-2012/'],
+];
+
+/**
+ * Addresses of the prototype that no longer exist (UX review, fix A): the four pages by audience
+ * became the "Per chi viene" block of the home, and Contatti became a section of Visita.
+ * @type {ReadonlyArray<readonly [string, string]>}
+ */
+const PAGINE_TOLTE = [
+  ['/percorsi/con-la-scuola/', '/#per-chi-viene'],
+  ['/percorsi/in-famiglia/', '/#per-chi-viene'],
+  ['/percorsi/in-visita-a-offida/', '/#per-chi-viene'],
+  ['/percorsi/per-studiare-sergiacomi/', '/#per-chi-viene'],
+  ['/contatti/', '/visita/#contatti'],
 ];
 
 /**
@@ -89,9 +102,12 @@ export function variantiMaiuscole(percorso) {
  * @returns {Redirect[]}
  */
 export function creaRedirect() {
-  return VECCHIE_PAGINE.flatMap(([da, a]) =>
-    variantiMaiuscole(da).map((variante) => ({ da: variante, a, codice: 301 })),
-  );
+  return [
+    ...VECCHIE_PAGINE.flatMap(([da, a]) =>
+      variantiMaiuscole(da).map((variante) => ({ da: variante, a, codice: 301 })),
+    ),
+    ...PAGINE_TOLTE.map(([da, a]) => ({ da, a, codice: /** @type {const} */ (301) })),
+  ];
 }
 
 // ---------------------------------------------------------------------------------------------

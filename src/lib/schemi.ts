@@ -97,7 +97,6 @@ export const TIPO_CONTINUA = {
   evento: 'eventi',
   didattica: 'didattica',
   pagina: 'pagine',
-  percorso: 'percorsi',
 } as const;
 
 const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;

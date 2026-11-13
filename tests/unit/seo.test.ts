@@ -28,6 +28,6 @@ describe('leggiSito', () => {
   it('reads and validates sito.yaml', () => {
     const sito = leggiSito();
     expect(sito.nome).toBe('Museo Aldo Sergiacomi');
-    expect(sito.navigazione.principale).toHaveLength(7);
+    expect(sito.navigazione.principale).toHaveLength(6);
   });
 });

@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { DIST, builtPages, walk } from './helpers';
@@ -110,24 +110,16 @@ describe('/archivio/', () => {
   });
 });
 
-describe('the four paths', () => {
-  const slugs = figli('percorsi');
+describe('the audience paths', () => {
   const esiste = (indirizzo: string) => pagine.some((p) => p.path === `${indirizzo.slice(1)}index.html`);
 
-  it('are the four addresses of the spec, with a breadcrumb Home and title only', () => {
-    expect(slugs.sort()).toEqual(['con-la-scuola', 'in-famiglia', 'in-visita-a-offida', 'per-studiare-sergiacomi']);
-    for (const slug of slugs) {
-      const d = documento(`/percorsi/${slug}/`);
-      expect(d.querySelectorAll('.briciole li')).toHaveLength(2);
-    }
+  it('have no pages of their own: they are the block "Per chi viene" of the home', () => {
+    expect(existsSync(join(DIST, 'percorsi'))).toBe(false);
   });
 
   it('only link to pages that exist', () => {
-    for (const slug of slugs) {
-      const d = documento(`/percorsi/${slug}/`);
-      const link = [...d.querySelectorAll('.schede a')].map((a) => a.getAttribute('href')!);
-      expect(link.length, slug).toBeGreaterThan(0);
-      for (const l of link) expect(esiste(l.replace(/#.*$/, '')), `${slug} -> ${l}`).toBe(true);
-    }
+    const link = [...documento('/').querySelectorAll('#per-chi-viene li li a')].map((a) => a.getAttribute('href')!);
+    expect(link.length).toBeGreaterThanOrEqual(8);
+    for (const l of link) expect(esiste(l.replace(/#.*$/, '')), l).toBe(true);
   });
 });

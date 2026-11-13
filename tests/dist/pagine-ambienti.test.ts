@@ -106,6 +106,11 @@ describe('the plan on /il-museo/', () => {
     nomi.forEach((nome, i) => expect(nome).toContain(AMBIENTI[i]![1].replaceAll('  ', ' ')));
   });
 
+  it('labels the rooms with their numbers: Sala 1, 2, 3 and Sala 4', () => {
+    const sigle = [...d.querySelectorAll('svg.pianta text.sigla')].map((t) => t.textContent!.trim());
+    expect(sigle).toEqual(['Sala 1, 2, 3', 'Sala 4']);
+  });
+
   it('has the same four links as a text list under the plan', () => {
     const elenco = [...d.querySelectorAll('ul.elenco-ambienti a')];
     expect(elenco.map(href)).toEqual(AMBIENTI.map(([indirizzo]) => indirizzo));

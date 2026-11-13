@@ -1,6 +1,6 @@
 ---
 // Site header: brand, main menu and, from 768 px up, the two visit actions.
-import { LINGUA_PREDEFINITA, percorso, type Lingua } from '../i18n/index.ts';
+import { LINGUA_PREDEFINITA, percorso, t, type Lingua } from '../i18n/index.ts';
 import BarraAzioni from './BarraAzioni.astro';
 import Menu from './Menu.astro';
 
@@ -20,6 +20,9 @@ const { nome, menu, azioni, corrente, lingua = LINGUA_PREDEFINITA } = Astro.prop
       {nome}
     </a>
     <div class="azioni">
+      <a class="cerca" href={percorso('/ricerca/', lingua)}>
+        {t('menu.cerca', lingua)}
+      </a>
       <BarraAzioni azioni={azioni} variante="testata" lingua={lingua} />
     </div>
     <div class="menu-riga">
@@ -54,10 +57,26 @@ const { nome, menu, azioni, corrente, lingua = LINGUA_PREDEFINITA } = Astro.prop
   .menu-riga {
     margin-inline-start: auto;
   }
+  /* The search link of the header shows from 768 px up; on phones it is in the menu. */
+  .azioni {
+    display: flex;
+    align-items: center;
+    gap: var(--spazio-4);
+  }
+  .cerca {
+    display: none;
+    align-items: center;
+    min-height: var(--bersaglio-min);
+    color: var(--colore-testo);
+    font-weight: 600;
+  }
   /* From 768 px up: row 1 brand and actions, row 2 the menu across the full width. */
   @media (min-width: 48em) {
     .azioni {
       margin-inline-start: auto;
+    }
+    .cerca {
+      display: inline-flex;
     }
     .menu-riga {
       flex-basis: 100%;

@@ -1,6 +1,7 @@
 ---
 // Main menu (spec 4, 5.8). A native popover on small screens (Esc closes it, no JavaScript);
-// an open row of links from 768 px up. The items come from sito.yaml, not from this file.
+// an open row of links from 768 px up. Home and Cerca are only in the phone menu: the header
+// has the brand and a search link. The items come from sito.yaml, not from this file.
 import { LINGUA_PREDEFINITA, percorso, t, type Lingua } from '../i18n/index.ts';
 
 interface Props {
@@ -21,6 +22,11 @@ const { voci, corrente, lingua = LINGUA_PREDEFINITA } = Astro.props;
     {t('menu.chiudi', lingua)}
   </button>
   <ul>
+    <li class="solo-telefono">
+      <a href={percorso('/', lingua)} aria-current={corrente === '/' ? 'page' : undefined}>
+        {t('menu.home', lingua)}
+      </a>
+    </li>
     {voci.map((voce) => (
       <li>
         <a
@@ -31,6 +37,14 @@ const { voci, corrente, lingua = LINGUA_PREDEFINITA } = Astro.props;
         </a>
       </li>
     ))}
+    <li class="solo-telefono">
+      <a
+        href={percorso('/ricerca/', lingua)}
+        aria-current={corrente === '/ricerca/' ? 'page' : undefined}
+      >
+        {t('menu.cerca', lingua)}
+      </a>
+    </li>
   </ul>
 </nav>
 
@@ -116,6 +130,9 @@ const { voci, corrente, lingua = LINGUA_PREDEFINITA } = Astro.props;
       font-family: var(--font-testo);
       font-size: var(--testo-m);
       font-weight: 600;
+    }
+    .solo-telefono {
+      display: none;
     }
     a:hover,
     a[aria-current='page'] {

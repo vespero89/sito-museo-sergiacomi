@@ -13,8 +13,8 @@ const ambienti = await leggiAmbienti();
 
 // Where each environment sits in the drawing (viewBox 640 x 360) and how its box is labelled.
 const RIQUADRI: Record<Ambiente, { x: number; y: number; w: number; h: number; sigla: string }> = {
-  'le-sale': { x: 20, y: 20, w: 390, h: 150, sigla: '1 · 2 · 3' },
-  'il-laboratorio': { x: 20, y: 190, w: 190, h: 150, sigla: '4' },
+  'le-sale': { x: 20, y: 20, w: 390, h: 150, sigla: 'Sala 1, 2, 3' },
+  'il-laboratorio': { x: 20, y: 190, w: 190, h: 150, sigla: 'Sala 4' },
   'il-chiostro': { x: 230, y: 190, w: 180, h: 150, sigla: '' },
   'spazi-fondazione': { x: 430, y: 20, w: 190, h: 320, sigla: '' },
 };

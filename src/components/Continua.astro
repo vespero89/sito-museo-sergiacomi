@@ -1,5 +1,5 @@
 ---
-// "Continua il percorso" (spec 5.4): two or three cards at the end of a content page. No script.
+// "Vedi anche" (spec 5.4): two or three cards at the end of a content page. No script.
 import { t } from '../i18n/index.ts';
 import { leggiContinua, type PaginaContinua } from '../lib/continua-dati.ts';
 import CartaVoce from './CartaVoce.astro';
@@ -18,7 +18,11 @@ const schede = await leggiContinua(pagina, href);
   <ul class="schede">
     {schede.map((s) => (
       <li>
-        <CartaVoce titolo={s.titolo} href={s.href} dati={t(`continua.tipo.${s.tipo}`)} />
+        <CartaVoce
+          titolo={s.titolo}
+          href={s.href}
+          dati={s.tipo === 'pagina' ? undefined : t(`continua.tipo.${s.tipo}`)}
+        />
       </li>
     ))}
   </ul>

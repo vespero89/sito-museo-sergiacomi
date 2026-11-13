@@ -1,4 +1,4 @@
-// "Continua il percorso" as the pages read it (the astro:content side of continua.ts): the
+// "Vedi anche" as the pages read it (the astro:content side of continua.ts): the
 // catalogue of the site, and the cards of one page.
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { t } from '../i18n/index.ts';
@@ -25,17 +25,15 @@ let memo: Promise<{ catalogo: Catalogo; schede: Map<string, Scheda> }> | undefin
 
 function leggi() {
   memo ??= (async () => {
-    const [opere, sale, archivio, itinerari, pagine, eventi, didattica, percorsi] =
-      await Promise.all([
-        leggiOpere(),
-        getCollection('sale'),
-        getCollection('archivio'),
-        leggiItinerari(),
-        getCollection('pagine'),
-        getCollection('eventi'),
-        getCollection('didattica'),
-        getCollection('percorsi'),
-      ]);
+    const [opere, sale, archivio, itinerari, pagine, eventi, didattica] = await Promise.all([
+      leggiOpere(),
+      getCollection('sale'),
+      getCollection('archivio'),
+      leggiItinerari(),
+      getCollection('pagine'),
+      getCollection('eventi'),
+      getCollection('didattica'),
+    ]);
     const per = <T extends { id: string }>(v: T[]) =>
       [...v].sort((a, b) => a.id.localeCompare(b.id));
     const saleOrdinate = [...sale].sort((a, b) => a.data.numero - b.data.numero);
@@ -103,13 +101,6 @@ function leggi() {
         href: '/didattica/',
       });
     }
-    for (const p of percorsi) {
-      schede.set(`percorso:${p.id}`, {
-        tipo: 'percorso',
-        titolo: p.data.titolo,
-        href: `/percorsi/${p.id}/`,
-      });
-    }
     for (const p of pagine) {
       schede.set(`pagina:${p.id}`, {
         tipo: 'pagina',
@@ -141,7 +132,7 @@ export type PaginaContinua =
   | { tipo: 'manuale'; continua?: Continua }
   | { tipo: 'voce'; voce: CollectionEntry<'pagine'> };
 
-/** The cards of "Continua il percorso" for the page at `href`. */
+/** The cards of "Vedi anche" for the page at `href`. */
 export async function leggiContinua(pagina: PaginaContinua, href: string): Promise<Scheda[]> {
   const { catalogo, schede } = await leggi();
   if (pagina.tipo === 'voce') {

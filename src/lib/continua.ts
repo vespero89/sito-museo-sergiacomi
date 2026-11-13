@@ -1,10 +1,10 @@
-// "Continua il percorso" (spec 5.4), as pure functions: given the page and a plain catalogue of the
+// "Vedi anche" (spec 5.4), as pure functions: given the page and a plain catalogue of the
 // site, the two or three cards that lead on. Only links that already exist in the collections; no
 // text of its own. The order is stable: the same input always gives the same cards.
 import { distanzaKm } from './relazioni.ts';
 
 export type TipoScheda =
-  'opera' | 'sala' | 'itinerario' | 'archivio' | 'evento' | 'didattica' | 'pagina' | 'percorso';
+  'opera' | 'sala' | 'itinerario' | 'archivio' | 'evento' | 'didattica' | 'pagina';
 
 export interface Scheda {
   tipo: TipoScheda;
@@ -120,16 +120,11 @@ function candidati(pagina: Pagina, cat: Catalogo): Scheda[] {
       ];
     }
     case 'itinerario': {
-      const i = cat.itinerari.findIndex((it) => it.id === pagina.id);
-      if (i < 0) throw new Error(`continua: there is no itinerary "${pagina.id}"`);
-      const n = cat.itinerari.length;
-      // The stops are already on the page: lead to the neighbours in the list, then the visit.
-      return [
-        cat.itinerari[(i + n - 1) % n]!,
-        cat.itinerari[(i + 1) % n]!,
-        cat.visita,
-        ...cat.itinerari,
-      ];
+      if (!cat.itinerari.some((it) => it.id === pagina.id))
+        throw new Error(`continua: there is no itinerary "${pagina.id}"`);
+      // The stops are on the page and the other itineraries are listed by the page itself
+      // ("Gli altri itinerari"): lead to the visit and the museum, then the defaults.
+      return [cat.visita, cat.museo];
     }
     case 'archivio': {
       const doc = trova(cat.archivio, pagina.id, 'document');
@@ -149,7 +144,7 @@ function candidati(pagina: Pagina, cat: Catalogo): Scheda[] {
 }
 
 /**
- * The cards of "Continua il percorso" for a page at `href`: two or three, never the page itself, no
+ * The cards of "Vedi anche" for a page at `href`: two or three, never the page itself, no
  * repeats. When the rules of the page give fewer than two, the defaults fill in.
  */
 export function continua(pagina: Pagina, href: string, cat: Catalogo): Scheda[] {

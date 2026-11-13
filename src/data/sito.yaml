@@ -51,7 +51,7 @@ artista:
 
 azioni:
   prenota:
-    titolo: Prenota
+    titolo: Prenota la visita
     href: /visita/#prenota
   orari:
     titolo: Orari e come arrivare
@@ -60,18 +60,18 @@ azioni:
 navigazione:
   principale:
     - { titolo: Aldo Sergiacomi, href: /aldo-sergiacomi/ }
-    - { titolo: Il Museo, href: /il-museo/ }
-    - { titolo: Opere e itinerari, href: /opere/ }
+    - { titolo: Il museo, href: /il-museo/ }
+    - { titolo: Opere, href: /opere/ }
+    - { titolo: Itinerari, href: /itinerari/ }
     - { titolo: Didattica, href: /didattica/ }
-    - { titolo: Eventi, href: /eventi/ }
-    - { titolo: Archivio, href: /archivio/ }
-    - { titolo: Chi siamo, href: /chi-siamo/ }
+    - { titolo: Visita, href: /visita/ }
   piede:
-    - gruppo: Il museo
+    - gruppo: Approfondisci
       voci:
-        - { titolo: Visita, href: /visita/ }
-        - { titolo: Contatti, href: /contatti/ }
+        - { titolo: Eventi, href: /eventi/ }
+        - { titolo: Archivio, href: /archivio/ }
         - { titolo: Pubblicazioni, href: /pubblicazioni/ }
+        - { titolo: Chi siamo, href: /chi-siamo/ }
         - { titolo: Sostieni il museo, href: /sostieni/ }
         - { titolo: Cerca nel sito, href: /ricerca/ }
     - gruppo: Note

@@ -23,11 +23,13 @@ for (const [nome, vista] of [
 
     test('an entrance can be reached and opened with the keyboard', async ({ page }) => {
       await page.goto('/');
-      const link = page.getByRole('link', { name: 'Con la scuola' }).first();
+      const link = page
+        .locator('#per-chi-viene')
+        .getByRole('link', { name: 'Didattica', exact: true });
       await link.focus();
       await expect(link).toBeFocused();
       await page.keyboard.press('Enter');
-      await expect(page).toHaveURL(/\/percorsi\/con-la-scuola\/$/);
+      await expect(page).toHaveURL(/\/didattica\/$/);
     });
   });
 }
@@ -37,6 +39,6 @@ test.describe('home with reduced motion and without JavaScript', () => {
   test('still shows the photo and the entrances', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('main img').first()).toBeVisible();
-    await expect(page.getByRole('link', { name: 'In famiglia' }).first()).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'In famiglia' })).toBeVisible();
   });
 });

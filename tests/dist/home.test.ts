@@ -25,14 +25,27 @@ describe('/ (home)', () => {
     }
   });
 
-  it('links the four entrances by audience and the six areas, all to existing pages', () => {
-    const href = [...d.querySelectorAll('main a')].map((a) => a.getAttribute('href'));
-    for (const p of ['con-la-scuola', 'in-famiglia', 'in-visita-a-offida', 'per-studiare-sergiacomi']) {
-      expect(href).toContain(`/percorsi/${p}/`);
+  it('has the block "Per chi viene": four audiences with two or three direct links, no /percorsi/ pages', () => {
+    const blocco = d.querySelector('section#per-chi-viene')!;
+    expect(blocco.querySelector('h2')!.textContent).toBe('Per chi viene');
+    const pubblici = [...blocco.querySelectorAll(':scope > ul > li')];
+    expect(pubblici).toHaveLength(4);
+    for (const p of pubblici) {
+      const n = p.querySelectorAll('a').length;
+      expect(n).toBeGreaterThanOrEqual(2);
+      expect(n).toBeLessThanOrEqual(3);
     }
-    for (const a of ['/aldo-sergiacomi/', '/il-museo/', '/opere/', '/archivio/', '/didattica/', '/itinerari/']) {
+    const href = [...d.querySelectorAll('main a')].map((a) => a.getAttribute('href')!);
+    expect(href.filter((h) => h.startsWith('/percorsi/'))).toEqual([]);
+  });
+
+  it('links the four areas of the museum and the band "Altro dal museo", all to existing pages', () => {
+    const href = [...d.querySelectorAll('main a')].map((a) => a.getAttribute('href'));
+    for (const a of ['/aldo-sergiacomi/', '/il-museo/', '/opere/', '/itinerari/']) {
       expect(href).toContain(a);
     }
+    const altro = [...d.querySelectorAll('section.altro a')].map((a) => a.getAttribute('href'));
+    expect(altro).toEqual(['/eventi/', '/archivio/', '/pubblicazioni/', '/chi-siamo/', '/sostieni/']);
   });
 
   it('summarises "From the idea to the work" with three photos and a link to the page', () => {
@@ -41,11 +54,12 @@ describe('/ (home)', () => {
     expect(sezione.querySelector('a[href^="/opere/le-merlettaie/"]')).not.toBeNull();
   });
 
-  it('has the visit actions as plain links and the next event block', () => {
+  it('has the visit actions as plain links and no event box while no event is ahead', () => {
     const href = [...d.querySelectorAll('main a')].map((a) => a.getAttribute('href'));
     expect(href).toContain('/visita/#prenota');
     expect(href).toContain('/visita/#orari');
-    expect(d.querySelector('.prossimo')).not.toBeNull();
+    // The only dated event is from 2012: a past event is not highlighted on the home.
+    expect(d.querySelector('.prossimo')).toBeNull();
   });
 
   it('has the Museum and the WebSite in JSON-LD, with absolute urls', () => {

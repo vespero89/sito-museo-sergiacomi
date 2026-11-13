@@ -203,7 +203,7 @@ const DODICI = [
   ['/immaginimuseo.htm', '/il-museo/'],
   ['/iniziative.htm', '/eventi/'],
   ['/dovesiamo.htm', '/visita/'],
-  ['/contatti.htm', '/contatti/'],
+  ['/contatti.htm', '/visita/#contatti'],
   ['/centenario_aldo_sergiacomi.htm', '/eventi/centenario-2012/'],
 ] as const;
 
@@ -217,6 +217,20 @@ describe('_redirects generated from the single source', () => {
     const mappa = new Map(redirect.map((r) => [r.da, r.a]));
     for (const [da, a] of DODICI) expect(mappa.get(da)).toBe(a);
     expect(mappa.get('/index.html')).toBe('/');
+  });
+
+  it('sends the removed pages to the home block, to Visita, and the old Contatti page too', () => {
+    const mappa = new Map(redirect.map((r) => [r.da, r.a]));
+    for (const p of [
+      'con-la-scuola',
+      'in-famiglia',
+      'in-visita-a-offida',
+      'per-studiare-sergiacomi',
+    ]) {
+      expect(mappa.get(`/percorsi/${p}/`)).toBe('/#per-chi-viene');
+    }
+    expect(mappa.get('/contatti/')).toBe('/visita/#contatti');
+    expect(mappa.get('/contatti.htm')).toBe('/visita/#contatti');
   });
 
   it('ends every line with an explicit 301', () => {

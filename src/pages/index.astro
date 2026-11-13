@@ -1,6 +1,7 @@
 ---
 // The home page (spec 5.8, 9.4): the big photo of the Merlettaie first, then a mosaic of entrances
-// by audience, the next event, a summary of "From the idea to the work" and the visit actions.
+// of the museum, a summary of "From the idea to the work", the audience block, the visit actions
+// and the band "Altro dal museo". The event box shows only for an event still to come.
 // No carousel. The photo is the only high-priority image of the page.
 import { getCollection, getEntry } from 'astro:content';
 import DatoSito from '../components/DatoSito.astro';
@@ -14,7 +15,14 @@ import { leggiSito } from '../lib/sito-dati.ts';
 
 const sito = leggiSito();
 const { evidenza } = await leggiEventi();
-const percorsi = (await getCollection('percorsi')).sort((a, b) => a.id.localeCompare(b.id));
+const prossimo = evidenza && !evidenza.passato ? evidenza : undefined;
+// The four audiences, each with its first three links: the data of the `percorsi` collection.
+const pubblici = (await getCollection('percorsi')).sort((a, b) => a.id.localeCompare(b.id));
+// "Altro dal museo": what the footer lists under "Approfondisci", without the search.
+const altro = sito.navigazione.piede
+  .filter((g) => g.gruppo === 'Approfondisci')
+  .flatMap((g) => g.voci)
+  .filter((v) => v.href !== '/ricerca/');
 
 const FOTO_APERTURA = 'le-merlettaie-copertina-1';
 const apertura = await getEntry('immagini', FOTO_APERTURA);
@@ -38,18 +46,6 @@ const aree = [
     testo: t('home.area.opereTesto'),
     href: '/opere/',
     foto: 'sogno-del-pescatore-monumento-1',
-  },
-  {
-    nome: t('home.area.archivio'),
-    testo: t('home.area.archivioTesto'),
-    href: '/archivio/',
-    foto: 'archivio-pergamena-offida-1',
-  },
-  {
-    nome: t('home.area.didattica'),
-    testo: t('home.area.didatticaTesto'),
-    href: '/didattica/',
-    foto: 'strumenti-1',
   },
   {
     nome: t('home.area.itinerari'),
@@ -113,21 +109,7 @@ const fasi = ['bozzetto', 'fonderia', 'monumento']
   </section>
 
   <div class="cont">
-    <section class="ingressi" aria-labelledby="titolo-percorsi">
-      <h2 id="titolo-percorsi">{t('home.percorsi')}</h2>
-      <ul>
-        {percorsi.map((p) => (
-          <li>
-            <a href={`/percorsi/${p.id}/`}>
-              <span class="nome">{p.data.titolo}</span>
-              <span class="intro">{p.data.intro}</span>
-            </a>
-          </li>
-        ))}
-      </ul>
-    </section>
-
-    <ProssimoEvento evidenza={evidenza} />
+    <ProssimoEvento evidenza={prossimo} />
 
     <section class="mosaico" aria-labelledby="titolo-aree">
       <h2 id="titolo-aree">{t('home.aree')}</h2>
@@ -166,6 +148,25 @@ const fasi = ['bozzetto', 'fonderia', 'monumento']
       </section>
     )}
 
+    <section id="per-chi-viene" class="ingressi" aria-labelledby="titolo-percorsi">
+      <h2 id="titolo-percorsi">{t('home.perChi')}</h2>
+      <ul>
+        {pubblici.map((p) => (
+          <li>
+            <h3 class="nome">{p.data.titolo}</h3>
+            <p class="intro">{p.data.intro}</p>
+            <ul class="link">
+              {p.data.voci.slice(0, 3).map((v) => (
+                <li>
+                  <a href={v.percorso}>{v.titolo}</a>
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))}
+      </ul>
+    </section>
+
     <section class="visita" aria-labelledby="visita-titolo">
       <h2 id="visita-titolo">{t('home.visita')}</h2>
       <p>{t('home.visitaTesto')}</p>
@@ -180,6 +181,17 @@ const fasi = ['bozzetto', 'fonderia', 'monumento']
             {sito.azioni.orari.titolo}
           </a>
         </li>
+      </ul>
+    </section>
+
+    <section class="altro" aria-labelledby="altro-titolo">
+      <h2 id="altro-titolo">{t('home.altro')}</h2>
+      <ul>
+        {altro.map((v) => (
+          <li>
+            <a href={v.href}>{v.titolo}</a>
+          </li>
+        ))}
       </ul>
     </section>
   </div>
@@ -305,25 +317,33 @@ const fasi = ['bozzetto', 'fonderia', 'monumento']
     list-style: none;
     grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
   }
-  .ingressi a {
+  .ingressi > ul > li {
     display: flex;
     flex-direction: column;
     gap: var(--spazio-2);
-    height: 100%;
     padding: var(--spazio-5);
     border: 2px solid var(--colore-bordo);
     border-radius: var(--raggio-m);
     background: var(--colore-superficie-calda);
-    color: var(--colore-testo);
-    text-decoration: none;
-    transition:
-      border-color var(--durata-s),
-      transform var(--durata-s) var(--curva);
   }
-  .ingressi a:hover {
-    border-color: var(--colore-accento);
-    transform: translateY(-0.2rem);
+  .ingressi h3,
+  .ingressi p {
+    margin: 0;
   }
+  .ingressi .link {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spazio-1);
+    padding: 0;
+    list-style: none;
+  }
+  .ingressi .link a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--bersaglio-min);
+    font-weight: 600;
+  }
+
   .nome {
     font-family: var(--font-titoli);
     font-size: var(--testo-xl);
@@ -373,6 +393,25 @@ const fasi = ['bozzetto', 'fonderia', 'monumento']
     color: var(--colore-sul-scuro-tenue);
   }
 
+  /* The band "Altro dal museo": plain links. */
+  .altro {
+    margin-block-end: var(--spazio-7);
+  }
+  .altro ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spazio-2) var(--spazio-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .altro a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--bersaglio-min);
+    font-weight: 600;
+  }
+
   /* Summary of "From the idea to the work". */
   .idea {
     display: grid;
@@ -409,7 +448,6 @@ const fasi = ['bozzetto', 'fonderia', 'monumento']
   }
 
   .visita {
-    margin-block-end: var(--spazio-7);
     padding: var(--spazio-5);
     border: 2px solid var(--colore-bordo);
     border-radius: var(--raggio-m);
@@ -433,7 +471,7 @@ const fasi = ['bozzetto', 'fonderia', 'monumento']
       box-shadow: var(--ombra-m);
     }
     .mosaico ul {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
     .idea {
       grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
@@ -452,11 +490,9 @@ const fasi = ['bozzetto', 'fonderia', 'monumento']
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    .ingressi a,
     .mosaico a :global(img) {
       transition: none;
     }
-    .ingressi a:hover,
     .mosaico a:hover :global(img) {
       transform: none;
     }

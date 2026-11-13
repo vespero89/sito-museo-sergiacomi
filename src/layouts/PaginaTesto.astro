@@ -15,7 +15,7 @@ interface Props {
   jsonld?: NodoJsonLd[];
   /** The page above this one, when the address is under another page (for example `/il-museo/`). */
   padre?: { titolo: string; href: string };
-  /** The legal pages do not end with the "Continua il percorso" block (spec 5.4). */
+  /** The legal pages do not end with the "Vedi anche" block (spec 5.4). */
   senzaContinua?: boolean;
 }
 const { voce, jsonld = [], padre, senzaContinua = false } = Astro.props;
