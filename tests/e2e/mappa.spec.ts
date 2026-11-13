@@ -146,6 +146,94 @@ test.describe('the map at 1280 px', () => {
     expect(await page.getByRole('slider').inputValue()).toBe(fermo);
   });
 
+  test('"Riproduci" jumps from stop to stop, with the note on the long jump', async ({ page }) => {
+    await apri(page, '?fino=1934');
+    await page.getByRole('button', { name: 'Riproduci' }).click();
+    await expect(page.getByRole('slider')).toHaveValue('1951');
+    await expect(page.locator('[data-nota-salto]')).toHaveText('17 anni dopo');
+    // Every later value is a year with a work: the slider never rests on 1935 to 1950.
+    await expect(page.getByRole('slider')).not.toHaveValue('1952');
+    await page.getByRole('button', { name: 'Pausa' }).click();
+    await expect(page.locator('[data-nota-salto]')).toBeHidden();
+  });
+
+  test('the slider has a mark per decade', async ({ page }) => {
+    await apri(page);
+    const tacche = await page
+      .locator('#mappa-segni option')
+      .evaluateAll((l) => l.map((e) => (e as HTMLOptionElement).value));
+    expect(tacche).toEqual(['1940', '1950', '1960', '1970', '1980', '1990']);
+  });
+
+  test('a single work is an icon and a group is a number, the year is in the popup', async ({
+    page,
+  }) => {
+    await apri(page, '?fino=1934');
+    const marcatore = page.locator(MARCATORI).first();
+    await expect(marcatore.locator('svg')).toHaveCount(1);
+    expect(await marcatore.textContent()).toBe('');
+    await marcatore.focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('.leaflet-popup')).toContainText('(1934)');
+    await page.goto('/opere/');
+    const numeri = await page
+      .locator(`${MARCATORI}:not(:has(svg))`)
+      .evaluateAll((l) => l.map((e) => e.textContent));
+    expect(numeri.length).toBeGreaterThan(0);
+    expect(numeri.every((n) => /^\d+$/.test(n ?? ''))).toBe(true);
+  });
+
+  test('the view by decade groups the cards, shares the filters and keeps the address', async ({
+    page,
+  }) => {
+    await apri(page, '?vista=anno');
+    const anno = page.getByRole('button', { name: 'Per anno' });
+    await expect(anno).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('[data-vista="luogo"]')).toBeHidden();
+    await expect(page.getByRole('heading', { name: /^Anni 1960/ })).toBeVisible();
+    expect(await page.locator(VOCI_VISIBILI).count()).toBe(27);
+    await page.getByRole('slider').focus();
+    await page.keyboard.press('Home');
+    await expect(page).toHaveURL(/fino=1934&vista=anno$/);
+    // The work of 1934 and the two works with no certain year, which the slider never hides.
+    expect(await page.locator(VOCI_VISIBILI).count()).toBe(3);
+    await expect(page.getByRole('heading', { name: /^Anni 1960/ })).toBeHidden();
+    await page.getByRole('button', { name: 'Per luogo' }).click();
+    await expect(page).toHaveURL(/fino=1934$/);
+    await expect(page.locator('[data-vista="luogo"]')).toBeVisible();
+  });
+
+  test('the table sorts by column with buttons, shows the filtered works and is axe clean', async ({
+    page,
+  }) => {
+    await apri(page, '?vista=tabella');
+    const righe = page.locator('[data-vista="tabella"] tbody tr');
+    await expect(righe).toHaveCount(27);
+    const anni = () => righe.locator('td:nth-child(2)').allTextContents();
+    const prima = (await anni())[0];
+    expect(prima).toBe('1934');
+    const colonnaAnno = page.locator('th[data-colonna="anno"]');
+    await expect(colonnaAnno).toHaveAttribute('aria-sort', 'ascending');
+    await colonnaAnno.getByRole('button').click();
+    await expect(colonnaAnno).toHaveAttribute('aria-sort', 'descending');
+    expect((await anni())[0]).toBe('1994');
+    const titoli = page.locator('th[data-colonna="titolo"]');
+    await titoli.getByRole('button').focus();
+    await page.keyboard.press('Enter');
+    await expect(titoli).toHaveAttribute('aria-sort', 'ascending');
+    const nomi = await righe.locator('td:nth-child(1)').allTextContents();
+    expect(nomi).toEqual([...nomi].sort((a, b) => a.localeCompare(b, 'it')));
+    await page.locator('#mappa-comune').selectOption('offida');
+    expect(await righe.count()).toBeLessThan(27);
+    expect(await righe.locator('td:nth-child(3)').allTextContents()).toEqual(
+      Array(await righe.count()).fill('Offida'),
+    );
+    const violazioni = (await violazioniAxe(page)).filter(
+      (v) => !(v.regola === 'target-size' && v.elementi.every((e) => /marcatore|title=/.test(e))),
+    );
+    expect(violazioni).toEqual([]);
+  });
+
   test('without JavaScript the list is there and the page explains the map needs it', async ({
     browser,
   }) => {
@@ -204,6 +292,19 @@ test.describe('the map with reduced motion', () => {
       .locator('.leaflet-gesture-handling')
       .evaluate((e) => getComputedStyle(e, '::after').transitionDuration);
     expect(durata).toBe('0s');
+  });
+});
+
+test.describe('the map on a phone', () => {
+  test.use({ viewport: TELEFONO, reducedMotion: 'no-preference' });
+  test('the slider and the map are on screen together, the slider above', async ({ page }) => {
+    await apri(page);
+    const cursore = (await page.getByRole('slider').boundingBox())!;
+    const mappa = (await page.locator('[data-mappa]').boundingBox())!;
+    expect(cursore.y + cursore.height).toBeLessThanOrEqual(mappa.y);
+    // From the top of the slider to the bottom of the map: one screen, after one scroll.
+    expect(mappa.y + mappa.height - cursore.y).toBeLessThan(TELEFONO.height);
+    expect(await scorrimentoOrizzontale(page)).toBe(false);
   });
 });
 

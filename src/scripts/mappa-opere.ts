@@ -5,16 +5,27 @@
 // slider, "Riproduci", filters, the address, "near me". The rules are in src/lib/mappa.ts.
 import type * as Leaflet from 'leaflet';
 import {
+  DURATA_FERMATA,
   conta,
+  decennioDi,
+  fermate,
   filtra,
   formattaKm,
   leggiStato,
   ordinaPerDistanza,
+  ordinaTabella,
+  prossimaFermata,
+  raggruppaPerDecennio,
   raggruppaPerLuogo,
   scriviStato,
+  testoMateriali,
+  type Colonna,
+  type Direzione,
+  type Fermata,
   type GruppoLuogo,
   type OperaMappa,
   type StatoMappa,
+  type Vista,
 } from '../lib/mappa.ts';
 
 type L = typeof Leaflet;
@@ -37,6 +48,12 @@ export interface TestiMappa {
   attribuzione: string;
   /** Label of a stop on an itinerary, with `{n}`. */
   tappa: string;
+  /** The work has no certain year (the table and the decade view). */
+  annoNonIndicato: string;
+  /** The work has no material (the table). */
+  nonIndicato: string;
+  /** The note of a long jump of the animation, with `{n}` years. */
+  saltoAnni: string;
 }
 
 /**
@@ -119,18 +136,20 @@ export function controlloZoom(L: L, testi: TestiMappa): Leaflet.Control {
 const quante = (testi: TestiMappa, n: number) =>
   n === 1 ? testi.una : testi.piu.replace('{n}', String(n));
 
+/** The icon of a single work: a pin, drawn here so that no image file is asked for. */
+const ICONA_OPERA =
+  '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="currentColor" fill-rule="evenodd" d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 4.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z"/></svg>';
+
 /**
- * A marker for a place: a `divIcon` with the year (one work) or the number of works. It can be
- * focused, opens a popup with the links, and is named by `aria-label` (the visible text is only a number).
+ * A marker for a place: a `divIcon` with the number of works (a cluster) or an icon (one work; its
+ * year is in the popup). It can be focused, opens a popup with the links, and is named by `aria-label`.
  */
 export function creaMarcatore(L: L, gruppo: GruppoLuogo, testi: TestiMappa): Leaflet.Marker {
-  const primo = gruppo.opere[0]!;
-  const etichetta =
-    gruppo.opere.length > 1 ? String(gruppo.opere.length) : String(primo.anno ?? '?');
+  const numero = gruppo.opere.length > 1 ? String(gruppo.opere.length) : '';
   const nome = `${gruppo.luogoNome}, ${quante(testi, gruppo.opere.length)}`;
   const icona = L.divIcon({
     className: gruppo.indicativa ? 'marcatore indicativo' : 'marcatore',
-    html: `<span aria-hidden="true">${etichetta}</span>`,
+    html: numero ? `<span aria-hidden="true">${numero}</span>` : ICONA_OPERA,
     iconSize: [40, 40],
     iconAnchor: [20, 20],
     popupAnchor: [0, -20],
@@ -140,9 +159,9 @@ export function creaMarcatore(L: L, gruppo: GruppoLuogo, testi: TestiMappa): Lea
     title: nome,
     keyboard: true,
   });
-  // The name starts with the visible text, so what is read matches what is seen.
+  // The name starts with the visible text (the number), so what is read matches what is seen.
   marcatore.on('add', () =>
-    marcatore.getElement()?.setAttribute('aria-label', `${etichetta} ${nome}`),
+    marcatore.getElement()?.setAttribute('aria-label', numero ? `${numero} ${nome}` : nome),
   );
   marcatore.bindPopup(contenutoPopup(gruppo, testi));
   marcatore.on('popupopen', (e) => {
@@ -197,6 +216,8 @@ function leggiOpere(): { opera: OperaMappa; elemento: HTMLElement }[] {
       luogoId: d['luogo']!,
       luogoNome: d['luogoNome']!,
       indicativa: d['indicativa'] === '1',
+      comuneNome: d['comuneNome']!,
+      categoria: d['categoria']!,
       lat: Number(d['lat']),
       lon: Number(d['lon']),
     };
@@ -228,14 +249,17 @@ export async function avviaMappaOpere(radice: HTMLElement): Promise<void> {
   selezioneComune.value = iniziale.comune ?? '';
   selezioneMateriale.value = iniziale.materiale ?? '';
 
+  let vista: Vista = iniziale.vista;
   const leggiControlli = (): StatoMappa => ({
     fino: cursore.valueAsNumber,
     comune: selezioneComune.value || undefined,
     materiale: selezioneMateriale.value || undefined,
+    vista,
   });
 
   q('[data-senza-js]').hidden = true;
   q('[data-controlli]').hidden = false;
+  q('[data-filtri-luogo]').hidden = false;
   riquadro.hidden = false;
   q('[data-vicino]').hidden = false;
   if (!ridotto) q('[data-riproduzione]').hidden = false;
@@ -252,6 +276,71 @@ export async function avviaMappaOpere(radice: HTMLElement): Promise<void> {
     padding: [24, 24],
     animate: false,
   });
+
+  // The views of the list. The cards are the same elements: the view by decade moves them into its
+  // groups, the others put them back under their town. The table is built from the visible works.
+  const pannelli = [...document.querySelectorAll<HTMLElement>('[data-vista]')];
+  const scelte = [...document.querySelectorAll<HTMLButtonElement>('[data-vista-scelta]')];
+  const sotto = new Map(voci.map((v) => [v.opera.id, v.elemento.parentElement!]));
+  const elementi = new Map(voci.map((v) => [v.opera.id, v.elemento]));
+  const listaDecennio = new Map(
+    [...document.querySelectorAll<HTMLElement>('[data-decennio-sezione]')].map((e) => [
+      e.dataset['decennioSezione']!,
+      e.querySelector('ul')!,
+    ]),
+  );
+  const corpo = document.querySelector<HTMLElement>('[data-vista="tabella"] tbody')!;
+  const intestazioni = [...document.querySelectorAll<HTMLElement>('[data-colonna]')];
+  let ordine: { colonna: Colonna; direzione: Direzione } = { colonna: 'anno', direzione: 'asc' };
+
+  function montaCarte(): void {
+    if (vista === 'anno') {
+      for (const gruppo of raggruppaPerDecennio(opere)) {
+        const lista = listaDecennio.get(String(decennioDi(gruppo.opere[0]!) ?? 'senza'))!;
+        lista.append(...gruppo.opere.map((o) => elementi.get(o.id)!));
+      }
+    } else {
+      for (const { opera, elemento } of voci) sotto.get(opera.id)!.append(elemento);
+    }
+  }
+
+  function disegnaTabella(): void {
+    for (const th of intestazioni) {
+      const attiva = th.dataset['colonna'] === ordine.colonna;
+      if (attiva)
+        th.setAttribute('aria-sort', ordine.direzione === 'asc' ? 'ascending' : 'descending');
+      else th.removeAttribute('aria-sort');
+    }
+    corpo.replaceChildren(
+      ...ordinaTabella(visibili, ordine.colonna, ordine.direzione).map((o) => {
+        const riga = document.createElement('tr');
+        const titolo = document.createElement('td');
+        const link = document.createElement('a');
+        link.href = o.href;
+        link.textContent = o.titolo;
+        titolo.append(link);
+        const celle = [
+          o.certa && o.anno !== undefined ? String(o.anno) : testi.annoNonIndicato,
+          o.comuneNome,
+          o.categoria,
+          testoMateriali(o) || testi.nonIndicato,
+        ].map((testo) => {
+          const cella = document.createElement('td');
+          cella.textContent = testo;
+          return cella;
+        });
+        riga.append(titolo, ...celle);
+        return riga;
+      }),
+    );
+  }
+
+  function mostraVista(): void {
+    for (const p of pannelli) p.hidden = p.dataset['vista'] !== vista;
+    for (const b of scelte)
+      b.setAttribute('aria-pressed', String(b.dataset['vistaScelta'] === vista));
+    montaCarte();
+  }
 
   let posizione: { lat: number; lon: number } | undefined;
   let visibili: OperaMappa[] = opere;
@@ -288,12 +377,14 @@ export async function avviaMappaOpere(radice: HTMLElement): Promise<void> {
     visibili = filtra(opere, stato);
     const ids = new Set(visibili.map((o) => o.id));
     for (const { opera, elemento } of voci) elemento.hidden = !ids.has(opera.id);
-    document.querySelectorAll<HTMLElement>('[data-comune-sezione]').forEach((sezione) => {
-      const n = sezione.querySelectorAll('li[data-voce]:not([hidden])').length;
-      sezione.hidden = n === 0;
-      const numero = sezione.querySelector('[data-numero]');
-      if (numero) numero.textContent = quante(testi, n);
-    });
+    document
+      .querySelectorAll<HTMLElement>('[data-comune-sezione], [data-decennio-sezione]')
+      .forEach((sezione) => {
+        const n = sezione.querySelectorAll('li[data-voce]:not([hidden])').length;
+        sezione.hidden = n === 0;
+        const numero = sezione.querySelector('[data-numero]');
+        if (numero) numero.textContent = quante(testi, n);
+      });
     const nessuna = document.querySelector<HTMLElement>('[data-nessuna]');
     if (nessuna) nessuna.hidden = visibili.length > 0;
 
@@ -302,6 +393,7 @@ export async function avviaMappaOpere(radice: HTMLElement): Promise<void> {
       creaMarcatore(L, gruppo, testi).addTo(strato);
     }
     conteggio.textContent = testoConteggio(stato);
+    if (vista === 'tabella') disegnaTabella();
     mostraVicine();
     history.replaceState(
       null,
@@ -314,7 +406,28 @@ export async function avviaMappaOpere(radice: HTMLElement): Promise<void> {
   };
 
   // The slider updates on `input`; the screen reader hears the count on `change` only.
-  cursore.addEventListener('input', aggiorna);
+  cursore.addEventListener('input', () => {
+    nota.hidden = true;
+    aggiorna();
+  });
+  document.querySelector<HTMLElement>('[data-viste]')!.hidden = false;
+  for (const scelta of scelte) {
+    scelta.addEventListener('click', () => {
+      vista = scelta.dataset['vistaScelta'] as Vista;
+      mostraVista();
+      aggiorna();
+    });
+  }
+  for (const th of intestazioni) {
+    th.querySelector('button')!.addEventListener('click', () => {
+      const colonna = th.dataset['colonna'] as Colonna;
+      ordine = {
+        colonna,
+        direzione: ordine.colonna === colonna && ordine.direzione === 'asc' ? 'desc' : 'asc',
+      };
+      disegnaTabella();
+    });
+  }
   cursore.addEventListener('change', annunciare);
   for (const selezione of [selezioneComune, selezioneMateriale]) {
     selezione.addEventListener('change', () => {
@@ -331,30 +444,47 @@ export async function avviaMappaOpere(radice: HTMLElement): Promise<void> {
     });
   }
 
-  // "Riproduci": one year at a time, with "Pausa" next to it; never starts alone.
+  // "Riproduci": it stops only on the years with new works (`fermate`), with "Pausa" next to it;
+  // it never starts alone. A long jump shows a note ("17 anni dopo"). Dragging stays year by year.
+  const piano = fermate(opere);
+  const nota = q('[data-nota-salto]');
   let timer: number | undefined;
+  let inCorso = false;
   function ferma(): void {
-    if (timer === undefined) return;
-    window.clearInterval(timer);
-    timer = undefined;
+    if (!inCorso) return;
+    window.clearTimeout(timer);
+    inCorso = false;
+    nota.hidden = true;
     const sulPulsante = document.activeElement === pausa;
     riproduci.disabled = false;
     pausa.disabled = true;
     if (sulPulsante) riproduci.focus();
     annunciare();
   }
+  function mostraNota(fermata: Fermata): void {
+    nota.hidden = fermata.salto === undefined;
+    if (fermata.salto !== undefined) {
+      nota.textContent = testi.saltoAnni.replace('{n}', String(fermata.salto));
+    }
+  }
+  function avanza(): void {
+    const fermata = prossimaFermata(piano, cursore.valueAsNumber);
+    if (!fermata) return ferma();
+    cursore.value = String(fermata.anno);
+    aggiorna();
+    mostraNota(fermata);
+    if (!prossimaFermata(piano, fermata.anno)) return ferma();
+    timer = window.setTimeout(avanza, fermata.durata);
+  }
   riproduci.addEventListener('click', () => {
     if (cursore.valueAsNumber >= limiti.max) cursore.value = String(limiti.min);
     aggiorna();
+    inCorso = true;
     riproduci.disabled = true;
     pausa.disabled = false;
     pausa.focus();
-    timer = window.setInterval(() => {
-      if (cursore.valueAsNumber >= limiti.max) return ferma();
-      cursore.value = String(cursore.valueAsNumber + 1);
-      aggiorna();
-      if (cursore.valueAsNumber >= limiti.max) ferma();
-    }, 700);
+    const qui = piano.find((f) => f.anno === cursore.valueAsNumber);
+    timer = window.setTimeout(avanza, qui?.durata ?? DURATA_FERMATA);
   });
   pausa.addEventListener('click', ferma);
 
@@ -383,6 +513,7 @@ export async function avviaMappaOpere(radice: HTMLElement): Promise<void> {
     );
   });
 
+  mostraVista();
   aggiorna();
   radice.dataset['pronta'] = '1';
 }

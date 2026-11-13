@@ -56,14 +56,14 @@ const VECCHIE_PAGINE = [
 
 /**
  * Addresses of the prototype that no longer exist (UX review, fix A): the four pages by audience
- * became the "Per chi viene" block of the home, and Contatti became a section of Visita.
+ * became the "Su misura per te" block of the home, and Contatti became a section of Visita.
  * @type {ReadonlyArray<readonly [string, string]>}
  */
 const PAGINE_TOLTE = [
-  ['/percorsi/con-la-scuola/', '/#per-chi-viene'],
-  ['/percorsi/in-famiglia/', '/#per-chi-viene'],
-  ['/percorsi/in-visita-a-offida/', '/#per-chi-viene'],
-  ['/percorsi/per-studiare-sergiacomi/', '/#per-chi-viene'],
+  ['/percorsi/con-la-scuola/', '/#su-misura'],
+  ['/percorsi/in-famiglia/', '/#su-misura'],
+  ['/percorsi/in-visita-a-offida/', '/#su-misura'],
+  ['/percorsi/per-studiare-sergiacomi/', '/#su-misura'],
   ['/contatti/', '/visita/#contatti'],
 ];
 

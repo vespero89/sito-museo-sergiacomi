@@ -113,12 +113,12 @@ describe('/archivio/', () => {
 describe('the audience paths', () => {
   const esiste = (indirizzo: string) => pagine.some((p) => p.path === `${indirizzo.slice(1)}index.html`);
 
-  it('have no pages of their own: they are the block "Per chi viene" of the home', () => {
+  it('have no pages of their own: they are the block "Su misura per te" of the home', () => {
     expect(existsSync(join(DIST, 'percorsi'))).toBe(false);
   });
 
   it('only link to pages that exist', () => {
-    const link = [...documento('/').querySelectorAll('#per-chi-viene li li a')].map((a) => a.getAttribute('href')!);
+    const link = [...documento('/').querySelectorAll('#su-misura li li a')].map((a) => a.getAttribute('href')!);
     expect(link.length).toBeGreaterThanOrEqual(8);
     for (const l of link) expect(esiste(l.replace(/#.*$/, '')), l).toBe(true);
   });

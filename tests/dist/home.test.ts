@@ -25,9 +25,9 @@ describe('/ (home)', () => {
     }
   });
 
-  it('has the block "Per chi viene": four audiences with two or three direct links, no /percorsi/ pages', () => {
-    const blocco = d.querySelector('section#per-chi-viene')!;
-    expect(blocco.querySelector('h2')!.textContent).toBe('Per chi viene');
+  it('has the block "Su misura per te": four audiences with two or three direct links, no /percorsi/ pages', () => {
+    const blocco = d.querySelector('section#su-misura')!;
+    expect(blocco.querySelector('h2')!.textContent).toBe('Su misura per te');
     const pubblici = [...blocco.querySelectorAll(':scope > ul > li')];
     expect(pubblici).toHaveLength(4);
     for (const p of pubblici) {

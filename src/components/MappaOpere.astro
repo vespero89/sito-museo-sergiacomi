@@ -14,12 +14,12 @@ interface Props {
   limiti: LimitiAnni;
   comuni: { id: string; nome: string }[];
   materiali: string[];
-  /** Years of the biography inside the limits, for the marks of the slider. */
-  segni: { anno: number; titolo: string }[];
+  /** Decades inside the limits, for the marks of the slider. */
+  tacche: number[];
   /** Id of the list of the works: where "Salta la mappa" goes. */
   idElenco: string;
 }
-const { limiti, comuni, materiali, segni, idElenco } = Astro.props;
+const { limiti, comuni, materiali, tacche, idElenco } = Astro.props;
 const tile = tileMappa(import.meta.env.PUBLIC_TILE_URL);
 const testi = testiMappa(tile);
 ---
@@ -53,8 +53,8 @@ const testi = testiMappa(tile);
           list="mappa-segni"
         />
         <datalist id="mappa-segni">
-          {segni.map((s) => (
-            <option value={s.anno} label={String(s.anno)} title={s.titolo} />
+          {tacche.map((anno) => (
+            <option value={anno} label={String(anno)} />
           ))}
         </datalist>
       </div>
@@ -66,31 +66,40 @@ const testi = testiMappa(tile);
           {t('mappa.pausa')}
         </button>
       </div>
-      <div class="campo">
-        <label for="mappa-comune">{t('mappa.comune')}</label>
-        <select id="mappa-comune" name="comune">
-          <option value="">{t('mappa.tuttiComuni')}</option>
-          {comuni.map((c) => (
-            <option value={c.id}>{c.nome}</option>
-          ))}
-        </select>
-      </div>
-      <div class="campo">
-        <label for="mappa-materiale">{t('mappa.materiale')}</label>
-        <select id="mappa-materiale" name="materiale">
-          <option value="">{t('mappa.tuttiMateriali')}</option>
-          {materiali.map((m) => (
-            <option value={m}>{m[0]!.toUpperCase() + m.slice(1)}</option>
-          ))}
-          <option value={MATERIALE_NON_INDICATO}>{t('mappa.nonIndicato')}</option>
-        </select>
-      </div>
     </div>
     <p class="conteggio" data-conteggio></p>
     <p class="solo-lettori" aria-live="polite" data-annuncio></p>
+    <p class="nota-salto" data-nota-salto hidden></p>
   </div>
   <div class="riquadro" data-riquadro role="region" aria-label={t('mappa.etichetta')} hidden>
     <div class="mappa" data-mappa></div>
+  </div>
+  <div
+    class="filtri filtri-luogo"
+    data-filtri-luogo
+    role="group"
+    aria-label={t('mappa.filtriLuogo')}
+    hidden
+  >
+    <div class="campo">
+      <label for="mappa-comune">{t('mappa.comune')}</label>
+      <select id="mappa-comune" name="comune">
+        <option value="">{t('mappa.tuttiComuni')}</option>
+        {comuni.map((c) => (
+          <option value={c.id}>{c.nome}</option>
+        ))}
+      </select>
+    </div>
+    <div class="campo">
+      <label for="mappa-materiale">{t('mappa.materiale')}</label>
+      <select id="mappa-materiale" name="materiale">
+        <option value="">{t('mappa.tuttiMateriali')}</option>
+        {materiali.map((m) => (
+          <option value={m}>{m[0]!.toUpperCase() + m.slice(1)}</option>
+        ))}
+        <option value={MATERIALE_NON_INDICATO}>{t('mappa.nonIndicato')}</option>
+      </select>
+    </div>
   </div>
   <div class="vicino" data-vicino hidden>
     <button type="button" data-vicino-pulsante>
@@ -165,6 +174,17 @@ const testi = testiMappa(tile);
   .riproduzione {
     display: flex;
     gap: var(--spazio-2);
+  }
+  .filtri-luogo {
+    margin-block-start: var(--spazio-4);
+  }
+  .filtri-luogo[hidden] {
+    display: none;
+  }
+  .nota-salto {
+    margin-block: 0 var(--spazio-3);
+    font-weight: 600;
+    color: var(--colore-accento-scuro);
   }
   .riproduzione[hidden] {
     display: none;

@@ -21,5 +21,8 @@ export function testiMappa(tile: TileMappa) {
     gestoCmd: t('mappa.gestoCmd'),
     attribuzione: `<a href="${tile.attribuzioneUrl}">${tile.attribuzione}</a>`,
     tappa: t('mappa.tappa'),
+    annoNonIndicato: t('mappa.annoNonIndicato'),
+    nonIndicato: t('mappa.nonIndicato'),
+    saltoAnni: t('mappa.saltoAnni'),
   };
 }

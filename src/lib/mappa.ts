@@ -22,12 +22,20 @@ export interface OperaMappa extends Posizione {
   luogoNome: string;
   /** The position is the centre of the town or an approximation. */
   indicativa: boolean;
+  /** Name of the town and label of the category, for the table. */
+  comuneNome: string;
+  categoria: string;
 }
+
+/** The ways to show the list: grouped by town (the default), by decade, or as a sortable table. */
+export const VISTE = ['luogo', 'anno', 'tabella'] as const;
+export type Vista = (typeof VISTE)[number];
 
 export interface StatoMappa {
   fino: number;
   comune: string | undefined;
   materiale: string | undefined;
+  vista: Vista;
 }
 
 export interface LimitiAnni {
@@ -52,13 +60,20 @@ export function limitiAnni(opere: readonly OperaMappa[]): LimitiAnni {
   return { min: Math.min(...anni), max: Math.max(...anni) };
 }
 
+/** The decades with a mark on the slider: 1940, 1950... inside the limits. */
+export function tacche(limiti: LimitiAnni): number[] {
+  const anni: number[] = [];
+  for (let d = Math.ceil(limiti.min / 10) * 10; d <= limiti.max; d += 10) anni.push(d);
+  return anni;
+}
+
 /** An integer year from text, or undefined for anything else ("1975.5", "abc", "", "1e3"). */
 function leggiAnno(testo: string | null): number | undefined {
   return testo !== null && /^\d{1,4}$/.test(testo) ? Number(testo) : undefined;
 }
 
 /**
- * The state from the query string (`?fino=1975&comune=offida&materiale=bronzo`). A value that is not
+ * The state from the query string (`?fino=1975&comune=offida&materiale=bronzo&vista=anno`). A value that is not
  * valid is ignored; a year outside the limits goes to the nearest limit. No year means the last one.
  */
 export function leggiStato(
@@ -75,6 +90,7 @@ export function leggiStato(
     fino: anno === undefined ? limiti.max : Math.min(limiti.max, Math.max(limiti.min, anno)),
     comune: comuni.includes(comune) ? comune : undefined,
     materiale: materiali.includes(materiale) ? materiale : undefined,
+    vista: VISTE.find((v) => v === parametri.get('vista')) ?? 'luogo',
   };
 }
 
@@ -84,6 +100,7 @@ export function scriviStato(stato: StatoMappa, limiti: LimitiAnni): string {
   if (stato.fino !== limiti.max) parametri.set('fino', String(stato.fino));
   if (stato.comune) parametri.set('comune', stato.comune);
   if (stato.materiale) parametri.set('materiale', stato.materiale);
+  if (stato.vista !== 'luogo') parametri.set('vista', stato.vista);
   const testo = parametri.toString();
   return testo ? `?${testo}` : '';
 }
@@ -158,3 +175,118 @@ export function tileMappa(urlSostitutivo?: string): TileMappa {
   const registro = tileOsm();
   return urlSostitutivo ? { ...registro, urlTemplate: urlSostitutivo } : registro;
 }
+
+export interface GruppoDecennio {
+  /** The first year of the decade (1960), or undefined for the works with no certain year. */
+  decennio: number | undefined;
+  opere: OperaMappa[];
+}
+
+/** The decade of a work: 1967 gives 1960; no certain year gives undefined. */
+export const decennioDi = (opera: OperaMappa): number | undefined =>
+  opera.certa && opera.anno !== undefined ? Math.floor(opera.anno / 10) * 10 : undefined;
+
+/** One group per decade, oldest first, the works with no certain year last. Inside: by year, then title. */
+export function raggruppaPerDecennio(opere: readonly OperaMappa[]): GruppoDecennio[] {
+  const gruppi = new Map<number | undefined, OperaMappa[]>();
+  for (const o of ordinaPerAnno(opere)) {
+    const chiave = decennioDi(o);
+    gruppi.set(chiave, [...(gruppi.get(chiave) ?? []), o]);
+  }
+  return [...gruppi.entries()]
+    .sort(([a], [b]) => (a ?? Infinity) - (b ?? Infinity))
+    .map(([decennio, lista]) => ({ decennio, opere: lista }));
+}
+
+function ordinaPerAnno(opere: readonly OperaMappa[]): OperaMappa[] {
+  return [...opere].sort(
+    (a, b) => (a.anno ?? Infinity) - (b.anno ?? Infinity) || a.titolo.localeCompare(b.titolo, 'it'),
+  );
+}
+
+export const COLONNE = ['titolo', 'anno', 'comune', 'categoria', 'materiale'] as const;
+export type Colonna = (typeof COLONNE)[number];
+export type Direzione = 'asc' | 'desc';
+
+/** The materials of a work as one text for the table ("" when none). */
+export const testoMateriali = (opera: OperaMappa): string => opera.materiali.join(', ');
+
+/**
+ * The works sorted by a column of the table, Italian alphabetical order for text. Empty values
+ * (no year, no material) go last in both directions; ties are ordered by title.
+ */
+export function ordinaTabella(
+  opere: readonly OperaMappa[],
+  colonna: Colonna,
+  direzione: Direzione,
+): OperaMappa[] {
+  const segno = direzione === 'asc' ? 1 : -1;
+  const valore = (o: OperaMappa): string | number | undefined => {
+    switch (colonna) {
+      case 'titolo':
+        return o.titolo;
+      case 'anno':
+        return o.certa ? o.anno : undefined;
+      case 'comune':
+        return o.comuneNome;
+      case 'categoria':
+        return o.categoria;
+      case 'materiale':
+        return testoMateriali(o) || undefined;
+    }
+  };
+  return [...opere].sort((a, b) => {
+    const x = valore(a);
+    const y = valore(b);
+    if (x === undefined || y === undefined) {
+      if (x !== y) return x === undefined ? 1 : -1;
+    } else {
+      const c = typeof x === 'number' ? x - (y as number) : x.localeCompare(y as string, 'it');
+      if (c !== 0) return c * segno;
+    }
+    return a.titolo.localeCompare(b.titolo, 'it');
+  });
+}
+
+/** A stop of the animation: a year with at least one new work. */
+export interface Fermata {
+  anno: number;
+  /** Works that appear in this year. */
+  nuove: number;
+  /** Years since the previous stop when the jump is long (`SOGLIA_SALTO` or more), else undefined. */
+  salto: number | undefined;
+  /** How long the animation stays here, in milliseconds. */
+  durata: number;
+}
+
+export const DURATA_FERMATA = 800;
+export const DURATA_EXTRA_DUE_OPERE = 400;
+export const DURATA_EXTRA_SALTO = 600;
+/** A jump of this many years or more gets a note ("17 anni dopo"). */
+export const SOGLIA_SALTO = 10;
+
+/**
+ * The stops of "Riproduci": only the years with works counted by the slider, oldest first. A stop is
+ * longer when two or more works appear, and when it comes after a long jump (the note is read there).
+ */
+export function fermate(opere: readonly OperaMappa[]): Fermata[] {
+  const perAnno = new Map<number, number>();
+  for (const o of opere) {
+    if (o.certa && o.anno !== undefined) perAnno.set(o.anno, (perAnno.get(o.anno) ?? 0) + 1);
+  }
+  const anni = [...perAnno.keys()].sort((a, b) => a - b);
+  return anni.map((anno, i) => {
+    const nuove = perAnno.get(anno)!;
+    const distanza = i === 0 ? 0 : anno - anni[i - 1]!;
+    const salto = distanza >= SOGLIA_SALTO ? distanza : undefined;
+    const durata =
+      DURATA_FERMATA +
+      (nuove >= 2 ? DURATA_EXTRA_DUE_OPERE : 0) +
+      (salto !== undefined ? DURATA_EXTRA_SALTO : 0);
+    return { anno, nuove, salto, durata };
+  });
+}
+
+/** The first stop after a year, or undefined at the end. */
+export const prossimaFermata = (piano: readonly Fermata[], anno: number): Fermata | undefined =>
+  piano.find((f) => f.anno > anno);

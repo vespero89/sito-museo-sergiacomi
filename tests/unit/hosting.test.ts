@@ -227,7 +227,7 @@ describe('_redirects generated from the single source', () => {
       'in-visita-a-offida',
       'per-studiare-sergiacomi',
     ]) {
-      expect(mappa.get(`/percorsi/${p}/`)).toBe('/#per-chi-viene');
+      expect(mappa.get(`/percorsi/${p}/`)).toBe('/#su-misura');
     }
     expect(mappa.get('/contatti/')).toBe('/visita/#contatti');
     expect(mappa.get('/contatti.htm')).toBe('/visita/#contatti');

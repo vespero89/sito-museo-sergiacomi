@@ -3,13 +3,20 @@
 // The list is the real page: every work, grouped by town, with data-attributes the map script reads.
 // A work with no certain year (Stemmi, Tomba Palmucci) is in the list like the others, with a label,
 // and the slider never hides it.
-import { getCollection } from 'astro:content';
 import CartaOpera from '../../components/CartaOpera.astro';
 import { t } from '../../i18n/index.ts';
 import Base from '../../layouts/Base.astro';
 import { briciole as briciolaJsonLd } from '../../lib/jsonld.ts';
 import MappaOpere from '../../components/MappaOpere.astro';
-import { limitiAnni, slugComune, type OperaMappa } from '../../lib/mappa.ts';
+import {
+  COLONNE,
+  VISTE,
+  limitiAnni,
+  raggruppaPerDecennio,
+  slugComune,
+  tacche as tacheAnni,
+  type OperaMappa,
+} from '../../lib/mappa.ts';
 import { indirizzoOpera, leggiOpere, type OperaCompleta } from '../../lib/opere-dati.ts';
 
 const opere = await leggiOpere();
@@ -49,6 +56,8 @@ const dati = new Map<string, OperaMappa>(
         luogoId: o.voce.data.luogo.id,
         luogoNome: o.luogo.nome,
         indicativa: o.luogo.precisione !== 'punto',
+        comuneNome: o.luogo.comune,
+        categoria: t(`opera.categoria.${o.voce.data.categoria}`),
         lat: o.luogo.lat,
         lon: o.luogo.lon,
       },
@@ -59,15 +68,30 @@ const limiti = limitiAnni([...dati.values()]);
 const materialiUsati = [...new Set(opere.flatMap((o) => o.voce.data.materiali))].sort((a, b) =>
   a.localeCompare(b, 'it'),
 );
-const segni = [
-  ...new Map(
-    (await getCollection('biografia'))
-      .filter((v) => v.data.anno >= limiti.min && v.data.anno <= limiti.max)
-      .sort((a, b) => a.data.anno - b.data.anno)
-      .map((v) => [v.data.anno, { anno: v.data.anno, titolo: v.data.titolo }] as const),
-  ).values(),
-];
+const tacche = tacheAnni(limiti);
+// The empty groups of the view by decade: the script moves the cards into them.
+const decenni = raggruppaPerDecennio([...dati.values()]).map((g) => ({
+  chiave: g.decennio === undefined ? 'senza' : String(g.decennio),
+  id: `decennio-${g.decennio ?? 'senza'}`,
+  titolo:
+    g.decennio === undefined
+      ? t('mappa.annoNonIndicato')
+      : t('mappa.decennio').replace('{d}', String(g.decennio)),
+  n: g.opere.length,
+}));
 
+const nomiViste = {
+  luogo: t('mappa.vistaLuogo'),
+  anno: t('mappa.vistaAnno'),
+  tabella: t('mappa.vistaTabella'),
+};
+const nomiColonne = {
+  titolo: t('mappa.colonnaTitolo'),
+  anno: t('mappa.colonnaAnno'),
+  comune: t('mappa.colonnaComune'),
+  categoria: t('mappa.colonnaTipo'),
+  materiale: t('mappa.colonnaMateriale'),
+};
 const titolo = t('opere.titolo');
 const briciole = [{ titolo: t('briciole.home'), href: '/' }, { titolo }];
 const quante = (n: number) => (n === 1 ? t('opere.una') : t('opere.piu').replace('{n}', String(n)));
@@ -93,7 +117,7 @@ const quante = (n: number) => (n === 1 ? t('opere.una') : t('opere.piu').replace
     limiti={limiti}
     comuni={comuni.map((c) => ({ id: c.slug, nome: c.comune }))}
     materiali={materialiUsati}
-    segni={segni}
+    tacche={tacche}
     idElenco="elenco-opere"
   />
   <div id="elenco-opere" tabindex="-1">
@@ -101,39 +125,84 @@ const quante = (n: number) => (n === 1 ? t('opere.una') : t('opere.piu').replace
     <p class="nessuna" data-nessuna hidden>
       {t('mappa.nessuna')}
     </p>
-    {comuni.map(({ comune, id, lista }) => (
-      <section class="comune" aria-labelledby={id} data-comune-sezione>
-        <h2 id={id}>
-          {comune}{' '}
-          <span class="numero" data-numero>
-            {quante(lista.length)}
-          </span>
-        </h2>
-        <ul class="schede">
-          {lista.map((opera) => {
-            const d = dati.get(opera.slug)!;
-            return (
-              <li
-                data-voce={d.id}
-                data-titolo={d.titolo}
-                data-href={d.href}
-                data-anno={d.anno}
-                data-certa={d.certa ? '1' : '0'}
-                data-comune={d.comune}
-                data-materiali={d.materiali.join(' ')}
-                data-luogo={d.luogoId}
-                data-luogo-nome={d.luogoNome}
-                data-indicativa={d.indicativa ? '1' : '0'}
-                data-lat={d.lat}
-                data-lon={d.lon}
-              >
-                <CartaOpera opera={opera} transizione />
-              </li>
-            );
-          })}
-        </ul>
-      </section>
-    ))}
+    <div class="viste" data-viste hidden>
+      <p id="etichetta-viste">{t('mappa.vistaEtichetta')}</p>
+      <div role="group" aria-labelledby="etichetta-viste">
+        {VISTE.map((v) => (
+          <button type="button" data-vista-scelta={v} aria-pressed="false">
+            {nomiViste[v]}
+          </button>
+        ))}
+      </div>
+    </div>
+    <div data-vista="luogo">
+      {comuni.map(({ comune, id, lista }) => (
+        <section class="comune" aria-labelledby={id} data-comune-sezione>
+          <h2 id={id}>
+            {comune}{' '}
+            <span class="numero" data-numero>
+              {quante(lista.length)}
+            </span>
+          </h2>
+          <ul class="schede">
+            {lista.map((opera) => {
+              const d = dati.get(opera.slug)!;
+              return (
+                <li
+                  data-voce={d.id}
+                  data-titolo={d.titolo}
+                  data-href={d.href}
+                  data-anno={d.anno}
+                  data-certa={d.certa ? '1' : '0'}
+                  data-comune={d.comune}
+                  data-materiali={d.materiali.join(' ')}
+                  data-luogo={d.luogoId}
+                  data-luogo-nome={d.luogoNome}
+                  data-indicativa={d.indicativa ? '1' : '0'}
+                  data-lat={d.lat}
+                  data-lon={d.lon}
+                  data-comune-nome={d.comuneNome}
+                  data-categoria={d.categoria}
+                >
+                  <CartaOpera opera={opera} transizione />
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ))}
+    </div>
+    <div data-vista="anno" hidden>
+      {decenni.map(({ chiave, id, titolo: nome, n }) => (
+        <section class="comune" aria-labelledby={id} data-decennio-sezione={chiave}>
+          <h2 id={id}>
+            {nome}{' '}
+            <span class="numero" data-numero>
+              {quante(n)}
+            </span>
+          </h2>
+          <ul class="schede" />
+        </section>
+      ))}
+    </div>
+    <div class="tabella-scorrevole" data-vista="tabella" hidden>
+      <table>
+        <caption class="solo-lettori">{t('mappa.tabellaDidascalia')}</caption>
+        <thead>
+          <tr>
+            {COLONNE.map((c) => {
+              const nome = nomiColonne[c];
+              return (
+                <th scope="col" data-colonna={c}>
+                  <button type="button">{nome}</button>
+                </th>
+              );
+            })}
+          </tr>
+        </thead>
+        <tbody />
+      </table>
+    </div>
   </div>
 </Base>
 
@@ -175,5 +244,74 @@ const quante = (n: number) => (n === 1 ? t('opere.una') : t('opere.piu').replace
     margin: 0;
     padding: 0;
     list-style: none;
+  }
+  .viste {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spazio-2) var(--spazio-4);
+    margin-block-end: var(--spazio-5);
+  }
+  .viste[hidden] {
+    display: none;
+  }
+  .viste p {
+    margin: 0;
+    font-weight: 600;
+  }
+  .viste > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spazio-2);
+  }
+  .viste button {
+    min-height: var(--bersaglio-min);
+    padding-inline: var(--spazio-4);
+    font: inherit;
+    color: var(--colore-testo);
+    background: var(--colore-superficie);
+    border: 1px solid var(--colore-bordo);
+    border-radius: var(--raggio-m);
+    cursor: pointer;
+  }
+  .viste button[aria-pressed='true'] {
+    color: var(--colore-sull-accento);
+    background: var(--colore-accento-scuro);
+    border-color: var(--colore-accento-scuro);
+  }
+  .tabella-scorrevole {
+    overflow-x: auto;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .tabella-scorrevole :global(th),
+  .tabella-scorrevole :global(td) {
+    padding: var(--spazio-2) var(--spazio-3);
+    text-align: start;
+    vertical-align: top;
+    border-block-end: 1px solid var(--colore-bordo);
+  }
+  th button {
+    display: inline-flex;
+    gap: var(--spazio-2);
+    min-height: var(--bersaglio-min);
+    align-items: center;
+    padding: 0 var(--spazio-1);
+    font: inherit;
+    font-weight: 700;
+    color: inherit;
+    background: none;
+    border: 0;
+    cursor: pointer;
+  }
+  th[aria-sort='ascending'] button::after {
+    content: '\25B2';
+    font-size: 0.7em;
+  }
+  th[aria-sort='descending'] button::after {
+    content: '\25BC';
+    font-size: 0.7em;
   }
 </style>

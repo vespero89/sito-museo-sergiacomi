@@ -2,14 +2,19 @@ import { describe, expect, it } from 'vitest';
 import {
   MATERIALE_NON_INDICATO,
   conta,
+  fermate,
   filtra,
   formattaKm,
   leggiStato,
   limitiAnni,
   ordinaPerDistanza,
+  ordinaTabella,
+  prossimaFermata,
+  raggruppaPerDecennio,
   raggruppaPerLuogo,
   scriviStato,
   slugComune,
+  tacche,
   tileMappa,
   type OperaMappa,
 } from '../../src/lib/mappa';
@@ -25,6 +30,8 @@ const opera = (id: string, extra: Partial<OperaMappa> = {}): OperaMappa => ({
   luogoId: `luogo-${id}`,
   luogoNome: `Luogo ${id}`,
   indicativa: false,
+  comuneNome: 'Offida',
+  categoria: 'Scultura',
   lat: 42.9,
   lon: 13.68,
   ...extra,
@@ -53,7 +60,14 @@ describe('state in the address', () => {
       fino: 1975,
       comune: 'offida',
       materiale: 'bronzo',
+      vista: 'luogo',
     });
+  });
+  it('reads the view and ignores a view that does not exist', () => {
+    expect(stato('?vista=anno').vista).toBe('anno');
+    expect(stato('?vista=tabella').vista).toBe('tabella');
+    expect(stato('?vista=mappa').vista).toBe('luogo');
+    expect(stato('').vista).toBe('luogo');
   });
   it('takes a year outside the limits to the nearest limit', () => {
     expect(stato('?fino=1912').fino).toBe(1934);
@@ -64,6 +78,7 @@ describe('state in the address', () => {
       fino: 1994,
       comune: undefined,
       materiale: undefined,
+      vista: 'luogo',
     });
     expect(stato('?fino=1975.5').fino).toBe(1994);
     expect(stato('?fino=').fino).toBe(1994);
@@ -74,6 +89,87 @@ describe('state in the address', () => {
     const s = stato('?fino=1975&comune=offida&materiale=non-indicato');
     expect(scriviStato(s, LIMITI)).toBe('?fino=1975&comune=offida&materiale=non-indicato');
     expect(stato(scriviStato(s, LIMITI))).toEqual(s);
+  });
+  it('writes the view only when it is not the default, and reads it back', () => {
+    expect(scriviStato(stato('?vista=luogo'), LIMITI)).toBe('');
+    const s = stato('?fino=1975&vista=tabella');
+    expect(scriviStato(s, LIMITI)).toBe('?fino=1975&vista=tabella');
+    expect(stato(scriviStato(s, LIMITI))).toEqual(s);
+  });
+});
+
+describe('marks of the slider', () => {
+  it('has one mark per decade inside the limits', () => {
+    expect(tacche({ min: 1934, max: 1994 })).toEqual([1940, 1950, 1960, 1970, 1980, 1990]);
+    expect(tacche({ min: 1940, max: 1950 })).toEqual([1940, 1950]);
+    expect(tacche({ min: 1951, max: 1958 })).toEqual([]);
+  });
+});
+
+describe('the view by decade', () => {
+  it('groups by decade, oldest first, ordered by year inside, with the works of no certain year last', () => {
+    const gruppi = raggruppaPerDecennio([
+      opera('x', { anno: undefined, certa: false }),
+      opera('b', { anno: 1967 }),
+      opera('a', { anno: 1934 }),
+      opera('c', { anno: 1962 }),
+      opera('d', { anno: 1999 }),
+    ]);
+    expect(gruppi.map((g) => g.decennio)).toEqual([1930, 1960, 1990, undefined]);
+    expect(gruppi[1]!.opere.map((o) => o.id)).toEqual(['c', 'b']);
+    expect(gruppi[3]!.opere.map((o) => o.id)).toEqual(['x']);
+  });
+  it('is empty with no works', () => {
+    expect(raggruppaPerDecennio([])).toEqual([]);
+  });
+});
+
+describe('the table', () => {
+  const T = [
+    opera('b', { titolo: 'Bruno', anno: 1980, comuneNome: 'Teramo', materiali: ['marmo'] }),
+    opera('a', { titolo: 'Ágata', anno: 1960, comuneNome: 'Offida', materiali: [] }),
+    opera('c', { titolo: 'Carlo', anno: undefined, certa: false, comuneNome: 'Fermo' }),
+    opera('d', { titolo: 'Dino', anno: 1960, comuneNome: 'Ascoli', materiali: ['bronzo'] }),
+  ];
+  const ids = (l: { id: string }[]) => l.map((o) => o.id).join('');
+  it('sorts by year both ways, the work with no year last, ties by title', () => {
+    expect(ids(ordinaTabella(T, 'anno', 'asc'))).toBe('adbc');
+    expect(ids(ordinaTabella(T, 'anno', 'desc'))).toBe('badc');
+  });
+  it('sorts text in Italian order (accents do not break it) and the empty material last', () => {
+    expect(ids(ordinaTabella(T, 'titolo', 'asc'))).toBe('abcd');
+    expect(ids(ordinaTabella(T, 'titolo', 'desc'))).toBe('dcba');
+    expect(ids(ordinaTabella(T, 'comune', 'asc'))).toBe('dcab');
+    expect(ids(ordinaTabella(T, 'materiale', 'asc'))).toBe('cdba');
+    expect(ids(ordinaTabella(T, 'materiale', 'desc'))).toBe('bcda');
+  });
+  it('does not change the list it is given', () => {
+    const copia = [...T];
+    ordinaTabella(T, 'titolo', 'desc');
+    expect(T).toEqual(copia);
+  });
+});
+
+describe('the stops of the animation', () => {
+  const DATI = [1934, 1951, 1952, 1952, 1955, 1967, 1967, 1967].map((anno, i) =>
+    opera(`o${i}`, { anno }),
+  );
+  const piano = fermate([...DATI, opera('senza', { anno: undefined, certa: false })]);
+  it('stops only on years with works, and the work with no year adds no stop', () => {
+    expect(piano.map((f) => f.anno)).toEqual([1934, 1951, 1952, 1955, 1967]);
+    expect(piano.map((f) => f.nuove)).toEqual([1, 1, 2, 1, 3]);
+  });
+  it('is longer for two works in the year and after the long jump, and names the jump', () => {
+    expect(piano.map((f) => f.durata)).toEqual([800, 1400, 1200, 800, 1800]);
+    expect(piano.map((f) => f.salto)).toEqual([undefined, 17, undefined, undefined, 12]);
+  });
+  it('gives the next stop after a year, also from a year with no stop, and nothing at the end', () => {
+    expect(prossimaFermata(piano, 1934)?.anno).toBe(1951);
+    expect(prossimaFermata(piano, 1940)?.anno).toBe(1951);
+    expect(prossimaFermata(piano, 1967)).toBeUndefined();
+  });
+  it('has no stops with no works', () => {
+    expect(fermate([])).toEqual([]);
   });
 });
 

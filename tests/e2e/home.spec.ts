@@ -23,9 +23,7 @@ for (const [nome, vista] of [
 
     test('an entrance can be reached and opened with the keyboard', async ({ page }) => {
       await page.goto('/');
-      const link = page
-        .locator('#per-chi-viene')
-        .getByRole('link', { name: 'Didattica', exact: true });
+      const link = page.locator('#su-misura').getByRole('link', { name: 'Didattica', exact: true });
       await link.focus();
       await expect(link).toBeFocused();
       await page.keyboard.press('Enter');
