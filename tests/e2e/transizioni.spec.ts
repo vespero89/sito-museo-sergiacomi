@@ -4,9 +4,14 @@ import { LARGO, expect, test } from './helpers.ts';
 
 const SLUG = 'le-merlettaie';
 
-/** Records, on the page that appears, whether the browser started a view transition. */
+/**
+ * Records, as the old page is left, whether the browser accepted a view transition for the
+ * navigation. The check is on `pageswap` (the page being left), not on `pagereveal` (the new
+ * page): the second one also depends on how fast the headless browser paints the two pages, and
+ * under load it dropped the transition at random while the first never did.
+ */
 const registraTransizione = () => {
-  addEventListener('pagereveal', (e) => {
+  addEventListener('pageswap', (e) => {
     sessionStorage.setItem(
       'vt',
       (e as Event & { viewTransition?: unknown }).viewTransition ? 'si' : 'no',
